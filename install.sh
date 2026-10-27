@@ -14,7 +14,7 @@
 set -eo pipefail
 
 VDE_VERSION="1.0.0"
-REPO_TARBALL="https://github.com/VicRoger27/VDE/archive/refs/heads/main.tar.gz"
+REPO_TARBALL="https://github.com/VicRoger27/VDE/archive/refs/heads/main.tar.gz?v=$(date +%s 2>/dev/null || echo 1)"
 REPO_URL="https://github.com/VicRoger27/VDE.git"
 INSTALL_PREFIX="/usr/share/vde"
 BIN_PREFIX="/usr/local/bin"
