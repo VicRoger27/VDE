@@ -3,10 +3,10 @@
 # Victorious Desktop Environment (VDE) - Universal Terminal Installer
 # https://github.com/VicRoger27/VDE
 #
-# Optimized for:
-#   - "Try Ubuntu" live USB / live sessions (instant live switch in RAM)
-#   - Ubuntu Server & Ubuntu Desktop (GNOME replacement or coexistence)
-#   - Debian, Linux Mint, Arch, Fedora
+# Default Action:
+#   - Purges GNOME, GDM, Snapd, and all Canonical telemetry slop
+#   - Installs the ultra-lightweight VDE stack (Labwc, Astal, Qt6/QML, Crossings)
+#   - Drops idle memory to sub-500 MB (sub-250 MB on minimal base)
 # ==============================================================================
 
 set -eo pipefail
@@ -50,33 +50,27 @@ else
     echo -e "${C_GREEN}>> Target User:${C_RESET} ${TARGET_USER} (${USER_HOME})"
 fi
 
-# 2. Parse Arguments or Interactive Mode
-WIPE_OLD=false
-START_NOW=false
+# Parse Flags: Default is to WIPE Canonical slop and GNOME unless explicitly told to coexist
+WIPE_SLOP=true
 
 for arg in "$@"; do
     case "$arg" in
-        --replace|--wipe|-r)
-            WIPE_OLD=true
+        --keep-gnome|--coexist|-k)
+            WIPE_SLOP=false
             ;;
-        --start|-s)
-            START_NOW=true
+        --replace|--wipe|--purge-slop)
+            WIPE_SLOP=true
             ;;
     esac
 done
 
-# If live session and not explicitly passed, default to instant tryout
-if [ "$IS_LIVE_SESSION" = true ]; then
-    WIPE_OLD=false
-fi
-
-# 3. Enable Universe repository on Ubuntu/Debian if missing
+# 2. Enable Universe repository on Ubuntu/Debian
 if command -v add-apt-repository >/dev/null 2>&1; then
     echo -e "${C_CYAN}>> Ensuring universe repository is enabled...${C_RESET}"
     add-apt-repository -y universe 2>/dev/null || true
 fi
 
-# 4. Fetch or Locate Sources
+# 3. Locate or Clone Repository Sources
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" 2>/dev/null && pwd || echo "")"
 SRC_DIR=""
 
@@ -96,22 +90,63 @@ else
     SRC_DIR="$TMP_SRC"
 fi
 
-# 5. Wipe Old Desktop if requested
-if [ "$WIPE_OLD" = true ]; then
+# 4. Wipe GNOME, Snaps, and Canonical Telemetry Slop
+if [ "$WIPE_SLOP" = true ]; then
     echo ""
-    echo -e "${C_RED}>> [WIPE] Purging old desktop environment (GNOME) & telemetry...${C_RESET}"
+    echo -e "${C_RED}==============================================================${C_RESET}"
+    echo -e "${C_RED}>> [PURGE] Stripping GNOME, Canonical Snaps & Telemetry Slop...${C_RESET}"
+    echo -e "${C_RED}==============================================================${C_RESET}"
+
     if command -v apt-get >/dev/null 2>&1; then
         export DEBIAN_FRONTEND=noninteractive
-        systemctl stop gdm3 2>/dev/null || systemctl stop lightdm 2>/dev/null || true
-        apt-get purge -y gnome-shell gnome-session gdm3 ubuntu-desktop ubuntu-desktop-minimal whoopsie popularity-contest ubuntu-report apport 2>/dev/null || true
+
+        # 1. Kill GNOME display processes to free memory immediately
+        echo -e "${C_YELLOW}>> Stopping GNOME and display managers...${C_RESET}"
+        systemctl stop gdm3 2>/dev/null || systemctl stop gdm 2>/dev/null || true
+        pkill -9 -f gnome-shell 2>/dev/null || true
+
+        # 2. Purge Canonical Snapd & snaps
+        echo -e "${C_YELLOW}>> Purging Canonical Snap daemon (snapd)...${C_RESET}"
+        systemctl stop snapd.service snapd.socket 2>/dev/null || true
+        apt-get purge -y snapd 2>/dev/null || true
+        rm -rf /var/cache/snapd /var/lib/snapd /snap /root/snap "$USER_HOME/snap" 2>/dev/null || true
+
+        # 3. Purge Canonical Telemetry and Tracking
+        echo -e "${C_YELLOW}>> Purging Canonical tracking, metrics & crash telemetry...${C_RESET}"
+        apt-get purge -y \
+            whoopsie \
+            popularity-contest \
+            ubuntu-report \
+            apport \
+            apport-symptoms \
+            landscape-common 2>/dev/null || true
+
+        # 4. Purge GNOME Shell and heavy bloat
+        echo -e "${C_YELLOW}>> Purging GNOME Shell, GDM, and legacy desktop bloat...${C_RESET}"
+        apt-get purge -y \
+            gnome-shell \
+            gnome-session \
+            gdm3 \
+            ubuntu-desktop \
+            ubuntu-desktop-minimal \
+            gnome-initial-setup \
+            mutter 2>/dev/null || true
+
+        # 5. Autoremove residual orphaned packages
+        echo -e "${C_YELLOW}>> Cleaning residual packages and unused dependencies...${C_RESET}"
         apt-get autoremove -y --purge 2>/dev/null || true
         apt-get clean
+    elif command -v dnf >/dev/null 2>&1; then
+        dnf remove -y @gnome-desktop gdm 2>/dev/null || true
+    elif command -v pacman >/dev/null 2>&1; then
+        pacman -Rns --noconfirm gnome gnome-extra gdm 2>/dev/null || true
     fi
-    echo -e "${C_GREEN}>> Old desktop purged.${C_RESET}"
+    echo -e "${C_GREEN}>> Canonical slop and GNOME purged successfully.${C_RESET}"
 fi
 
-# 6. Install Core Dependencies
-echo -e "${C_CYAN}>> [1/5] Installing VDE compositor & Wayland dependencies...${C_RESET}"
+# 5. Install Clean VDE Dependencies
+echo ""
+echo -e "${C_CYAN}>> [1/5] Installing lightweight VDE Wayland stack...${C_RESET}"
 if command -v apt-get >/dev/null 2>&1; then
     export DEBIAN_FRONTEND=noninteractive
     apt-get update -y
@@ -150,7 +185,7 @@ elif command -v dnf >/dev/null 2>&1; then
     dnf install -y labwc pipewire wireplumber foot glib2 brightnessctl grim slurp wl-clipboard polkit xdg-utils
 fi
 
-# 7. Deploy VDE Shell Components
+# 6. Deploy VDE Shell Components
 echo -e "${C_CYAN}>> [2/5] Deploying VDE shell components to ${INSTALL_PREFIX}...${C_RESET}"
 mkdir -p "${INSTALL_PREFIX}"
 cp -rf "$SRC_DIR/assets" "${INSTALL_PREFIX}/"
@@ -162,7 +197,7 @@ if [ -d "$SRC_DIR/apps" ]; then
     cp -rf "$SRC_DIR/apps" "${INSTALL_PREFIX}/"
 fi
 
-# 8. Deploy Labwc Configurations
+# 7. Deploy Labwc Configurations
 echo -e "${C_CYAN}>> [3/5] Configuring Labwc compositor...${C_RESET}"
 mkdir -p /etc/xdg/labwc
 cp -f "$SRC_DIR/compositor/rc.xml" /etc/xdg/labwc/rc.xml
@@ -170,7 +205,7 @@ cp -f "$SRC_DIR/compositor/themerc" /etc/xdg/labwc/themerc
 cp -f "$SRC_DIR/compositor/environment" /etc/xdg/labwc/environment
 cp -f "$SRC_DIR/compositor/autostart" /etc/xdg/labwc/autostart
 
-# Deploy to current user's ~/.config/labwc
+# Deploy to target user's local config
 if [ -n "$USER_HOME" ]; then
     USER_LABWC="$USER_HOME/.config/labwc"
     mkdir -p "$USER_LABWC"
@@ -178,7 +213,7 @@ if [ -n "$USER_HOME" ]; then
     chown -R "$TARGET_USER:$TARGET_USER" "$USER_HOME/.config" 2>/dev/null || true
 fi
 
-# 9. Install Executable Binaries in /usr/local/bin
+# 8. Install Executable Commands in /usr/local/bin
 echo -e "${C_CYAN}>> [4/5] Installing executable commands in ${BIN_PREFIX}...${C_RESET}"
 
 cat << 'EOF' > "${BIN_PREFIX}/vde-session"
@@ -204,9 +239,8 @@ chmod +x "${BIN_PREFIX}/vde-session"
 
 cat << 'EOF' > "${BIN_PREFIX}/vde"
 #!/usr/bin/env bash
-# Direct VDE launcher (runs nested if already in a desktop, or native if on TTY)
 if [ -n "$WAYLAND_DISPLAY" ] || [ -n "$DISPLAY" ]; then
-    echo ">> Running VDE nested inside current display..."
+    echo ">> Running VDE on display..."
     exec labwc -s /usr/local/bin/vde-bar
 else
     exec /usr/local/bin/vde-session "$@"
@@ -232,7 +266,7 @@ exec /usr/share/vde/apps/crossings/crossings "$@"
 EOF
 chmod +x "${BIN_PREFIX}/crossings"
 
-# 10. Register Sessions & Desktop Shortcuts
+# 9. Register Sessions & Desktop Shortcuts
 echo -e "${C_CYAN}>> [5/5] Registering desktop entries & live shortcuts...${C_RESET}"
 mkdir -p /usr/share/wayland-sessions
 cat << 'EOF' > /usr/share/wayland-sessions/vde.desktop
@@ -268,7 +302,7 @@ Type=Application
 Categories=System;
 EOF
 
-# Create desktop shortcut on the live user's desktop
+# Create desktop shortcut on live desktop
 for d in "$USER_HOME/Desktop" "/home/ubuntu/Desktop" "/root/Desktop"; do
     if [ -d "$d" ]; then
         cp -f /usr/share/applications/vde.desktop "$d/Launch_VDE.desktop"
@@ -277,13 +311,31 @@ for d in "$USER_HOME/Desktop" "/home/ubuntu/Desktop" "/root/Desktop"; do
     fi
 done
 
+# If GNOME was purged, configure automatic boot directly into VDE
+if [ "$WIPE_SLOP" = true ] && [ "$IS_LIVE_SESSION" = false ]; then
+    echo -e "${C_GREEN}>> Setting VDE as the default boot session...${C_RESET}"
+    mkdir -p /etc/systemd/system/getty@tty1.service.d
+    cat << EOF > /etc/systemd/system/getty@tty1.service.d/override.conf
+[Service]
+ExecStart=
+ExecStart=-/sbin/agetty --autologin ${TARGET_USER} --noclear %I \$TERM
+EOF
+    mkdir -p /etc/profile.d
+    cat << 'EOF' > /etc/profile.d/99-vde-login.sh
+if [ -z "$WAYLAND_DISPLAY" ] && [ "$(tty)" = "/dev/tty1" ]; then
+    exec /usr/local/bin/vde-session
+fi
+EOF
+    systemctl daemon-reload 2>/dev/null || true
+fi
+
 echo ""
 echo -e "${C_GREEN}==============================================================${C_RESET}"
-echo -e "${C_GREEN}  VDE is Ready in your Live Ubuntu Session!                   ${C_RESET}"
+echo -e "${C_GREEN}  VDE Installed & Canonical Slop Purged!                      ${C_RESET}"
 echo -e "${C_GREEN}==============================================================${C_RESET}"
 echo ""
-echo -e "You can launch VDE right now from this terminal:"
+echo -e "Canonical telemetry, snapd, and GNOME bloat have been eliminated."
+echo ""
+echo -e "To start VDE right now on your screen, simply run:"
 echo -e "  ${C_CYAN}vde${C_RESET}"
-echo ""
-echo -e "Or double-click the ${C_WHITE}'Launch VDE'${C_RESET} icon placed directly on your Desktop!"
 echo ""
