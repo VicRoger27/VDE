@@ -208,9 +208,14 @@ fi
 echo ""
 echo -e "${C_CYAN}>> [1/5] Installing lightweight VDE Wayland stack...${C_RESET}"
 if command -v apt-get >/dev/null 2>&1; then
+    if command -v add-apt-repository >/dev/null 2>&1; then
+        add-apt-repository -y universe 2>/dev/null || true
+    fi
     apt_run update -y
     apt_run install -y --no-install-recommends \
         labwc \
+        waybar \
+        swaybg \
         wayland-protocols \
         libgl1-mesa-dri \
         pipewire \
@@ -227,6 +232,8 @@ if command -v apt-get >/dev/null 2>&1; then
         fonts-dejavu-core 2>/dev/null || \
     apt_run install -y --no-install-recommends \
         labwc \
+        waybar \
+        swaybg \
         wayland-protocols \
         libgl1-mesa-dri \
         pipewire \
@@ -264,6 +271,7 @@ cp -f "$SRC_DIR/compositor/rc.xml" /etc/xdg/labwc/rc.xml
 cp -f "$SRC_DIR/compositor/themerc" /etc/xdg/labwc/themerc
 cp -f "$SRC_DIR/compositor/environment" /etc/xdg/labwc/environment
 cp -f "$SRC_DIR/compositor/autostart" /etc/xdg/labwc/autostart
+cp -f "$SRC_DIR/compositor/menu.xml" /etc/xdg/labwc/menu.xml 2>/dev/null || true
 
 # Deploy to target user's local config
 if [ -n "$USER_HOME" ]; then

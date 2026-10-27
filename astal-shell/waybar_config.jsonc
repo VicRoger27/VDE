@@ -1,0 +1,94 @@
+{
+  "layer": "top",
+  "position": "bottom",
+  "height": 48,
+  "margin-bottom": 0,
+  "margin-left": 0,
+  "margin-right": 0,
+  "spacing": 4,
+
+  "modules-left": [
+    "custom/vde_pill"
+  ],
+
+  "modules-center": [
+    "custom/start",
+    "custom/terminal",
+    "custom/files",
+    "custom/settings",
+    "wlr/taskbar"
+  ],
+
+  "modules-right": [
+    "tray",
+    "pulseaudio",
+    "network",
+    "clock"
+  ],
+
+  "custom/vde_pill": {
+    "format": "  VDE ",
+    "tooltip": false
+  },
+
+  "custom/start": {
+    "format": " ⊞ ",
+    "tooltip-format": "Start Menu (Win Key)",
+    "on-click": "vde-launcher || qdbus org.vde.Launcher /Launcher org.vde.Launcher.Toggle"
+  },
+
+  "custom/terminal": {
+    "format": "  ",
+    "tooltip-format": "Terminal (Super+Enter)",
+    "on-click": "foot"
+  },
+
+  "custom/files": {
+    "format": " 📁 ",
+    "tooltip-format": "File Explorer",
+    "on-click": "xdg-open ~"
+  },
+
+  "custom/settings": {
+    "format": " ⚙ ",
+    "tooltip-format": "Crossings Settings",
+    "on-click": "crossings"
+  },
+
+  "wlr/taskbar": {
+    "format": "{icon}",
+    "icon-size": 20,
+    "tooltip-format": "{title}",
+    "on-click": "activate",
+    "on-click-middle": "close",
+    "ignore-list": [
+      "waybar"
+    ]
+  },
+
+  "tray": {
+    "icon-size": 18,
+    "spacing": 8
+  },
+
+  "clock": {
+    "format": "{:%I:%M %p\n%m/%d/%Y}",
+    "tooltip-format": "<big>{:%B %Y}</big>\n<tt><small>{calendar}</small></tt>"
+  },
+
+  "pulseaudio": {
+    "format": "{icon} {volume}%",
+    "format-muted": "🔇 Muted",
+    "format-icons": {
+      "default": ["🔈", "🔉", "🔊"]
+    },
+    "on-click": "pavucontrol || pactl set-sink-mute @DEFAULT_SINK@ toggle"
+  },
+
+  "network": {
+    "format-wifi": " {signalStrength}%",
+    "format-ethernet": "󰈀 Wired",
+    "format-disconnected": "󰖪 Offline",
+    "tooltip-format": "{ifname}: {ipaddr}/{cidr}"
+  }
+}

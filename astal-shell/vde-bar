@@ -12,13 +12,15 @@ if [ ! -f "style.css" ]; then
     fi
 fi
 
-# Run Astal Shell via ags or astal CLI
+# Run Astal Shell via ags or astal CLI, with Waybar fallback
 if command -v ags >/dev/null 2>&1; then
     exec ags run app.ts "$@"
 elif command -v astal >/dev/null 2>&1; then
     exec astal -i app.ts "$@"
+elif command -v waybar >/dev/null 2>&1; then
+    echo ">> [VDE Shell] Starting VDE Mica Taskbar via Waybar..."
+    exec waybar -c "$SCRIPT_DIR/waybar_config.jsonc" -s "$SCRIPT_DIR/waybar_style.css" "$@"
 else
-    echo "[VDE Shell Error] Neither 'ags' nor 'astal' command found in PATH." >&2
-    echo "Please install Astal (AGS v2) or run inside the VDE development container." >&2
+    echo "[VDE Shell Error] Neither 'ags', 'astal', nor 'waybar' found in PATH." >&2
     exit 1
 fi

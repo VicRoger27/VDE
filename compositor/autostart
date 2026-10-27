@@ -28,8 +28,13 @@ else
     command -v pipewire >/dev/null 2>&1 && pipewire &
     command -v wireplumber >/dev/null 2>&1 && wireplumber &
 
-    # Astal Taskbar & Quick Settings Shell Daemon
-    if [ -x "$VDE_DIR/../astal-shell/vde-bar" ]; then
+    # Wallpaper / Canvas Background
+    command -v swaybg >/dev/null 2>&1 && swaybg -c '#18181b' &
+
+    # Taskbar & Shell Runner (Astal / Waybar fallback)
+    if [ -x "/usr/local/bin/vde-bar" ]; then
+        /usr/local/bin/vde-bar &
+    elif [ -x "$VDE_DIR/../astal-shell/vde-bar" ]; then
         "$VDE_DIR/../astal-shell/vde-bar" &
     fi
 

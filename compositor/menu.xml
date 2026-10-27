@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openbox_menu>
+  <menu id="root-menu" label="Victorious Desktop Environment">
+    <separator label="Victorious Desktop (VDE)" />
+    <item label="Open Terminal">
+      <action name="Execute" command="foot || x-terminal-emulator || gnome-terminal" />
+    </item>
+    <item label="Start Launcher">
+      <action name="Execute" command="vde-launcher" />
+    </item>
+    <item label="File Manager">
+      <action name="Execute" command="xdg-open ~" />
+    </item>
+    <item label="Crossings Settings">
+      <action name="Execute" command="crossings" />
+    </item>
+    <separator />
+    <item label="Reload VDE Shell">
+      <action name="Execute" command="pkill -9 -f waybar 2>/dev/null; /usr/local/bin/vde-bar &amp;" />
+    </item>
+    <item label="Reconfigure Window Manager">
+      <action name="Reconfigure" />
+    </item>
+    <separator />
+    <item label="Log Out / Exit">
+      <action name="Exit" />
+    </item>
+  </menu>
+</openbox_menu>
