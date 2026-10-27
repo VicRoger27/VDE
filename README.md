@@ -6,13 +6,24 @@ An ultra-lightweight, privacy-centric Linux desktop environment capturing modern
 
 ## ⚡ 1-Command Terminal Installation
 
-### Option 1: Clean Replace (Wipe Old Desktop / GNOME / Bloat & Install VDE)
-Runs inside any existing Ubuntu Server or GNOME desktop, purges GNOME, GDM, and Canonical telemetry bloat, and replaces it with VDE:
+### 🟢 Inside "Try Ubuntu" (Live USB / Live Session)
+Boot any standard Ubuntu live USB/ISO ("Try Ubuntu"), open a terminal, and run:
+```bash
+curl -sSL https://raw.githubusercontent.com/VicRoger27/VDE/main/install.sh | sudo bash
+```
+Once it finishes, type `vde` in your terminal or double-click the **Launch VDE** icon created on your desktop!
+
+---
+
+### 🔄 On Installed Systems: Clean Replace (Wipe Old Desktop / GNOME / Bloat)
+Purges GNOME, GDM, and Canonical telemetry bloat, and replaces it with VDE:
 ```bash
 curl -sSL https://raw.githubusercontent.com/VicRoger27/VDE/main/install.sh | sudo bash -s -- --replace
 ```
 
-### Option 2: Coexist (Install Alongside Existing Desktop)
+---
+
+### 📦 Coexist (Install Alongside Existing Desktop)
 ```bash
 curl -sSL https://raw.githubusercontent.com/VicRoger27/VDE/main/install.sh | sudo bash
 ```
