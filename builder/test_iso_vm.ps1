@@ -1,5 +1,5 @@
 # VDE VirtualBox VM Test Runner (PowerShell / Windows Native)
-# Launches a native Virtual Machine for testing VDE ISOs without WSL or containers
+# Launches a native Virtual Machine for testing VDE ISOs on top of Ubuntu Server backbone
 
 param (
     [string]$IsoPath = "vde-live-amd64.iso",
@@ -16,11 +16,12 @@ if (-not (Test-Path $VBoxManage)) {
     exit 1
 }
 
-# Resolve ISO path: fallback to local ISO folder if build ISO doesn't exist yet
+# Resolve ISO path: check for built VDE live ISO, or fallback to Ubuntu Server backbone ISO in C:\Users\Victor\ISO
 if (-not (Test-Path $IsoPath)) {
     $fallbackIso = "C:\Users\Victor\ISO\ubuntu-26.04.1-live-server-amd64.iso"
     if (Test-Path $fallbackIso) {
-        Write-Host "Notice: $IsoPath not found, using local ISO cache: $fallbackIso" -ForegroundColor Yellow
+        Write-Host "Notice: $IsoPath not yet generated. Attaching Ubuntu Server backbone ISO:" -ForegroundColor Yellow
+        Write-Host "  $fallbackIso" -ForegroundColor Yellow
         $IsoPath = $fallbackIso
     } else {
         Write-Error "No valid ISO found at $IsoPath or $fallbackIso"
@@ -30,26 +31,28 @@ if (-not (Test-Path $IsoPath)) {
 
 $resolvedIso = (Resolve-Path $IsoPath).Path
 Write-Host "==========================================================" -ForegroundColor Cyan
-Write-Host " Configuring VDE Native VirtualBox VM ($VmName)" -ForegroundColor Cyan
-Write-Host " ISO: $resolvedIso" -ForegroundColor Cyan
+Write-Host " VDE VirtualBox VM Manager" -ForegroundColor Cyan
+Write-Host " Backbone ISO: $resolvedIso" -ForegroundColor Cyan
 Write-Host " RAM: ${RamMB} MB | CPUs: $Cpus | Graphics: VMSVGA 128MB" -ForegroundColor Cyan
 Write-Host "==========================================================" -ForegroundColor Cyan
 
-# Check if VM already exists; unregister/remove if recreating
-$existing = & $VBoxManage list vms | Select-String "`"$VmName`""
-if ($existing) {
-    Write-Host ">> Powering off and replacing existing VM '$VmName'..." -ForegroundColor Yellow
+# Terminate existing running instance if active
+$running = & $VBoxManage list runningvms | Select-String "`"$VmName`""
+if ($running) {
+    Write-Host ">> Powering off active instance of '$VmName'..." -ForegroundColor Yellow
     & $VBoxManage controlvm $VmName poweroff 2>$null
     Start-Sleep -Seconds 1
-    & $VBoxManage unregistervm $VmName --delete 2>$null
 }
 
-# 1. Create VM
-Write-Host ">> Creating VM definition..."
-& $VBoxManage createvm --name $VmName --ostype "Ubuntu_64" --register
+# Check if VM definition exists; reconfigure or recreate
+$existing = & $VBoxManage list vms | Select-String "`"$VmName`""
+if (-not $existing) {
+    Write-Host ">> Registering VM definition in VirtualBox..."
+    & $VBoxManage createvm --name $VmName --ostype "Ubuntu_64" --register
+}
 
-# 2. Configure Hardware (CPUs, RAM, Graphics, EFI/BIOS)
-Write-Host ">> Configuring hardware specs..."
+# Configure VM Hardware
+Write-Host ">> Setting VM hardware parameters..."
 & $VBoxManage modifyvm $VmName `
     --cpus $Cpus `
     --memory $RamMB `
@@ -64,34 +67,31 @@ Write-Host ">> Configuring hardware specs..."
     --boot3 none `
     --boot4 none
 
-# 3. Attach Storage Controller and ISO
-Write-Host ">> Attaching optical drive with ISO..."
-& $VBoxManage storagectl $VmName --name "IDE Controller" --add ide
+# Attach storage controller and ISO
+& $VBoxManage storagectl $VmName --name "IDE Controller" --add ide 2>$null || true
 & $VBoxManage storageattach $VmName `
     --storagectl "IDE Controller" `
     --port 0 `
     --device 0 `
     --type dvddrive `
-    --medium $resolvedIso
+    --medium $resolvedIso 2>$null || true
 
-# 4. Generate direct launcher batch file in project root
+# Update 1-click batch launcher
 $batPath = Join-Path (Get-Location) "Launch_VDE_VM.bat"
 @"
 @echo off
 title VDE Virtual Machine Runner
 echo ========================================================
-echo  Launching VDE Live OS in VirtualBox GUI Window
+echo  Launching VDE Live OS ($VmName)
+echo  Backbone: Ubuntu Server 24.04
 echo ========================================================
 start "" "$VBoxGUI" --startvm "$VmName"
 "@ | Set-Content -Path $batPath -Encoding ASCII
 
-# 5. Launch the VM GUI via explorer.exe to trigger foreground interactive window
-Write-Host ">> Spawning VirtualBox GUI window on user desktop..." -ForegroundColor Green
-Start-Process "explorer.exe" -ArgumentList "`"$batPath`""
-
 Write-Host "==========================================================" -ForegroundColor Green
-Write-Host " VM '$VmName' launched!" -ForegroundColor Green
-Write-Host " If the window does not foreground automatically, run:" -ForegroundColor Yellow
-Write-Host "   .\Launch_VDE_VM.bat" -ForegroundColor Cyan
-Write-Host " or open Oracle VirtualBox from your Start Menu." -ForegroundColor Yellow
+Write-Host " VM '$VmName' is registered and ready in Oracle VirtualBox!" -ForegroundColor Green
+Write-Host " To display the VM window interactively on your screen:" -ForegroundColor Cyan
+Write-Host "   1. Open Oracle VirtualBox from your Windows Start Menu" -ForegroundColor White
+Write-Host "   2. Click 'VDE-Live-Test' in the left pane and press Start" -ForegroundColor White
+Write-Host "   OR double-click 'Launch_VDE_VM.bat' in your file explorer." -ForegroundColor White
 Write-Host "==========================================================" -ForegroundColor Green
