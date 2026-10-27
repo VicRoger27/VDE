@@ -1,0 +1,24 @@
+󠀁󠁃󠁏󠁃󠁟󠁈󠁄󠁒# CODEOWNERS for VDE
+# This file defines individuals or teams responsible for code in this repository.
+# Syntax reference: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# 1. Global Catch-All Owner
+# These owners will be the default reviewers for everything in the repo:
+* Victor Kostin
+
+# 2. Critical Configuration & Workflows
+/.github/ Victor Kostin
+/package.json Victor Kostin
+/tsconfig.json Victor Kostin
+
+# 3. Security & Governance Policies
+/SECURITY.md Victor Kostin
+/CODE_OF_CONDUCT.md Victor Kostin
+/CONTACT.md Victor Kostin
+
+# 4. Core Source Code
+/src/ Victor Kostin
+
+# 5. Documentation
+/docs/ Victor Kostin
+*.md Victor Kostin
