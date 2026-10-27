@@ -13,7 +13,7 @@
 
   <!-- Window Snapping & Placement -->
   <snapping>
-    <range>10</range>
+    <range inner="10" outer="10" />
     <topEdgeAction>Maximize</topEdgeAction>
     <leftEdgeAction>SnapLeft</leftEdgeAction>
     <rightEdgeAction>SnapRight</rightEdgeAction>
@@ -39,13 +39,9 @@
 
   <windowRules>
     <!-- Prevent layer-shell and VDE popups from displaying titlebars -->
-    <windowRule identifier="vde-bar" serverDecoration="none" />
-    <windowRule identifier="vde-launcher" serverDecoration="none" />
-    <windowRule identifier="vde-quicksettings" serverDecoration="none" />
-    <!-- Standard Dialogs -->
-    <windowRule windowType="dialog">
-      <action name="SetPosition" x="center" y="center" />
-    </windowRule>
+    <windowRule identifier="vde-bar" serverDecoration="no" />
+    <windowRule identifier="vde-launcher" serverDecoration="no" />
+    <windowRule identifier="vde-quicksettings" serverDecoration="no" />
   </windowRules>
 
   <!-- Keyboard Keybindings -->

@@ -6,6 +6,11 @@ export XDG_CURRENT_DESKTOP=VDE:wlroots
 export XDG_SESSION_DESKTOP=VDE
 export XDG_SESSION_TYPE=wayland
 
+# Renderer & Hardware/Software Fallbacks
+export WLR_RENDERER=gles2
+export WLR_RENDERER_ALLOW_SOFTWARE=1
+export WLR_NO_HARDWARE_CURSORS=1
+
 # Qt Platform Abstraction
 export QT_QPA_PLATFORM=wayland;xcb
 export QT_WAYLAND_DISABLE_WINDOWDECORATION=1

@@ -189,7 +189,8 @@ if [ "$WIPE_SLOP" = true ]; then
             ubuntu-desktop \
             ubuntu-desktop-minimal \
             gnome-initial-setup \
-            mutter 2>/dev/null || true
+            mutter \
+            mesa-vulkan-drivers 2>/dev/null || true
 
         # 5. Autoremove residual orphaned packages
         echo -e "${C_YELLOW}>> Cleaning residual packages and unused dependencies...${C_RESET}"
@@ -211,7 +212,7 @@ if command -v apt-get >/dev/null 2>&1; then
     apt_run install -y --no-install-recommends \
         labwc \
         wayland-protocols \
-        mesa-vulkan-drivers \
+        libgl1-mesa-dri \
         pipewire \
         wireplumber \
         foot \
@@ -227,7 +228,7 @@ if command -v apt-get >/dev/null 2>&1; then
     apt_run install -y --no-install-recommends \
         labwc \
         wayland-protocols \
-        mesa-vulkan-drivers \
+        libgl1-mesa-dri \
         pipewire \
         wireplumber \
         foot \
@@ -281,6 +282,11 @@ export XDG_CURRENT_DESKTOP=VDE
 export XDG_SESSION_DESKTOP=VDE
 export XDG_SESSION_TYPE=wayland
 
+# Guarantee universal Wayland rendering across VMs and hardware (OpenGL ES 2 + software fallback)
+export WLR_RENDERER=${WLR_RENDERER:-gles2}
+export WLR_RENDERER_ALLOW_SOFTWARE=1
+export WLR_NO_HARDWARE_CURSORS=1
+
 # Ensure XDG_RUNTIME_DIR is set and accessible
 if [ -z "$XDG_RUNTIME_DIR" ]; then
     export XDG_RUNTIME_DIR="/run/user/$(id -u)"
@@ -303,15 +309,30 @@ echo " Compositor: Labwc (wlroots layer-shell)"
 echo " Shell: Astal Taskbar & Qt6 Start Menu"
 echo "=========================================================="
 
-exec labwc -s /usr/local/bin/vde-bar
+labwc -s /usr/local/bin/vde-bar "$@"
+EXIT_CODE=$?
+
+if [ $EXIT_CODE -ne 0 ]; then
+    echo ">> GLES2 renderer exited with code $EXIT_CODE. Retrying with Pixman software renderer..."
+    export WLR_RENDERER=pixman
+    exec labwc -s /usr/local/bin/vde-bar "$@"
+fi
 EOF
 chmod +x "${BIN_PREFIX}/vde-session"
 
 cat << 'EOF' > "${BIN_PREFIX}/vde"
 #!/usr/bin/env bash
+export WLR_RENDERER=${WLR_RENDERER:-gles2}
+export WLR_RENDERER_ALLOW_SOFTWARE=1
+export WLR_NO_HARDWARE_CURSORS=1
+
 if [ -n "$WAYLAND_DISPLAY" ] || [ -n "$DISPLAY" ]; then
     echo ">> Running VDE on display..."
-    exec labwc -s /usr/local/bin/vde-bar
+    labwc -s /usr/local/bin/vde-bar "$@" || {
+        echo ">> Falling back to Pixman software renderer..."
+        export WLR_RENDERER=pixman
+        exec labwc -s /usr/local/bin/vde-bar "$@"
+    }
 else
     exec /usr/local/bin/vde-session "$@"
 fi
