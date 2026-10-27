@@ -1,0 +1,8 @@
+# Build artifacts and overlays
+*.squashfs
+builder/vde.squashfs
+builder/vde_overlay/
+*.iso
+build/
+*.o
+*.obj
