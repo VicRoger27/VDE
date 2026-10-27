@@ -4,6 +4,8 @@
 # https://github.com/VicRoger27/VDE
 #
 # Default Action:
+#   - Automatically clears and waits for Ubuntu background apt locks
+#   - Downloads sources without git dependency (via native wget/tarball)
 #   - Purges GNOME, GDM, Snapd, and all Canonical telemetry slop
 #   - Installs the ultra-lightweight VDE stack (Labwc, Astal, Qt6/QML, Crossings)
 #   - Drops idle memory to sub-500 MB (sub-250 MB on minimal base)
@@ -12,6 +14,7 @@
 set -eo pipefail
 
 VDE_VERSION="1.0.0"
+REPO_TARBALL="https://github.com/VicRoger27/VDE/archive/refs/heads/main.tar.gz"
 REPO_URL="https://github.com/VicRoger27/VDE.git"
 INSTALL_PREFIX="/usr/share/vde"
 BIN_PREFIX="/usr/local/bin"
@@ -34,7 +37,7 @@ echo ""
 if [ "$EUID" -ne 0 ]; then
     echo -e "${C_RED}[Error] This installer must be run as root.${C_RESET}"
     echo -e "Please run with sudo:"
-    echo -e "  ${C_YELLOW}curl -sSL https://raw.githubusercontent.com/VicRoger27/VDE/main/install.sh | sudo bash${C_RESET}"
+    echo -e "  ${C_YELLOW}wget -qO- https://raw.githubusercontent.com/VicRoger27/VDE/main/install.sh | sudo bash${C_RESET}"
     exit 1
 fi
 
@@ -64,13 +67,59 @@ for arg in "$@"; do
     esac
 done
 
+# Helper: Wait for and safely manage dpkg/apt locks
+wait_for_dpkg_lock() {
+    local waited=0
+    while fuser /var/lib/dpkg/lock-frontend >/dev/null 2>&1 || \
+          fuser /var/lib/dpkg/lock >/dev/null 2>&1 || \
+          fuser /var/lib/apt/lists/lock >/dev/null 2>&1; do
+        if [ "$waited" -eq 0 ]; then
+            echo -e "${C_YELLOW}>> Background system updater is holding dpkg lock.${C_RESET}"
+            echo -e "${C_YELLOW}>> Stopping background update services...${C_RESET}"
+            systemctl stop unattended-upgrades apt-daily.service apt-daily.timer apt-daily-upgrade.service apt-daily-upgrade.timer 2>/dev/null || true
+        fi
+        sleep 2
+        waited=$((waited + 2))
+        if [ "$waited" -ge 8 ]; then
+            echo -e "${C_YELLOW}>> Releasing stuck background updater locks...${C_RESET}"
+            pkill -9 -f "apt.systemd.daily" 2>/dev/null || true
+            pkill -9 -f "unattended-upgrade" 2>/dev/null || true
+            sleep 1
+            break
+        fi
+    done
+}
+
+# Helper: Resilient apt-get wrapper with automatic lock waiting and retry
+apt_run() {
+    export DEBIAN_FRONTEND=noninteractive
+    local max_tries=5
+    local attempt=1
+    while true; do
+        wait_for_dpkg_lock
+        if apt-get "$@"; then
+            return 0
+        else
+            echo -e "${C_YELLOW}>> apt-get was busy. Waiting 3s to retry ($attempt/$max_tries)...${C_RESET}"
+            wait_for_dpkg_lock
+            sleep 3
+            attempt=$((attempt + 1))
+            if [ "$attempt" -gt "$max_tries" ]; then
+                echo -e "${C_RED}[Error] apt-get failed after $max_tries attempts.${C_RESET}"
+                return 1
+            fi
+        fi
+    done
+}
+
 # 2. Enable Universe repository on Ubuntu/Debian
 if command -v add-apt-repository >/dev/null 2>&1; then
     echo -e "${C_CYAN}>> Ensuring universe repository is enabled...${C_RESET}"
+    wait_for_dpkg_lock
     add-apt-repository -y universe 2>/dev/null || true
 fi
 
-# 3. Locate or Clone Repository Sources
+# 3. Locate or Fetch Repository Sources (Zero git package dependency)
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" 2>/dev/null && pwd || echo "")"
 SRC_DIR=""
 
@@ -78,16 +127,24 @@ if [ -f "$SCRIPT_DIR/tokens/theme.json" ] && [ -d "$SCRIPT_DIR/compositor" ]; th
     SRC_DIR="$SCRIPT_DIR"
     echo -e "${C_GREEN}>> Using local VDE source tree:${C_RESET} ${SRC_DIR}"
 else
-    TMP_SRC="/tmp/vde-install-src"
-    echo -e "${C_YELLOW}>> Fetching latest VDE sources from GitHub into ${TMP_SRC}...${C_RESET}"
-    rm -rf "$TMP_SRC"
-    if command -v git >/dev/null 2>&1; then
-        git clone --depth 1 "$REPO_URL" "$TMP_SRC"
+    TMP_EXTRACT="/tmp/vde-extract"
+    echo -e "${C_YELLOW}>> Fetching latest VDE release from GitHub...${C_RESET}"
+    rm -rf "$TMP_EXTRACT"
+    mkdir -p "$TMP_EXTRACT"
+    if command -v wget >/dev/null 2>&1; then
+        wget -qO- "$REPO_TARBALL" | tar -xz -C "$TMP_EXTRACT"
+    elif command -v curl >/dev/null 2>&1; then
+        curl -sSL "$REPO_TARBALL" | tar -xz -C "$TMP_EXTRACT"
     else
-        apt-get update -y && apt-get install -y --no-install-recommends git ca-certificates
-        git clone --depth 1 "$REPO_URL" "$TMP_SRC"
+        apt_run update -y
+        apt_run install -y --no-install-recommends wget ca-certificates
+        wget -qO- "$REPO_TARBALL" | tar -xz -C "$TMP_EXTRACT"
     fi
-    SRC_DIR="$TMP_SRC"
+    SRC_DIR="$(ls -d ${TMP_EXTRACT}/VDE-* 2>/dev/null | head -n 1)"
+    if [ -z "$SRC_DIR" ] || [ ! -d "$SRC_DIR" ]; then
+        SRC_DIR="$TMP_EXTRACT"
+    fi
+    echo -e "${C_GREEN}>> Sources staged in:${C_RESET} ${SRC_DIR}"
 fi
 
 # 4. Wipe GNOME, Snaps, and Canonical Telemetry Slop
@@ -98,8 +155,6 @@ if [ "$WIPE_SLOP" = true ]; then
     echo -e "${C_RED}==============================================================${C_RESET}"
 
     if command -v apt-get >/dev/null 2>&1; then
-        export DEBIAN_FRONTEND=noninteractive
-
         # 1. Kill GNOME display processes to free memory immediately
         echo -e "${C_YELLOW}>> Stopping GNOME and display managers...${C_RESET}"
         systemctl stop gdm3 2>/dev/null || systemctl stop gdm 2>/dev/null || true
@@ -108,12 +163,12 @@ if [ "$WIPE_SLOP" = true ]; then
         # 2. Purge Canonical Snapd & snaps
         echo -e "${C_YELLOW}>> Purging Canonical Snap daemon (snapd)...${C_RESET}"
         systemctl stop snapd.service snapd.socket 2>/dev/null || true
-        apt-get purge -y snapd 2>/dev/null || true
+        apt_run purge -y snapd 2>/dev/null || true
         rm -rf /var/cache/snapd /var/lib/snapd /snap /root/snap "$USER_HOME/snap" 2>/dev/null || true
 
         # 3. Purge Canonical Telemetry and Tracking
         echo -e "${C_YELLOW}>> Purging Canonical tracking, metrics & crash telemetry...${C_RESET}"
-        apt-get purge -y \
+        apt_run purge -y \
             whoopsie \
             popularity-contest \
             ubuntu-report \
@@ -123,7 +178,7 @@ if [ "$WIPE_SLOP" = true ]; then
 
         # 4. Purge GNOME Shell and heavy bloat
         echo -e "${C_YELLOW}>> Purging GNOME Shell, GDM, and legacy desktop bloat...${C_RESET}"
-        apt-get purge -y \
+        apt_run purge -y \
             gnome-shell \
             gnome-session \
             gdm3 \
@@ -134,8 +189,8 @@ if [ "$WIPE_SLOP" = true ]; then
 
         # 5. Autoremove residual orphaned packages
         echo -e "${C_YELLOW}>> Cleaning residual packages and unused dependencies...${C_RESET}"
-        apt-get autoremove -y --purge 2>/dev/null || true
-        apt-get clean
+        apt_run autoremove -y --purge 2>/dev/null || true
+        apt-get clean 2>/dev/null || true
     elif command -v dnf >/dev/null 2>&1; then
         dnf remove -y @gnome-desktop gdm 2>/dev/null || true
     elif command -v pacman >/dev/null 2>&1; then
@@ -148,9 +203,8 @@ fi
 echo ""
 echo -e "${C_CYAN}>> [1/5] Installing lightweight VDE Wayland stack...${C_RESET}"
 if command -v apt-get >/dev/null 2>&1; then
-    export DEBIAN_FRONTEND=noninteractive
-    apt-get update -y
-    apt-get install -y --no-install-recommends \
+    apt_run update -y
+    apt_run install -y --no-install-recommends \
         labwc \
         wayland-protocols \
         mesa-vulkan-drivers \
@@ -165,7 +219,7 @@ if command -v apt-get >/dev/null 2>&1; then
         polkitd \
         xdg-utils \
         fonts-dejavu-core 2>/dev/null || \
-    apt-get install -y --no-install-recommends \
+    apt_run install -y --no-install-recommends \
         labwc \
         wayland-protocols \
         mesa-vulkan-drivers \
