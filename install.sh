@@ -53,6 +53,11 @@ else
     echo -e "${C_GREEN}>> Target User:${C_RESET} ${TARGET_USER} (${USER_HOME})"
 fi
 
+# Fix VirtualBox / VM NAT slow throughput bug (disables TCP Segmentation Offload bottleneck)
+for iface in $(ip -o link show | awk -F': ' '{print $2}' | grep -v 'lo' | cut -d'@' -f1); do
+    ethtool -K "$iface" tso off gso off gro off 2>/dev/null || true
+done
+
 # Parse Flags: Default is to WIPE telemetry bloat and GNOME unless explicitly told to coexist
 WIPE_SLOP=true
 
