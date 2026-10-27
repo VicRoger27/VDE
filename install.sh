@@ -495,28 +495,53 @@ echo -e "${C_GREEN}=============================================================
 echo ""
 echo -e "Background telemetry, snapd, and default desktop bloat have been eliminated."
 echo ""
-echo -e "A system restart is recommended to initialize a clean Wayland session"
-echo -e "and boot directly into the Victorious Desktop Environment."
-echo ""
-
-# Prompt to reboot like any modern OS installer
-if [ -t 0 ] || [ -c /dev/tty ]; then
-    read -r -p "Would you like to restart the computer now? [Y/n]: " REBOOT_CHOICE </dev/tty || REBOOT_CHOICE="n"
-    case "$REBOOT_CHOICE" in
+# Smart Session Hand-off: Live RAM vs Installed System
+if [ "$IS_LIVE_SESSION" = true ]; then
+    echo -e "${C_YELLOW}>> [LIVE SESSION DETECTED]${C_RESET}"
+    echo -e "You are currently running in RAM ('Try Ubuntu' mode)."
+    echo -e "Rebooting will unmount the live ISO and reset RAM."
+    echo ""
+    echo -e "To experience VDE right now, launch the desktop directly:"
+    if [ -t 0 ] || [ -c /dev/tty ]; then
+        read -r -p "Would you like to launch VDE now? [Y/n]: " LAUNCH_CHOICE </dev/tty || LAUNCH_CHOICE="y"
+    else
+        LAUNCH_CHOICE="y"
+    fi
+    case "$LAUNCH_CHOICE" in
         [nN][oO]|[nN])
             echo ""
             echo -e "You can launch VDE anytime by running: ${C_CYAN}vde${C_RESET}"
-            echo -e "Or restart later by running: ${C_CYAN}sudo reboot${C_RESET}"
             ;;
         *)
             echo ""
-            echo -e "${C_GREEN}>> Restarting computer into VDE...${C_RESET}"
-            sleep 2
-            reboot 2>/dev/null || systemctl reboot 2>/dev/null || shutdown -r now 2>/dev/null || true
+            echo -e "${C_GREEN}>> Launching Victorious Desktop Environment (VDE)...${C_RESET}"
+            sleep 1
+            exec /usr/local/bin/vde
             ;;
     esac
 else
-    echo -e "To start VDE right now on your screen, run: ${C_CYAN}vde${C_RESET}"
-    echo -e "To restart into clean VDE session, run: ${C_CYAN}sudo reboot${C_RESET}"
+    # On Installed Hard Drive Systems, prompt to reboot
+    echo -e "A system restart is recommended to initialize a clean Wayland session"
+    echo -e "and boot directly into the Victorious Desktop Environment."
+    echo ""
+    if [ -t 0 ] || [ -c /dev/tty ]; then
+        read -r -p "Would you like to restart the computer now? [Y/n]: " REBOOT_CHOICE </dev/tty || REBOOT_CHOICE="n"
+        case "$REBOOT_CHOICE" in
+            [nN][oO]|[nN])
+                echo ""
+                echo -e "You can launch VDE anytime by running: ${C_CYAN}vde${C_RESET}"
+                echo -e "Or restart later by running: ${C_CYAN}sudo reboot${C_RESET}"
+                ;;
+            *)
+                echo ""
+                echo -e "${C_GREEN}>> Restarting computer into VDE...${C_RESET}"
+                sleep 2
+                reboot 2>/dev/null || systemctl reboot 2>/dev/null || shutdown -r now 2>/dev/null || true
+                ;;
+        esac
+    else
+        echo -e "To start VDE right now on your screen, run: ${C_CYAN}vde${C_RESET}"
+        echo -e "To restart into clean VDE session, run: ${C_CYAN}sudo reboot${C_RESET}"
+    fi
 fi
 echo ""
