@@ -268,6 +268,10 @@ cp -rf "$SRC_DIR/qt-launcher" "${INSTALL_PREFIX}/"
 if [ -d "$SRC_DIR/apps" ]; then
     cp -rf "$SRC_DIR/apps" "${INSTALL_PREFIX}/"
 fi
+chmod -R +x "${INSTALL_PREFIX}/astal-shell" 2>/dev/null || true
+chmod -R +x "${INSTALL_PREFIX}/qt-launcher" 2>/dev/null || true
+chmod -R +x "${INSTALL_PREFIX}/apps" 2>/dev/null || true
+chmod +x "${INSTALL_PREFIX}/astal-shell/vde-bar" 2>/dev/null || true
 
 # 7. Deploy Labwc Configurations
 echo -e "${C_CYAN}>> [3/5] Configuring Labwc compositor...${C_RESET}"
@@ -354,7 +358,12 @@ chmod +x "${BIN_PREFIX}/vde"
 
 cat << 'EOF' > "${BIN_PREFIX}/vde-bar"
 #!/usr/bin/env bash
-exec /usr/share/vde/astal-shell/vde-bar "$@"
+if [ -f /usr/share/vde/astal-shell/vde-bar ]; then
+    chmod +x /usr/share/vde/astal-shell/vde-bar 2>/dev/null || true
+    /usr/share/vde/astal-shell/vde-bar "$@"
+elif command -v waybar >/dev/null 2>&1; then
+    exec waybar -c /usr/share/vde/astal-shell/waybar_config.jsonc -s /usr/share/vde/astal-shell/waybar_style.css "$@"
+fi
 EOF
 chmod +x "${BIN_PREFIX}/vde-bar"
 

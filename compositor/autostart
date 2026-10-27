@@ -11,35 +11,30 @@ fi
 
 # 2. Update D-Bus & systemd activation environment
 if command -v dbus-update-activation-environment >/dev/null 2>&1; then
-    dbus-update-activation-environment --systemd WAYLAND_DISPLAY DISPLAY XDG_CURRENT_DESKTOP XDG_SESSION_TYPE
+    dbus-update-activation-environment --systemd WAYLAND_DISPLAY DISPLAY XDG_CURRENT_DESKTOP XDG_SESSION_TYPE 2>/dev/null || true
 fi
 
-# 3. Systemd session orchestration fallback
+# 3. Import environment into systemd if available
 if command -v systemctl >/dev/null 2>&1 && systemctl --user is-system-running >/dev/null 2>&1; then
-    systemctl --user import-environment WAYLAND_DISPLAY DISPLAY XDG_CURRENT_DESKTOP
-    systemctl --user start vde-session.target
-else
-    # 4. Standalone Process Spawning (Non-systemd / fallback)
-    
-    # PolicyKit Authentication Agent
-    /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 &
+    systemctl --user import-environment WAYLAND_DISPLAY DISPLAY XDG_CURRENT_DESKTOP 2>/dev/null || true
+fi
 
-    # Audio Infrastructure
-    command -v pipewire >/dev/null 2>&1 && pipewire &
-    command -v wireplumber >/dev/null 2>&1 && wireplumber &
+# 4. Core Session Processes
+# Wallpaper / Canvas Background
+command -v swaybg >/dev/null 2>&1 && swaybg -c '#18181b' &
 
-    # Wallpaper / Canvas Background
-    command -v swaybg >/dev/null 2>&1 && swaybg -c '#18181b' &
+# Audio Infrastructure
+command -v pipewire >/dev/null 2>&1 && pipewire &
+command -v wireplumber >/dev/null 2>&1 && wireplumber &
 
-    # Taskbar & Shell Runner (Astal / Waybar fallback)
-    if [ -x "/usr/local/bin/vde-bar" ]; then
-        /usr/local/bin/vde-bar &
-    elif [ -x "$VDE_DIR/../astal-shell/vde-bar" ]; then
-        "$VDE_DIR/../astal-shell/vde-bar" &
-    fi
+# Taskbar & Shell Runner (Astal / Waybar fallback)
+if [ -x "/usr/local/bin/vde-bar" ]; then
+    /usr/local/bin/vde-bar &
+elif [ -x "$VDE_DIR/../astal-shell/vde-bar" ]; then
+    "$VDE_DIR/../astal-shell/vde-bar" &
+fi
 
-    # Qt6 / QML Start Menu Daemon (in background waiting for D-Bus trigger)
-    if [ -x "$VDE_DIR/../qt-launcher/vde-launcher" ]; then
-        "$VDE_DIR/../qt-launcher/vde-launcher" --daemon &
-    fi
+# Qt6 / QML Start Menu Daemon
+if command -v vde-launcher >/dev/null 2>&1; then
+    vde-launcher --daemon &
 fi
