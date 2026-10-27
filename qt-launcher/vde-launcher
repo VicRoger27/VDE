@@ -1,0 +1,16 @@
+#!/bin/sh
+# VDE Start Menu Launcher Runner
+# Executable wrapper for Qt6 Start Menu daemon
+
+SCRIPT_DIR="$(dirname "$(realpath "$0" 2>/dev/null || readlink -f "$0" 2>/dev/null || echo "$0")")"
+BUILD_BIN="$SCRIPT_DIR/build/vde-launcher"
+
+if [ -x "$BUILD_BIN" ]; then
+    exec "$BUILD_BIN" "$@"
+elif command -v vde-launcher >/dev/null 2>&1; then
+    exec vde-launcher "$@"
+else
+    echo "[VDE Launcher Error] vde-launcher binary not found." >&2
+    echo "Please build the project with cmake and ninja inside qt-launcher/build." >&2
+    exit 1
+fi
