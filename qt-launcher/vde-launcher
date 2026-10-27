@@ -1,16 +1,19 @@
 #!/bin/sh
 # VDE Start Menu Launcher Runner
-# Executable wrapper for Qt6 Start Menu daemon
+# Prioritizes Wofi with VDE Mica Theme, falling back to compiled binary or fuzzel
 
 SCRIPT_DIR="$(dirname "$(realpath "$0" 2>/dev/null || readlink -f "$0" 2>/dev/null || echo "$0")")"
 BUILD_BIN="$SCRIPT_DIR/build/vde-launcher"
 
 if [ -x "$BUILD_BIN" ]; then
     exec "$BUILD_BIN" "$@"
-elif command -v vde-launcher >/dev/null 2>&1; then
-    exec vde-launcher "$@"
+elif command -v wofi >/dev/null 2>&1; then
+    exec wofi --show drun --conf "/usr/share/vde/astal-shell/wofi_config" --style "/usr/share/vde/astal-shell/wofi_style.css" "$@"
+elif command -v fuzzel >/dev/null 2>&1; then
+    exec fuzzel "$@"
+elif command -v dmenu-wl >/dev/null 2>&1 || command -v dmenu >/dev/null 2>&1; then
+    exec dmenu-wl "$@"
 else
-    echo "[VDE Launcher Error] vde-launcher binary not found." >&2
-    echo "Please build the project with cmake and ninja inside qt-launcher/build." >&2
+    echo "[VDE Launcher Error] No launcher backend available in PATH." >&2
     exit 1
 fi

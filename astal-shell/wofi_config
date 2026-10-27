@@ -1,0 +1,9 @@
+mode=drun
+width=520
+height=460
+prompt=Search apps, settings, and files...
+allow_images=true
+image_size=28
+insensitive=true
+no_actions=true
+term=foot

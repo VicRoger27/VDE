@@ -267,11 +267,13 @@ if command -v apt-get >/dev/null 2>&1; then
         labwc \
         waybar \
         swaybg \
+        wofi \
+        foot \
+        xterm \
         wayland-protocols \
         libgl1-mesa-dri \
         pipewire \
         wireplumber \
-        foot \
         libglib2.0-bin \
         brightnessctl \
         grim \
@@ -285,11 +287,13 @@ if command -v apt-get >/dev/null 2>&1; then
         labwc \
         waybar \
         swaybg \
+        wofi \
+        foot \
+        xterm \
         wayland-protocols \
         libgl1-mesa-dri \
         pipewire \
         wireplumber \
-        foot \
         libglib2.0-bin \
         brightnessctl \
         grim \

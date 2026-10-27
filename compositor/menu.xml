@@ -3,7 +3,7 @@
   <menu id="root-menu" label="Victorious Desktop Environment">
     <separator label="Victorious Desktop (VDE)" />
     <item label="Open Terminal">
-      <action name="Execute" command="foot || x-terminal-emulator || gnome-terminal" />
+      <action name="Execute" command="foot || xterm || x-terminal-emulator || gnome-terminal" />
     </item>
     <item label="Start Launcher">
       <action name="Execute" command="vde-launcher" />

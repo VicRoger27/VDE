@@ -99,31 +99,31 @@
     </keybind>
 
     <!-- ============================================== -->
-    <!-- VDE Shell Integration (D-Bus Signals)          -->
+    <!-- VDE Shell Integration (Start & Terminal)       -->
     <!-- ============================================== -->
     <!-- Super / Super + Space: Toggle Start Menu Launcher -->
     <keybind key="W-space">
       <action name="Execute">
-        <command>qdbus org.vde.Launcher /Launcher org.vde.Launcher.Toggle</command>
+        <command>/usr/local/bin/vde-launcher || wofi --show drun</command>
       </action>
     </keybind>
     <keybind key="Super_L">
       <action name="Execute">
-        <command>qdbus org.vde.Launcher /Launcher org.vde.Launcher.Toggle</command>
+        <command>/usr/local/bin/vde-launcher || wofi --show drun</command>
       </action>
     </keybind>
 
     <!-- Super + A: Toggle Quick Settings Flyout -->
     <keybind key="W-a">
       <action name="Execute">
-        <command>qdbus org.vde.Shell /Shell org.vde.Shell.ToggleQuickSettings</command>
+        <command>qdbus org.vde.Shell /Shell org.vde.Shell.ToggleQuickSettings 2>/dev/null || true</command>
       </action>
     </keybind>
 
     <!-- Super + N: Toggle Notifications / Calendar -->
     <keybind key="W-n">
       <action name="Execute">
-        <command>qdbus org.vde.Shell /Shell org.vde.Shell.ToggleCalendar</command>
+        <command>qdbus org.vde.Shell /Shell org.vde.Shell.ToggleCalendar 2>/dev/null || true</command>
       </action>
     </keybind>
 
@@ -137,7 +137,7 @@
     <!-- Super + Return: Terminal -->
     <keybind key="W-Return">
       <action name="Execute">
-        <command>foot || alacritty || x-terminal-emulator</command>
+        <command>foot || xterm || alacritty || x-terminal-emulator</command>
       </action>
     </keybind>
 
