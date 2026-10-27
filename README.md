@@ -4,62 +4,79 @@ An ultra-lightweight, privacy-centric Linux desktop environment capturing modern
 
 ---
 
-## ⚡ 1-Command Terminal Installation
+## ⚡ 1-Command Quick Install
 
-### 🟢 Inside "Try Ubuntu" (Live USB / Live Session)
-Boot any standard Ubuntu live USB/ISO ("Try Ubuntu"), open a terminal, and run:
+### 🟢 Universal One-Liner (Try Ubuntu, Live USB, Ubuntu Server, or Installed Linux)
+Open a terminal (or switch to a virtual console via `Ctrl + Alt + F3`) and run:
+
 ```bash
-curl -sSL https://raw.githubusercontent.com/VicRoger27/VDE/main/install.sh | sudo bash
+wget -qO- https://raw.githubusercontent.com/VicRoger27/VDE/main/install.sh | sudo bash
 ```
-Once it finishes, type `vde` in your terminal or double-click the **Launch VDE** icon created on your desktop!
+
+> **Note**: Uses native `wget` directly to avoid Canonical `snap` sandbox permission restrictions (`snap-confine`).
 
 ---
 
-### 🔄 On Installed Systems: Clean Replace (Wipe Old Desktop / GNOME / Bloat)
-Purges GNOME, GDM, and Canonical telemetry bloat, and replaces it with VDE:
-```bash
-curl -sSL https://raw.githubusercontent.com/VicRoger27/VDE/main/install.sh | sudo bash -s -- --replace
-```
+### 🛠️ Installation Options
 
----
+| Mode | Command | Description |
+| :--- | :--- | :--- |
+| **Clean Replace (Default)** | `wget -qO- https://raw.githubusercontent.com/VicRoger27/VDE/main/install.sh \| sudo bash` | Purges Canonical `snapd`, telemetry (`whoopsie`, `apport`, `ubuntu-report`), and GNOME bloat, installing clean VDE. |
+| **Coexist Mode** | `wget -qO- https://raw.githubusercontent.com/VicRoger27/VDE/main/install.sh \| sudo bash -s -- --keep-gnome` | Installs VDE alongside your existing desktop without removing GNOME. |
 
-### 📦 Coexist (Install Alongside Existing Desktop)
-```bash
-curl -sSL https://raw.githubusercontent.com/VicRoger27/VDE/main/install.sh | sudo bash
-```
-
-Alternatively, clone the repository and run locally:
+Alternatively, install from source:
 ```bash
 git clone https://github.com/VicRoger27/VDE.git
 cd VDE
-sudo ./install.sh --replace
+sudo ./install.sh
 ```
 
 ---
 
 ## 🚀 Launching VDE
 
-Once installed, you can enter VDE in two ways:
+Once installed, launch VDE anytime:
 
-1. **Directly from Any Terminal or TTY**:
+1. **Directly from Terminal or TTY Console**:
    ```bash
    vde
    ```
-2. **From Your Login Display Manager**:
-   Select **`Victorious Desktop Environment (VDE)`** from your session chooser on GDM, SDDM, LightDM, or greetd.
+2. **From Login Display Managers**:
+   Select **`Victorious Desktop Environment (VDE)`** from your session menu on GDM, SDDM, LightDM, or greetd.
+
+---
+
+## ⌨️ Windows 11 Ergonomics & Shortcuts
+
+| Shortcut | Action |
+| :--- | :--- |
+| <kbd>Super</kbd> / <kbd>Super</kbd> + <kbd>Space</kbd> | Toggle Start Menu (`vde-launcher`) |
+| <kbd>Super</kbd> + <kbd>Return</kbd> | Open Fast Terminal (`foot`) |
+| <kbd>Super</kbd> + <kbd>←</kbd> / <kbd>→</kbd> | Snap Window Left / Right Half |
+| <kbd>Super</kbd> + <kbd>↑</kbd> | Maximize Window |
+| <kbd>Super</kbd> + <kbd>↓</kbd> | Minimize / Restore Window |
+| <kbd>Super</kbd> + <kbd>Alt</kbd> + <kbd>Arrows</kbd> | 4-Corner Quadrant Snap (Top-Left, Top-Right, Bottom-Left, Bottom-Right) |
+| <kbd>Alt</kbd> + <kbd>Tab</kbd> | Windows-style Task Switcher |
+| <kbd>Alt</kbd> + <kbd>F4</kbd> | Close Active Window |
+| <kbd>Super</kbd> + <kbd>E</kbd> | Open File Explorer |
+| <kbd>Super</kbd> + <kbd>L</kbd> | Lock Screen |
+| <kbd>PrintScreen</kbd> | Interactive Area Screenshot to Clipboard (`grim` + `slurp`) |
+| **Right-Click Desktop** | Open VDE Context Menu (Apps, Settings, Terminal, Window Controls) |
 
 ---
 
 ## 🏛️ Core Architecture
 
-- **Compositor**: Labwc (Wayland `wlroots` layer-shell with 1px border snapping).
-- **Taskbar & Flyout (`vde-bar`)**: Built with Astal & GTK4, featuring centered pinned icons and a modular Quick Settings flyout.
-- **Start Menu Runner (`vde-launcher`)**: Hardware-accelerated Qt6 / QML with inotify `.desktop` indexing and local llama.cpp MiniCPM-V 4.7 vision client.
-- **Settings Hub (`crossings`)**: Native two-pane interactive Card architecture for system customization and telemetry-free privacy toggles.
+- **Compositor**: [Labwc](https://github.com/labwc/labwc) — Lightweight stacking Wayland compositor built on `wlroots` with sub-millisecond layer-shell rendering, GLES2 acceleration, and Pixman software fallback.
+- **Taskbar & Shell (`vde-bar`)**: Built with Astal & GTK4, with automated dark Mica Waybar fallback featuring centered taskbar items, start menu button, system tray, audio flyout, and clock.
+- **Start Menu Runner (`vde-launcher`)**: Hardware-accelerated Qt6 / QML with real-time inotify `.desktop` indexing and local llama.cpp vision client.
+- **Settings Hub (`crossings`)**: Two-pane interactive card-based customization center for theme accents, display scaling, and privacy controls.
 - **Memory Footprint**: Target < 500 MB idle RAM (under 250 MB on minimal Ubuntu Server base).
 
 ---
 
 ## 📜 License & Privacy
 
-VDE is licensed under the VPL License. Designed with zero cloud telemetry, zero remote tracking, and strictly local AI inference.
+VDE is licensed under the **VPL License**. 
+
+Designed strictly with **zero cloud telemetry**, **zero remote tracking**, and exclusively **local on-device processing**.
