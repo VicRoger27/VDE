@@ -319,6 +319,14 @@ chmod -R +x "${INSTALL_PREFIX}/qt-launcher" 2>/dev/null || true
 chmod -R +x "${INSTALL_PREFIX}/apps" 2>/dev/null || true
 chmod +x "${INSTALL_PREFIX}/astal-shell/vde-bar" 2>/dev/null || true
 
+# Register VDE modern vector icon suite as default system icons
+echo -e "${C_CYAN}>> Registering VDE modern vector icon suite...${C_RESET}"
+mkdir -p /usr/share/icons/hicolor/scalable/apps
+cp -f "$SRC_DIR/assets/icons/glm/"*.svg /usr/share/icons/hicolor/scalable/apps/ 2>/dev/null || true
+if command -v gtk-update-icon-cache >/dev/null 2>&1; then
+    gtk-update-icon-cache -f -t /usr/share/icons/hicolor 2>/dev/null || true
+fi
+
 # 7. Deploy Labwc Configurations
 echo -e "${C_CYAN}>> [3/5] Configuring Labwc compositor...${C_RESET}"
 mkdir -p /etc/xdg/labwc
