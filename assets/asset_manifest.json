@@ -1,6 +1,6 @@
 {
   "manifest_version": "1.0.0",
-  "project": "VDE (Victor Desktop Environment)",
+  "project": "VDE (Victorious Desktop Environment)",
   "description": "External asset rendering manifest for GLM 5.3 (vectors) and Flux via local Unsloth pipeline (textures/graphics).",
   "rendering_engine_targets": {
     "vectors": "GLM 5.3",

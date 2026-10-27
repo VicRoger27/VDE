@@ -1,6 +1,6 @@
 # VDE Changelog
 
-All notable changes and milestones for the Victor Desktop Environment (VDE) project are documented in this file.
+All notable changes and milestones for the Victorious Desktop Environment (VDE) project are documented in this file.
 
 ---
 

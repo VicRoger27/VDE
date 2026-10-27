@@ -1,6 +1,6 @@
 # VDE Changelog — Milestone 2
 
-All notable changes introduced in Phase 4 of the Victor Desktop Environment (VDE).
+All notable changes introduced in Phase 4 of the Victorious Desktop Environment (VDE).
 
 ---
 

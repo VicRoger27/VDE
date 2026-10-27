@@ -1,5 +1,5 @@
 #!/bin/sh
-# VDE (Victor Desktop Environment) Autostart Script
+# VDE (Victorious Desktop Environment) Autostart Script
 # Executed by Labwc compositor on startup
 
 VDE_DIR="$(dirname "$0")"

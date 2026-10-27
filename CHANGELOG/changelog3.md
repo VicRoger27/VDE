@@ -1,6 +1,6 @@
 # VDE Changelog — Milestone 3
 
-All notable changes and preview prototypes for the Victor Desktop Environment (VDE).
+All notable changes and preview prototypes for the Victorious Desktop Environment (VDE).
 
 ---
 

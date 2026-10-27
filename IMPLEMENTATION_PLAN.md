@@ -1,4 +1,4 @@
-# VDE (Victor Desktop Environment) — Architectural Blueprint & Implementation Plan
+# VDE (Victorious Desktop Environment) — Architectural Blueprint & Implementation Plan
 
 > **Codename:** VDE (Windows 11 Ergonomics & Visual Familiarity for Linux)  
 > **Target Idle RAM:** Sub-500 MB (Entire desktop session: compositor + shell daemons)  
