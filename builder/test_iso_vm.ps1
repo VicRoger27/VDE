@@ -9,6 +9,7 @@ param (
 )
 
 $VBoxManage = "C:\Program Files\Oracle\VirtualBox\VBoxManage.exe"
+$VBoxGUI    = "C:\Program Files\Oracle\VirtualBox\VirtualBox.exe"
 
 if (-not (Test-Path $VBoxManage)) {
     Write-Error "VirtualBox not found at $VBoxManage"
@@ -29,7 +30,7 @@ if (-not (Test-Path $IsoPath)) {
 
 $resolvedIso = (Resolve-Path $IsoPath).Path
 Write-Host "==========================================================" -ForegroundColor Cyan
-Write-Host " Launching VDE Native VirtualBox VM ($VmName)" -ForegroundColor Cyan
+Write-Host " Configuring VDE Native VirtualBox VM ($VmName)" -ForegroundColor Cyan
 Write-Host " ISO: $resolvedIso" -ForegroundColor Cyan
 Write-Host " RAM: ${RamMB} MB | CPUs: $Cpus | Graphics: VMSVGA 128MB" -ForegroundColor Cyan
 Write-Host "==========================================================" -ForegroundColor Cyan
@@ -54,7 +55,7 @@ Write-Host ">> Configuring hardware specs..."
     --memory $RamMB `
     --vram 128 `
     --graphicscontroller vmsvga `
-    --accelerate3d on `
+    --accelerate3d off `
     --audio-enabled on `
     --audio-controller hda `
     --nic1 nat `
@@ -73,10 +74,24 @@ Write-Host ">> Attaching optical drive with ISO..."
     --type dvddrive `
     --medium $resolvedIso
 
-# 4. Start the VM in a native GUI window
-Write-Host ">> Booting VM into GUI window..." -ForegroundColor Green
-& $VBoxManage startvm $VmName --type gui
+# 4. Generate direct launcher batch file in project root
+$batPath = Join-Path (Get-Location) "Launch_VDE_VM.bat"
+@"
+@echo off
+title VDE Virtual Machine Runner
+echo ========================================================
+echo  Launching VDE Live OS in VirtualBox GUI Window
+echo ========================================================
+start "" "$VBoxGUI" --startvm "$VmName"
+"@ | Set-Content -Path $batPath -Encoding ASCII
+
+# 5. Launch the VM GUI via explorer.exe to trigger foreground interactive window
+Write-Host ">> Spawning VirtualBox GUI window on user desktop..." -ForegroundColor Green
+Start-Process "explorer.exe" -ArgumentList "`"$batPath`""
 
 Write-Host "==========================================================" -ForegroundColor Green
-Write-Host " VM '$VmName' is now running!" -ForegroundColor Green
+Write-Host " VM '$VmName' launched!" -ForegroundColor Green
+Write-Host " If the window does not foreground automatically, run:" -ForegroundColor Yellow
+Write-Host "   .\Launch_VDE_VM.bat" -ForegroundColor Cyan
+Write-Host " or open Oracle VirtualBox from your Start Menu." -ForegroundColor Yellow
 Write-Host "==========================================================" -ForegroundColor Green
