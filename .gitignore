@@ -6,3 +6,5 @@ builder/vde_overlay/
 build/
 *.o
 *.obj
+tools/
+scratch/
