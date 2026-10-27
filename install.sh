@@ -155,10 +155,14 @@ if [ "$WIPE_SLOP" = true ]; then
     echo -e "${C_RED}==============================================================${C_RESET}"
 
     if command -v apt-get >/dev/null 2>&1; then
-        # 1. Kill GNOME display processes to free memory immediately
-        echo -e "${C_YELLOW}>> Stopping GNOME and display managers...${C_RESET}"
-        systemctl stop gdm3 2>/dev/null || systemctl stop gdm 2>/dev/null || true
-        pkill -9 -f gnome-shell 2>/dev/null || true
+        # 1. If running outside GUI (on TTY/console), safely stop GDM
+        if [ -z "$WAYLAND_DISPLAY" ] && [ -z "$DISPLAY" ]; then
+            echo -e "${C_YELLOW}>> Stopping display managers...${C_RESET}"
+            systemctl stop gdm3 2>/dev/null || systemctl stop gdm 2>/dev/null || true
+            pkill -9 -f gnome-shell 2>/dev/null || true
+        else
+            echo -e "${C_YELLOW}>> Running inside active desktop terminal. Deferring display switch to end...${C_RESET}"
+        fi
 
         # 2. Purge Canonical Snapd & snaps
         echo -e "${C_YELLOW}>> Purging Canonical Snap daemon (snapd)...${C_RESET}"
@@ -218,6 +222,7 @@ if command -v apt-get >/dev/null 2>&1; then
         wl-clipboard \
         polkitd \
         xdg-utils \
+        dbus-x11 \
         fonts-dejavu-core 2>/dev/null || \
     apt_run install -y --no-install-recommends \
         labwc \
@@ -276,9 +281,20 @@ export XDG_CURRENT_DESKTOP=VDE
 export XDG_SESSION_DESKTOP=VDE
 export XDG_SESSION_TYPE=wayland
 
+# Ensure XDG_RUNTIME_DIR is set and accessible
+if [ -z "$XDG_RUNTIME_DIR" ]; then
+    export XDG_RUNTIME_DIR="/run/user/$(id -u)"
+    if [ ! -d "$XDG_RUNTIME_DIR" ]; then
+        mkdir -p "$XDG_RUNTIME_DIR" 2>/dev/null || true
+        chmod 0700 "$XDG_RUNTIME_DIR" 2>/dev/null || true
+    fi
+fi
+
 # Ensure D-Bus user session
 if [ -z "$DBUS_SESSION_BUS_ADDRESS" ]; then
-    eval $(dbus-launch --sh-syntax --exit-with-session 2>/dev/null || true)
+    if command -v dbus-launch >/dev/null 2>&1; then
+        eval $(dbus-launch --sh-syntax --exit-with-session 2>/dev/null || true)
+    fi
 fi
 
 echo "=========================================================="
