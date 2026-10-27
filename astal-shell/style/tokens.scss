@@ -1,0 +1,72 @@
+// Auto-generated from tokens/theme.json. DO NOT EDIT DIRECTLY.
+
+// Dark Surface Colors
+$surface-base: #202020;
+$surface-mica: #202020;
+$surface-acrylic: rgba(32, 32, 32, 0.78);
+$surface-card: #2d2d2d;
+$surface-cardHover: #383838;
+$surface-cardPressed: #282828;
+$surface-flyout: #2c2c2c;
+$surface-taskbar: rgba(32, 32, 32, 0.82);
+$surface-input: #242424;
+
+// Dark Border Colors
+$border-subtle: rgba(255, 255, 255, 0.05);
+$border-default: rgba(255, 255, 255, 0.09);
+$border-strong: rgba(255, 255, 255, 0.16);
+$border-focus: #60cdff;
+$border-divider: rgba(255, 255, 255, 0.08);
+
+// Dark Text Colors
+$text-primary: #ffffff;
+$text-secondary: rgba(255, 255, 255, 0.78);
+$text-tertiary: rgba(255, 255, 255, 0.54);
+$text-disabled: rgba(255, 255, 255, 0.38);
+$text-onAccent: #000000;
+
+// Dark Accent Colors
+$accent-primary: #60cdff;
+$accent-secondary: #0078d4;
+$accent-hover: #70d6ff;
+$accent-pressed: #50bce8;
+$accent-subtle: rgba(96, 205, 255, 0.12);
+
+// Dark Status Indicators
+$status-aiIdle: rgba(255, 255, 255, 0.70);
+$status-aiInference: #60cdff;
+$status-aiInferenceGlow: rgba(96, 205, 255, 0.45);
+$status-aiOffline: rgba(255, 255, 255, 0.28);
+$status-runningIndicator: #60cdff;
+$status-focusedIndicator: #60cdff;
+$status-urgentIndicator: #ff99a4;
+
+// Radii
+$radius-xs: 2px;
+$radius-sm: 4px;
+$radius-md: 8px;
+$radius-lg: 12px;
+$radius-xl: 16px;
+$radius-full: 9999px;
+
+// Typography
+$font-family: 'Segoe UI Variable', 'Inter', 'Cantarell', system-ui, -apple-system, sans-serif;
+$font-size-caption: 11px;
+$font-size-body: 13px;
+$font-size-subtitle: 15px;
+$font-size-title: 18px;
+$font-size-header: 22px;
+
+// Layout Dimensions
+$layout-taskbarHeight: 48px;
+$layout-taskbarIconSize: 24px;
+$layout-taskbarItemWidth: 44px;
+$layout-startMenuWidth: 580px;
+$layout-startMenuHeight: 650px;
+$layout-quickSettingsWidth: 360px;
+$layout-quickSettingsHeight: 440px;
+
+// Transitions
+$transition-fast: 120ms cubic-bezier(0.1, 0.9, 0.2, 1.0);
+$transition-normal: 220ms cubic-bezier(0.1, 0.9, 0.2, 1.0);
+$transition-smooth: 350ms cubic-bezier(0.1, 0.9, 0.2, 1.0);

@@ -1,0 +1,147 @@
+{
+  "$schema": "./theme-schema.json",
+  "name": "VDE-Default-Dark",
+  "version": "1.0.0",
+  "mode": "dark",
+  "colors": {
+    "dark": {
+      "surface": {
+        "base": "#202020",
+        "mica": "#202020",
+        "acrylic": "rgba(32, 32, 32, 0.78)",
+        "card": "#2d2d2d",
+        "cardHover": "#383838",
+        "cardPressed": "#282828",
+        "flyout": "#2c2c2c",
+        "taskbar": "rgba(32, 32, 32, 0.82)",
+        "input": "#242424"
+      },
+      "border": {
+        "subtle": "rgba(255, 255, 255, 0.05)",
+        "default": "rgba(255, 255, 255, 0.09)",
+        "strong": "rgba(255, 255, 255, 0.16)",
+        "focus": "#60cdff",
+        "divider": "rgba(255, 255, 255, 0.08)"
+      },
+      "text": {
+        "primary": "#ffffff",
+        "secondary": "rgba(255, 255, 255, 0.78)",
+        "tertiary": "rgba(255, 255, 255, 0.54)",
+        "disabled": "rgba(255, 255, 255, 0.38)",
+        "onAccent": "#000000"
+      },
+      "accent": {
+        "primary": "#60cdff",
+        "secondary": "#0078d4",
+        "hover": "#70d6ff",
+        "pressed": "#50bce8",
+        "subtle": "rgba(96, 205, 255, 0.12)"
+      },
+      "status": {
+        "aiIdle": "rgba(255, 255, 255, 0.70)",
+        "aiInference": "#60cdff",
+        "aiInferenceGlow": "rgba(96, 205, 255, 0.45)",
+        "aiOffline": "rgba(255, 255, 255, 0.28)",
+        "runningIndicator": "#60cdff",
+        "focusedIndicator": "#60cdff",
+        "urgentIndicator": "#ff99a4"
+      }
+    },
+    "light": {
+      "surface": {
+        "base": "#f3f3f3",
+        "mica": "#f3f3f3",
+        "acrylic": "rgba(243, 243, 243, 0.82)",
+        "card": "#ffffff",
+        "cardHover": "#f9f9f9",
+        "cardPressed": "#f0f0f0",
+        "flyout": "#ffffff",
+        "taskbar": "rgba(243, 243, 243, 0.85)",
+        "input": "#ffffff"
+      },
+      "border": {
+        "subtle": "rgba(0, 0, 0, 0.04)",
+        "default": "rgba(0, 0, 0, 0.08)",
+        "strong": "rgba(0, 0, 0, 0.14)",
+        "focus": "#005fb8",
+        "divider": "rgba(0, 0, 0, 0.06)"
+      },
+      "text": {
+        "primary": "#1f1f1f",
+        "secondary": "rgba(31, 31, 31, 0.75)",
+        "tertiary": "rgba(31, 31, 31, 0.52)",
+        "disabled": "rgba(31, 31, 31, 0.36)",
+        "onAccent": "#ffffff"
+      },
+      "accent": {
+        "primary": "#0067c0",
+        "secondary": "#005fb8",
+        "hover": "#1877d5",
+        "pressed": "#0054a4",
+        "subtle": "rgba(0, 103, 192, 0.10)"
+      },
+      "status": {
+        "aiIdle": "rgba(0, 0, 0, 0.65)",
+        "aiInference": "#0067c0",
+        "aiInferenceGlow": "rgba(0, 103, 192, 0.35)",
+        "aiOffline": "rgba(0, 0, 0, 0.24)",
+        "runningIndicator": "#0067c0",
+        "focusedIndicator": "#0067c0",
+        "urgentIndicator": "#c42b1c"
+      }
+    }
+  },
+  "radii": {
+    "xs": "2px",
+    "sm": "4px",
+    "md": "8px",
+    "lg": "12px",
+    "xl": "16px",
+    "full": "9999px"
+  },
+  "typography": {
+    "fontFamily": "'Segoe UI Variable', 'Inter', 'Cantarell', system-ui, -apple-system, sans-serif",
+    "fontSizes": {
+      "caption": "11px",
+      "body": "13px",
+      "subtitle": "15px",
+      "title": "18px",
+      "header": "22px"
+    },
+    "fontWeights": {
+      "regular": 400,
+      "medium": 500,
+      "semibold": 600,
+      "bold": 700
+    },
+    "lineHeights": {
+      "tight": 1.2,
+      "normal": 1.4,
+      "relaxed": 1.6
+    }
+  },
+  "effects": {
+    "acrylicBlurRadius": 24,
+    "acrylicNoiseOpacity": 0.02,
+    "shadows": {
+      "card": "0px 4px 8px rgba(0, 0, 0, 0.18)",
+      "flyout": "0px 16px 32px rgba(0, 0, 0, 0.36), 0px 0px 0px 1px rgba(255, 255, 255, 0.08)",
+      "taskbar": "0px 8px 16px rgba(0, 0, 0, 0.24), 0px 0px 0px 1px rgba(255, 255, 255, 0.06)",
+      "popover": "0px 8px 24px rgba(0, 0, 0, 0.32)"
+    }
+  },
+  "transitions": {
+    "fast": "120ms cubic-bezier(0.1, 0.9, 0.2, 1.0)",
+    "normal": "220ms cubic-bezier(0.1, 0.9, 0.2, 1.0)",
+    "smooth": "350ms cubic-bezier(0.1, 0.9, 0.2, 1.0)"
+  },
+  "layout": {
+    "taskbarHeight": 48,
+    "taskbarIconSize": 24,
+    "taskbarItemWidth": 44,
+    "startMenuWidth": 580,
+    "startMenuHeight": 650,
+    "quickSettingsWidth": 360,
+    "quickSettingsHeight": 440
+  }
+}

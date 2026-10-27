@@ -1,0 +1,40 @@
+#!/bin/sh
+# VDE (Victor Desktop Environment) Autostart Script
+# Executed by Labwc compositor on startup
+
+VDE_DIR="$(dirname "$0")"
+
+# 1. Source Environment
+if [ -f "$VDE_DIR/environment" ]; then
+    . "$VDE_DIR/environment"
+fi
+
+# 2. Update D-Bus & systemd activation environment
+if command -v dbus-update-activation-environment >/dev/null 2>&1; then
+    dbus-update-activation-environment --systemd WAYLAND_DISPLAY DISPLAY XDG_CURRENT_DESKTOP XDG_SESSION_TYPE
+fi
+
+# 3. Systemd session orchestration fallback
+if command -v systemctl >/dev/null 2>&1 && systemctl --user is-system-running >/dev/null 2>&1; then
+    systemctl --user import-environment WAYLAND_DISPLAY DISPLAY XDG_CURRENT_DESKTOP
+    systemctl --user start vde-session.target
+else
+    # 4. Standalone Process Spawning (Non-systemd / fallback)
+    
+    # PolicyKit Authentication Agent
+    /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 &
+
+    # Audio Infrastructure
+    command -v pipewire >/dev/null 2>&1 && pipewire &
+    command -v wireplumber >/dev/null 2>&1 && wireplumber &
+
+    # Astal Taskbar & Quick Settings Shell Daemon
+    if [ -x "$VDE_DIR/../astal-shell/vde-bar" ]; then
+        "$VDE_DIR/../astal-shell/vde-bar" &
+    fi
+
+    # Qt6 / QML Start Menu Daemon (in background waiting for D-Bus trigger)
+    if [ -x "$VDE_DIR/../qt-launcher/vde-launcher" ]; then
+        "$VDE_DIR/../qt-launcher/vde-launcher" --daemon &
+    fi
+fi

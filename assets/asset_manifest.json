@@ -1,0 +1,458 @@
+{
+  "manifest_version": "1.0.0",
+  "project": "VDE (Victor Desktop Environment)",
+  "description": "External asset rendering manifest for GLM 5.3 (vectors) and Flux via local Unsloth pipeline (textures/graphics).",
+  "rendering_engine_targets": {
+    "vectors": "GLM 5.3",
+    "textures_standard": "Flux 1 schnell",
+    "textures_detailed": "Flux 2/3 klein (via local Unsloth scripts)"
+  },
+  "status_summary": {
+    "total_assets": 18,
+    "rendered": 17,
+    "pending_review": 18,
+    "total_extracted_svgs": 74,
+    "sources": {
+      "2.txt": "GLM 5.3 (46 icons)",
+      "3.txt": "DeepSeek DeepThink (28 icons)",
+      "4.txt": "GLM 5.3 duplicate of 2.txt"
+    },
+    "total_production_icons": 74,
+    "active_provider": "GLM 5.3 Flash Effort Max (2.txt + 4.txt)",
+    "archived_provider": "DeepSeek DeepThink (1.txt + 3.txt)"
+  },
+  "assets": [
+    {
+      "asset_id": "icon-start-button",
+      "target_file": "assets/icons/icon-start-button.svg",
+      "category": "vector-icon",
+      "target_generator": "GLM 5.3",
+      "canvas_dimensions": [
+        24,
+        24
+      ],
+      "stroke_weight": "1.5px",
+      "style_tokens": {
+        "fill": "currentColor",
+        "radius": "2px",
+        "color_default": "rgba(255, 255, 255, 0.70)"
+      },
+      "visual_description": "Clean, modern Windows 11-style geometric 4-quadrant start emblem. Four equal square tiles separated by a balanced 2px gap. Each quadrant tile has smooth 2px rounded outer corners. Minimalist, precision alignment, optimized for a 24x24 pixel grid.",
+      "placeholder_spec": {
+        "type": "css-box",
+        "border": "1px dashed rgba(96, 205, 255, 0.5)",
+        "label": "START"
+      },
+      "status": "rendered",
+      "rendered_file": "assets/icons/start-idle-dark.svg",
+      "rendered_file_light": "assets/icons/start-idle-light.svg"
+    },
+    {
+      "asset_id": "icon-start-button-active",
+      "target_file": "assets/icons/icon-start-button-active.svg",
+      "category": "vector-icon",
+      "target_generator": "GLM 5.3",
+      "canvas_dimensions": [
+        24,
+        24
+      ],
+      "stroke_weight": "1.5px",
+      "style_tokens": {
+        "fill": "currentColor",
+        "accent_color": "#60cdff",
+        "glow": "rgba(96, 205, 255, 0.5)"
+      },
+      "visual_description": "Windows 11 start emblem in active AI inference mode. Four balanced quadrant tiles with a distinct glowing accent dot or illuminated corner on the top-right tile signaling local neural model activity. Clean vector lines, accent color #60CDFF.",
+      "placeholder_spec": {
+        "type": "css-box",
+        "border": "1px solid #60cdff",
+        "label": "AI*"
+      },
+      "status": "rendered",
+      "rendered_file": "assets/icons/start-active-dark.svg",
+      "rendered_file_light": "assets/icons/start-active-light.svg"
+    },
+    {
+      "asset_id": "icon-start-button-offline",
+      "target_file": "assets/icons/icon-start-button-offline.svg",
+      "category": "vector-icon",
+      "target_generator": "GLM 5.3",
+      "canvas_dimensions": [
+        24,
+        24
+      ],
+      "stroke_weight": "1.5px",
+      "style_tokens": {
+        "fill": "rgba(255, 255, 255, 0.28)",
+        "radius": "2px"
+      },
+      "visual_description": "Windows 11 start emblem in standby/offline mode. Subtle outline or dimmed monochrome 4-square tiles representing dormant local AI inference daemon.",
+      "placeholder_spec": {
+        "type": "css-box",
+        "border": "1px dashed rgba(255, 255, 255, 0.2)",
+        "label": "AI-"
+      },
+      "status": "rendered",
+      "rendered_file": "assets/icons/start-offline-dark.svg",
+      "rendered_file_light": "assets/icons/start-offline-light.svg"
+    },
+    {
+      "asset_id": "icon-search",
+      "target_file": "assets/icons/icon-search.svg",
+      "category": "vector-icon",
+      "target_generator": "GLM 5.3",
+      "canvas_dimensions": [
+        20,
+        20
+      ],
+      "stroke_weight": "1.5px",
+      "style_tokens": {
+        "stroke": "currentColor",
+        "fill": "none"
+      },
+      "visual_description": "Windows 11 Fluent style search magnifying glass. Simple circular lens at top-left angled at 45 degrees with a clean rounded handle extending toward the bottom-right. Crisp sub-pixel optical balance.",
+      "placeholder_spec": {
+        "type": "css-box",
+        "border": "1px dashed rgba(255, 255, 255, 0.3)",
+        "label": "SRCH"
+      },
+      "status": "rendered",
+      "rendered_file": "assets/icons/search-dark.svg",
+      "rendered_file_light": "assets/icons/search-light.svg"
+    },
+    {
+      "asset_id": "icon-apps-grid",
+      "target_file": "assets/icons/icon-apps-grid.svg",
+      "category": "vector-icon",
+      "target_generator": "GLM 5.3",
+      "canvas_dimensions": [
+        20,
+        20
+      ],
+      "stroke_weight": "1.5px",
+      "style_tokens": {
+        "fill": "currentColor"
+      },
+      "visual_description": "All Apps drawer toggle icon. 3x3 array of tiny rounded dots or a bulleted list icon with rounded endpoints in Windows 11 Fluent iconography language.",
+      "placeholder_spec": {
+        "type": "css-box",
+        "border": "1px dashed rgba(255, 255, 255, 0.3)",
+        "label": "APPS"
+      },
+      "status": "rendered",
+      "rendered_file": "assets/icons/all-apps-dark.svg",
+      "rendered_file_light": "assets/icons/all-apps-light.svg"
+    },
+    {
+      "asset_id": "icon-power",
+      "target_file": "assets/icons/icon-power.svg",
+      "category": "vector-icon",
+      "target_generator": "GLM 5.3",
+      "canvas_dimensions": [
+        20,
+        20
+      ],
+      "stroke_weight": "1.5px",
+      "style_tokens": {
+        "stroke": "currentColor",
+        "fill": "none"
+      },
+      "visual_description": "Standard circular power icon with vertical line intersecting the top opening. Smooth rounded line caps, 1.5px stroke weight, Fluent design.",
+      "placeholder_spec": {
+        "type": "css-box",
+        "border": "1px dashed rgba(255, 255, 255, 0.3)",
+        "label": "PWR"
+      },
+      "status": "rendered",
+      "rendered_file": "assets/icons/power-shutdown-dark.svg",
+      "rendered_file_light": "assets/icons/power-shutdown-light.svg"
+    },
+    {
+      "asset_id": "icon-restart",
+      "target_file": "assets/icons/icon-restart.svg",
+      "category": "vector-icon",
+      "target_generator": "GLM 5.3",
+      "canvas_dimensions": [
+        20,
+        20
+      ],
+      "stroke_weight": "1.5px",
+      "style_tokens": {
+        "stroke": "currentColor",
+        "fill": "none"
+      },
+      "visual_description": "Circular clockwise arrow indicating system reboot. Sharp arrow head with rounded path curves matching Windows 11 power menu style.",
+      "placeholder_spec": {
+        "type": "css-box",
+        "border": "1px dashed rgba(255, 255, 255, 0.3)",
+        "label": "RST"
+      },
+      "status": "rendered",
+      "rendered_file": "assets/icons/power-restart-dark.svg",
+      "rendered_file_light": "assets/icons/power-restart-light.svg"
+    },
+    {
+      "asset_id": "icon-sleep",
+      "target_file": "assets/icons/icon-sleep.svg",
+      "category": "vector-icon",
+      "target_generator": "GLM 5.3",
+      "canvas_dimensions": [
+        20,
+        20
+      ],
+      "stroke_weight": "1.5px",
+      "style_tokens": {
+        "stroke": "currentColor",
+        "fill": "none"
+      },
+      "visual_description": "Crescent moon sleep icon tilted 20 degrees. Smooth inner and outer circular arcs, fluent styling.",
+      "placeholder_spec": {
+        "type": "css-box",
+        "border": "1px dashed rgba(255, 255, 255, 0.3)",
+        "label": "SLP"
+      },
+      "status": "rendered",
+      "rendered_file": "assets/icons/power-sleep-dark.svg",
+      "rendered_file_light": "assets/icons/power-sleep-light.svg"
+    },
+    {
+      "asset_id": "icon-settings",
+      "target_file": "assets/icons/icon-settings.svg",
+      "category": "vector-icon",
+      "target_generator": "GLM 5.3",
+      "canvas_dimensions": [
+        20,
+        20
+      ],
+      "stroke_weight": "1.5px",
+      "style_tokens": {
+        "stroke": "currentColor",
+        "fill": "none"
+      },
+      "visual_description": "Windows 11 settings gear icon with 8 rounded teeth and a central hollow circle.",
+      "placeholder_spec": {
+        "type": "css-box",
+        "border": "1px dashed rgba(255, 255, 255, 0.3)",
+        "label": "SET"
+      },
+      "status": "rendered",
+      "rendered_file": "assets/icons/settings-dark.svg",
+      "rendered_file_light": "assets/icons/settings-light.svg"
+    },
+    {
+      "asset_id": "icon-quick-wifi",
+      "target_file": "assets/icons/icon-quick-wifi.svg",
+      "category": "vector-icon",
+      "target_generator": "GLM 5.3",
+      "canvas_dimensions": [
+        20,
+        20
+      ],
+      "stroke_weight": "1.5px",
+      "style_tokens": {
+        "stroke": "currentColor",
+        "fill": "none"
+      },
+      "visual_description": "Wireless network signal icon with 3 concentric rounded arc waves and a solid circular dot base.",
+      "placeholder_spec": {
+        "type": "css-box",
+        "border": "1px dashed rgba(255, 255, 255, 0.3)",
+        "label": "WIFI"
+      },
+      "status": "rendered",
+      "rendered_file": "assets/icons/wifi-dark.svg",
+      "rendered_file_light": "assets/icons/wifi-light.svg"
+    },
+    {
+      "asset_id": "icon-quick-bluetooth",
+      "target_file": "assets/icons/icon-quick-bluetooth.svg",
+      "category": "vector-icon",
+      "target_generator": "GLM 5.3",
+      "canvas_dimensions": [
+        20,
+        20
+      ],
+      "stroke_weight": "1.5px",
+      "style_tokens": {
+        "stroke": "currentColor",
+        "fill": "none"
+      },
+      "visual_description": "Geometric Bluetooth rune symbol with clean 45-degree angle intersections and rounded terminal caps.",
+      "placeholder_spec": {
+        "type": "css-box",
+        "border": "1px dashed rgba(255, 255, 255, 0.3)",
+        "label": "BT"
+      },
+      "status": "rendered",
+      "rendered_file": "assets/icons/bluetooth-dark.svg",
+      "rendered_file_light": "assets/icons/bluetooth-light.svg"
+    },
+    {
+      "asset_id": "icon-quick-volume",
+      "target_file": "assets/icons/icon-quick-volume.svg",
+      "category": "vector-icon",
+      "target_generator": "GLM 5.3",
+      "canvas_dimensions": [
+        20,
+        20
+      ],
+      "stroke_weight": "1.5px",
+      "style_tokens": {
+        "stroke": "currentColor",
+        "fill": "none"
+      },
+      "visual_description": "Speaker cone with two curved sound wave arcs radiating outwards to the right. Fluent stroke geometry.",
+      "placeholder_spec": {
+        "type": "css-box",
+        "border": "1px dashed rgba(255, 255, 255, 0.3)",
+        "label": "VOL"
+      },
+      "status": "rendered",
+      "rendered_file": "assets/icons/volume-dark.svg",
+      "rendered_file_light": "assets/icons/volume-light.svg"
+    },
+    {
+      "asset_id": "icon-quick-volume-mute",
+      "target_file": "assets/icons/icon-quick-volume-mute.svg",
+      "category": "vector-icon",
+      "target_generator": "GLM 5.3",
+      "canvas_dimensions": [
+        20,
+        20
+      ],
+      "stroke_weight": "1.5px",
+      "style_tokens": {
+        "stroke": "currentColor",
+        "fill": "none"
+      },
+      "visual_description": "Speaker cone with a clean diagonal slash or 'x' cross mute indicator on the right side.",
+      "placeholder_spec": {
+        "type": "css-box",
+        "border": "1px dashed rgba(255, 255, 255, 0.3)",
+        "label": "MUTE"
+      },
+      "status": "rendered",
+      "rendered_file": "assets/icons/mute-dark.svg",
+      "rendered_file_light": "assets/icons/mute-light.svg"
+    },
+    {
+      "asset_id": "icon-quick-theme",
+      "target_file": "assets/icons/icon-quick-theme.svg",
+      "category": "vector-icon",
+      "target_generator": "GLM 5.3",
+      "canvas_dimensions": [
+        20,
+        20
+      ],
+      "stroke_weight": "1.5px",
+      "style_tokens": {
+        "stroke": "currentColor",
+        "fill": "none"
+      },
+      "visual_description": "Windows 11 theme toggle glyph: a circle split vertically with one half solid and one half stroked outline (or sun/crescent hybrid).",
+      "placeholder_spec": {
+        "type": "css-box",
+        "border": "1px dashed rgba(255, 255, 255, 0.3)",
+        "label": "THM"
+      },
+      "status": "rendered",
+      "rendered_file": "assets/icons/theme-switch-dark.svg",
+      "rendered_file_light": "assets/icons/theme-switch-light.svg"
+    },
+    {
+      "asset_id": "icon-quick-battery",
+      "target_file": "assets/icons/icon-quick-battery.svg",
+      "category": "vector-icon",
+      "target_generator": "GLM 5.3",
+      "canvas_dimensions": [
+        20,
+        20
+      ],
+      "stroke_weight": "1.5px",
+      "style_tokens": {
+        "stroke": "currentColor",
+        "fill": "none"
+      },
+      "visual_description": "Horizontal rounded battery pill with positive terminal nipple on the right. 1.5px stroke outline with internal level segment.",
+      "placeholder_spec": {
+        "type": "css-box",
+        "border": "1px dashed rgba(255, 255, 255, 0.3)",
+        "label": "BAT"
+      },
+      "status": "rendered",
+      "rendered_file": "assets/icons/battery-dark.svg",
+      "rendered_file_light": "assets/icons/battery-light.svg"
+    },
+    {
+      "asset_id": "icon-quick-bell",
+      "target_file": "assets/icons/icon-quick-bell.svg",
+      "category": "vector-icon",
+      "target_generator": "GLM 5.3",
+      "canvas_dimensions": [
+        20,
+        20
+      ],
+      "stroke_weight": "1.5px",
+      "style_tokens": {
+        "stroke": "currentColor",
+        "fill": "none"
+      },
+      "visual_description": "Notification bell outline with rounded clapper at bottom center. Fluent design line curve.",
+      "placeholder_spec": {
+        "type": "css-box",
+        "border": "1px dashed rgba(255, 255, 255, 0.3)",
+        "label": "BELL"
+      },
+      "status": "rendered",
+      "rendered_file": "assets/icons/notifications-dark.svg",
+      "rendered_file_light": "assets/icons/notifications-light.svg"
+    },
+    {
+      "asset_id": "icon-chevron-right",
+      "target_file": "assets/icons/icon-chevron-right.svg",
+      "category": "vector-icon",
+      "target_generator": "GLM 5.3",
+      "canvas_dimensions": [
+        16,
+        16
+      ],
+      "stroke_weight": "1.5px",
+      "style_tokens": {
+        "stroke": "currentColor",
+        "fill": "none"
+      },
+      "visual_description": "Clean 90-degree rightward chevron pointing right. Rounded vertex and line ends.",
+      "placeholder_spec": {
+        "type": "css-box",
+        "border": "1px dashed rgba(255, 255, 255, 0.3)",
+        "label": ">"
+      },
+      "status": "rendered",
+      "rendered_file": "assets/icons/chevron-down-dark.svg",
+      "rendered_file_light": "assets/icons/chevron-down-light.svg"
+    },
+    {
+      "asset_id": "texture-acrylic-noise",
+      "target_file": "assets/textures/acrylic-noise.png",
+      "category": "texture-surface",
+      "target_generator": "Flux 1 schnell / Flux 2 klein",
+      "canvas_dimensions": [
+        256,
+        256
+      ],
+      "format": "png",
+      "stroke_weight": "N/A",
+      "style_tokens": {
+        "type": "seamless-tile",
+        "opacity": 0.02,
+        "color_profile": "monochrome-dithered"
+      },
+      "visual_description": "Seamless tileable micro-noise grain texture for modern acrylic and mica glass shaders. Ultra-fine monochromatic gaussian grain, perfectly uniform distribution, high-frequency subtle texture with no banding or repetitive patterns. Optimized for 2-3% alpha blending over dark frosted surfaces.",
+      "placeholder_spec": {
+        "type": "css-shader-fallback",
+        "fallback": "background-color: rgba(32, 32, 32, 0.78)"
+      },
+      "status": "pending_external_render"
+    }
+  ]
+}

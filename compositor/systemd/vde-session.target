@@ -1,0 +1,6 @@
+[Unit]
+Description=VDE Graphical Session
+Documentation=https://github.com/VicRoger27/VDE
+BindsTo=graphical-session.target
+Wants=graphical-session-pre.target vde-bar.service vde-launcher.service
+After=graphical-session-pre.target

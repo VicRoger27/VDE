@@ -1,0 +1,14 @@
+[Unit]
+Description=VDE Start Menu Runner (Qt6 / QML Fast Indexer)
+Documentation=https://github.com/VicRoger27/VDE
+PartOf=vde-session.target
+After=vde-session.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/vde-launcher --daemon
+Restart=on-failure
+RestartSec=1s
+
+[Install]
+WantedBy=vde-session.target

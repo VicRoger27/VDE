@@ -1,0 +1,15 @@
+[Unit]
+Description=VDE Local Vision AI Service (llama.cpp - MiniCPM-V 4.7)
+Documentation=https://github.com/VicRoger27/VDE
+PartOf=vde-session.target
+After=vde-session.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/llama-server -m /var/models/minicpm-v-4.7-1b-dense.gguf --port 8080 --host 127.0.0.1 -c 2048 -ngl 99
+Restart=on-failure
+RestartSec=3s
+CPUQuota=150%
+
+[Install]
+WantedBy=vde-session.target

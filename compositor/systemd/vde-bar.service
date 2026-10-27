@@ -1,0 +1,14 @@
+[Unit]
+Description=VDE Shell Daemon (Astal Taskbar & Quick Settings)
+Documentation=https://github.com/VicRoger27/VDE
+PartOf=vde-session.target
+After=vde-session.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/vde-bar
+Restart=on-failure
+RestartSec=1s
+
+[Install]
+WantedBy=vde-session.target

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none">
+  <defs>
+    <filter id="ai-glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="2" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+  <rect x="3" y="3" width="8" height="8" fill="#0078D4"/>
+  <rect x="13" y="3" width="8" height="8" fill="#0078D4"/>
+  <rect x="3" y="13" width="8" height="8" fill="#0078D4"/>
+  <rect x="13" y="13" width="8" height="8" fill="#0078D4"/>
+  <circle cx="21" cy="3" r="2.5" fill="#00B7C3" filter="url(#ai-glow)"/>
+</svg>
