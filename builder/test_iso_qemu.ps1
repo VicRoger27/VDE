@@ -1,12 +1,12 @@
 # VDE QEMU Hardware-Accelerated Runner (Windows Native)
-# Runs the live ISO in QEMU with WHPX acceleration and native fullscreen
+# Runs the live ISO in QEMU with WHPX acceleration and safe GTK windowing
 
 param (
     [ValidateSet("tryout", "server")]
     [string]$Mode = "tryout",
     [int]$RamMB = 3072,
     [int]$Cpus = 4,
-    [switch]$Windowed
+    [switch]$Fullscreen
 )
 
 $QemuBin = Join-Path (Split-Path (Split-Path $MyInvocation.MyCommand.Path)) "tools\qemu\qemu-system-x86_64.exe"
@@ -25,16 +25,12 @@ if (-not (Test-Path $QemuBin)) {
 
 $resolvedIso = (Resolve-Path $IsoPath).Path
 Write-Host "==========================================================" -ForegroundColor Cyan
-Write-Host " VDE QEMU VM Test Runner (Hardware-Accelerated)" -ForegroundColor Cyan
+Write-Host " VDE QEMU VM Test Runner (Safe Mode)" -ForegroundColor Cyan
 Write-Host " Target ISO:   $resolvedIso" -ForegroundColor Cyan
 Write-Host " Virtual Disk: $DiskPath (20 GB VirtIO)" -ForegroundColor Cyan
 Write-Host " Accelerator:  WHPX (Windows Hypervisor Platform)" -ForegroundColor Cyan
 Write-Host " RAM:          ${RamMB} MB | CPUs: $Cpus" -ForegroundColor Cyan
-Write-Host " Display Mode: $(if ($Windowed) { 'Windowed' } else { 'Native Fullscreen' })" -ForegroundColor Cyan
-Write-Host "==========================================================" -ForegroundColor Cyan
-Write-Host " [HOTKEYS]" -ForegroundColor Yellow
-Write-Host "   - [Ctrl + Alt + F] : Toggle Fullscreen" -ForegroundColor White
-Write-Host "   - [Ctrl + Alt + G] : Release Mouse cursor" -ForegroundColor White
+Write-Host " Display Mode: Safe GTK Window with USB Tablet (No mouse trap)" -ForegroundColor Cyan
 Write-Host "==========================================================" -ForegroundColor Cyan
 
 $qemuArgs = @(
@@ -46,11 +42,12 @@ $qemuArgs = @(
     "-drive", "file=$DiskPath,if=virtio,format=qcow2",
     "-boot", "d",
     "-vga", "virtio",
-    "-display", "sdl",
-    "-name", "Victorious Desktop Environment (VDE) - QEMU"
+    "-device", "usb-tablet",
+    "-display", "gtk",
+    "-name", "Victorious Desktop Environment (VDE)"
 )
 
-if (-not $Windowed) {
+if ($Fullscreen) {
     $qemuArgs += "-full-screen"
 }
 

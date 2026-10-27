@@ -1,7 +1,7 @@
 @echo off
-title VDE Hardware-Accelerated Runner (WHPX + Fullscreen)
+title VDE Hardware-Accelerated Runner (WHPX + Safe Window)
 echo ========================================================
-echo   Victorious Desktop Environment (VDE) - QEMU Runner
+echo   Victorious Desktop Environment (VDE) - Safe VM Runner
 echo   Hardware Acceleration: WHPX (Windows Hypervisor Platform)
 echo ========================================================
 echo.
@@ -35,15 +35,17 @@ goto do_launch
 
 :do_launch
 echo.
-echo [QEMU HOTKEYS]
-echo   - Press [Ctrl + Alt + F] to toggle Fullscreen / Windowed
-echo   - Press [Ctrl + Alt + G] to release mouse grab
+echo [SAFETY CONTROLS]
+echo   - Mouse: Absolute USB Tablet (smooth, seamless, no trapping)
+echo   - Window: Standard window with Minimize / Maximize / Close [X]
+echo   - Fullscreen: Click 'View' -^> 'Full Screen' or press [Ctrl + Alt + F]
+echo   - Emergency Exit: Press [Alt + F4] or close window
 echo.
 echo Launching QEMU...
 
-start "" "%QEMU_BIN%" -accel whpx -accel tcg -m 3072 -smp 4 -cdrom "%TARGET_ISO%" -drive "file=%DISK_PATH%,if=virtio,format=qcow2" -boot d -vga virtio -display sdl -full-screen -name "Victorious Desktop Environment (VDE)"
+start "" "%QEMU_BIN%" -accel whpx -accel tcg -m 3072 -smp 4 -cdrom "%TARGET_ISO%" -drive "file=%DISK_PATH%,if=virtio,format=qcow2" -boot d -vga virtio -device usb-tablet -display gtk -name "Victorious Desktop Environment (VDE)"
 
 echo.
-echo VM launched successfully.
+echo VM launched in safe window.
 echo ========================================================
 pause
