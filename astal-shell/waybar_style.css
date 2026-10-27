@@ -86,7 +86,6 @@ window#waybar {
 
 #clock {
   font-size: 11px;
-  text-align: right;
   font-weight: 500;
   line-height: 1.2;
 }

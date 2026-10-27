@@ -12,6 +12,11 @@ if [ ! -f "style.css" ]; then
     fi
 fi
 
+# Prevent duplicate shell / bar instances
+if pgrep -x waybar >/dev/null 2>&1; then
+    exit 0
+fi
+
 # Run Astal Shell via ags or astal CLI, with Waybar fallback
 if command -v ags >/dev/null 2>&1; then
     exec ags run app.ts "$@"
