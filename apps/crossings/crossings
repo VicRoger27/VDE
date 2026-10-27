@@ -1,0 +1,14 @@
+#!/bin/sh
+# Crossings Native Settings Hub Runner
+# Executable wrapper launching the QML Settings application
+
+SCRIPT_DIR="$(dirname "$(realpath "$0" 2>/dev/null || readlink -f "$0" 2>/dev/null || echo "$0")")"
+
+if command -v qml6 >/dev/null 2>&1; then
+    exec qml6 "$SCRIPT_DIR/CrossingsWindow.qml" "$@"
+elif command -v qml >/dev/null 2>&1; then
+    exec qml "$SCRIPT_DIR/CrossingsWindow.qml" "$@"
+else
+    echo "[Crossings Error] 'qml6' runtime command not found in PATH." >&2
+    exit 1
+fi
