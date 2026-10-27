@@ -2,34 +2,32 @@
 # Runs the live ISO in QEMU with WHPX acceleration and native fullscreen
 
 param (
-    [string]$IsoPath = "C:\Users\Victor\ISO\Test\vde-live-amd64.iso",
-    [int]$RamMB = 2048,
-    [int]$Cpus = 2,
+    [ValidateSet("tryout", "server")]
+    [string]$Mode = "tryout",
+    [int]$RamMB = 3072,
+    [int]$Cpus = 4,
     [switch]$Windowed
 )
 
 $QemuBin = Join-Path (Split-Path (Split-Path $MyInvocation.MyCommand.Path)) "tools\qemu\qemu-system-x86_64.exe"
+$DiskPath = "C:\Users\Victor\ISO\Test\vde-disk.qcow2"
+
+if ($Mode -eq "server") {
+    $IsoPath = "C:\Users\Victor\ISO\Test\vde-live-amd64.iso"
+} else {
+    $IsoPath = "C:\Users\Victor\ISO\Test\vde-live-tryout.iso"
+}
 
 if (-not (Test-Path $QemuBin)) {
     Write-Error "QEMU executable not found at $QemuBin"
     exit 1
 }
 
-if (-not (Test-Path $IsoPath)) {
-    $fallback = "C:\Users\Victor\ISO\ubuntu-26.04.1-live-server-amd64.iso"
-    if (Test-Path $fallback) {
-        Write-Host "Notice: $IsoPath not found, using fallback: $fallback" -ForegroundColor Yellow
-        $IsoPath = $fallback
-    } else {
-        Write-Error "No ISO found at $IsoPath"
-        exit 1
-    }
-}
-
 $resolvedIso = (Resolve-Path $IsoPath).Path
 Write-Host "==========================================================" -ForegroundColor Cyan
 Write-Host " VDE QEMU VM Test Runner (Hardware-Accelerated)" -ForegroundColor Cyan
 Write-Host " Target ISO:   $resolvedIso" -ForegroundColor Cyan
+Write-Host " Virtual Disk: $DiskPath (20 GB VirtIO)" -ForegroundColor Cyan
 Write-Host " Accelerator:  WHPX (Windows Hypervisor Platform)" -ForegroundColor Cyan
 Write-Host " RAM:          ${RamMB} MB | CPUs: $Cpus" -ForegroundColor Cyan
 Write-Host " Display Mode: $(if ($Windowed) { 'Windowed' } else { 'Native Fullscreen' })" -ForegroundColor Cyan
@@ -45,6 +43,7 @@ $qemuArgs = @(
     "-m", $RamMB,
     "-smp", $Cpus,
     "-cdrom", $resolvedIso,
+    "-drive", "file=$DiskPath,if=virtio,format=qcow2",
     "-boot", "d",
     "-vga", "virtio",
     "-display", "sdl",

@@ -12,10 +12,31 @@ import subprocess
 import io
 import pycdlib
 
+import argparse
+import os
+import sys
+import shutil
+import subprocess
+import io
+import pycdlib
+
+parser = argparse.ArgumentParser(description="VDE Live ISO Builder")
+parser.add_argument("--mode", choices=["server", "desktop"], default="server",
+                    help="Backbone mode: 'server' for Ubuntu Server minimal or 'desktop' for instant live desktop tryout")
+args = parser.parse_args()
+
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-TEMPLATE_ISO = r"C:\Users\Victor\ISO\ubuntu-26.04.1-live-server-amd64.iso"
 OUTPUT_DIR = r"C:\Users\Victor\ISO\Test"
-OUTPUT_ISO = os.path.join(OUTPUT_DIR, "vde-live-amd64.iso")
+
+if args.mode == "desktop":
+    TEMPLATE_ISO = r"C:\Users\Victor\ISO\lubuntu-26.10-desktop-amd64.iso"
+    OUTPUT_ISO = os.path.join(OUTPUT_DIR, "vde-live-tryout.iso")
+    BRAND_TITLE = "Victorious Desktop Environment (VDE) - Instant Live Tryout"
+else:
+    TEMPLATE_ISO = r"C:\Users\Victor\ISO\ubuntu-26.04.1-live-server-amd64.iso"
+    OUTPUT_ISO = os.path.join(OUTPUT_DIR, "vde-live-amd64.iso")
+    BRAND_TITLE = "Victorious Desktop Environment (VDE) - Live on Ubuntu Server"
+
 OVERLAY_DIR = os.path.join(ROOT_DIR, "builder", "vde_overlay")
 SQUASHFS_FILE = os.path.join(ROOT_DIR, "builder", "vde.squashfs")
 
@@ -157,40 +178,34 @@ iso.open(TEMPLATE_ISO)
 
 # Customized GRUB menu
 print(">> Customizing GRUB bootloader menu...")
-new_grub = b"""set timeout=5
+new_grub = f"""set timeout=5
 loadfont unicode
 
 set menu_color_normal=white/black
 set menu_color_highlight=black/cyan
 
-menuentry "Victorious Desktop Environment (VDE) - Live on Ubuntu Server" {
+menuentry "{BRAND_TITLE}" {{
     set gfxpayload=keep
-    linux  /casper/vmlinuz quiet splash systemd.mask=subiquity.service systemd.mask=subiquity-server.service --- 
+    linux  /casper/vmlinuz quiet splash --- 
     initrd /casper/initrd
-}
+}}
 
-menuentry "Victorious Desktop Environment (VDE) - Safe Graphics Mode" {
+menuentry "{BRAND_TITLE} (Safe Graphics Mode)" {{
     set gfxpayload=keep
-    linux  /casper/vmlinuz nomodeset systemd.mask=subiquity.service systemd.mask=subiquity-server.service --- 
+    linux  /casper/vmlinuz nomodeset quiet splash --- 
     initrd /casper/initrd
-}
-
-menuentry "Ubuntu Server Standard Installer (Subiquity)" {
-    set gfxpayload=keep
-    linux  /casper/vmlinuz --- 
-    initrd /casper/initrd
-}
+}}
 
 grub_platform
 if [ "$grub_platform" = "efi" ]; then
-menuentry 'Boot from next volume' {
+menuentry 'Boot from next volume' {{
     exit 1
-}
-menuentry 'UEFI Firmware Settings' {
+}}
+menuentry 'UEFI Firmware Settings' {{
     fwsetup
-}
+}}
 fi
-"""
+""".encode('utf-8')
 
 grub_fp = io.BytesIO(new_grub)
 iso.update_file_contents_fp(grub_fp, len(new_grub), iso_path='/BOOT/GRUB/GRUB.CFG;1')

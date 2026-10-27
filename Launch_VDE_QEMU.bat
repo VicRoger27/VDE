@@ -1,38 +1,49 @@
 @echo off
-title VDE QEMU Hardware-Accelerated Runner
+title VDE Hardware-Accelerated Runner (WHPX + Fullscreen)
 echo ========================================================
 echo   Victorious Desktop Environment (VDE) - QEMU Runner
 echo   Hardware Acceleration: WHPX (Windows Hypervisor Platform)
-echo   Target ISO: C:\Users\Victor\ISO\Test\vde-live-amd64.iso
 echo ========================================================
 echo.
-echo [QEMU HOTKEYS]
-echo   - [Ctrl + Alt + F] : Toggle in/out of Fullscreen mode!
-echo   - [Ctrl + Alt + G] : Release mouse cursor back to Windows!
-echo.
-echo Launching VDE directly into Fullscreen with WHPX acceleration...
 
 set QEMU_BIN=%~dp0tools\qemu\qemu-system-x86_64.exe
-set ISO_PATH=C:\Users\Victor\ISO\Test\vde-live-amd64.iso
+set DISK_PATH=C:\Users\Victor\ISO\Test\vde-disk.qcow2
+set TRYOUT_ISO=C:\Users\Victor\ISO\Test\vde-live-tryout.iso
+set SERVER_ISO=C:\Users\Victor\ISO\Test\vde-live-amd64.iso
 
-if not exist "%ISO_PATH%" (
-    echo [Notice] Custom ISO not found in Test folder, using primary ISO...
-    set ISO_PATH=C:\Users\Victor\ISO\ubuntu-26.04.1-live-server-amd64.iso
+echo Select Boot Mode:
+echo   [1] Instant Live Desktop Tryout (Direct boot to VDE in RAM - Zero Install)
+echo   [2] Ubuntu Server Backbone (With 20GB VirtIO disk attached)
+echo.
+set /p CHOICE="Enter choice [1 or 2, default is 1]: "
+
+if "%CHOICE%"=="2" (
+    set TARGET_ISO=%SERVER_ISO%
+    echo Starting Ubuntu Server backbone with 20GB VirtIO disk...
+) else (
+    set TARGET_ISO=%TRYOUT_ISO%
+    echo Starting Instant Live Desktop tryout (no disk install required)...
 )
+
+echo.
+echo [QEMU HOTKEYS]
+echo   - [Ctrl + Alt + F] : Toggle Fullscreen / Windowed mode
+echo   - [Ctrl + Alt + G] : Release Mouse back to Windows
+echo.
 
 start "" "%QEMU_BIN%" ^
     -accel whpx ^
     -accel tcg ^
-    -m 2048 ^
-    -smp 2 ^
-    -cdrom "%ISO_PATH%" ^
+    -m 3072 ^
+    -smp 4 ^
+    -cdrom "%TARGET_ISO%" ^
+    -drive file="%DISK_PATH%",if=virtio,format=qcow2 ^
     -boot d ^
     -vga virtio ^
     -display sdl ^
     -full-screen ^
     -name "Victorious Desktop Environment (VDE) - Fullscreen"
 
-echo.
-echo QEMU VM window dispatched!
+echo QEMU launched successfully.
 echo ========================================================
 timeout /t 3
