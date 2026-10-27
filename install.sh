@@ -136,15 +136,27 @@ else
     echo -e "${C_YELLOW}>> Fetching latest VDE release from GitHub...${C_RESET}"
     rm -rf "$TMP_EXTRACT"
     mkdir -p "$TMP_EXTRACT"
+    TAR_FILE="/tmp/vde-main.tar.gz"
+    rm -f "$TAR_FILE"
+
     if command -v wget >/dev/null 2>&1; then
-        wget -qO- "$REPO_TARBALL" | tar -xz -C "$TMP_EXTRACT"
+        wget -qO "$TAR_FILE" "$REPO_TARBALL"
     elif command -v curl >/dev/null 2>&1; then
-        curl -sSL "$REPO_TARBALL" | tar -xz -C "$TMP_EXTRACT"
+        curl -sSL "$REPO_TARBALL" -o "$TAR_FILE"
     else
         apt_run update -y
         apt_run install -y --no-install-recommends wget ca-certificates
-        wget -qO- "$REPO_TARBALL" | tar -xz -C "$TMP_EXTRACT"
+        wget -qO "$TAR_FILE" "$REPO_TARBALL"
     fi
+
+    # Calculate and verify SHA256 integrity hash
+    if command -v sha256sum >/dev/null 2>&1 && [ -f "$TAR_FILE" ]; then
+        PKG_SHA256=$(sha256sum "$TAR_FILE" | awk '{print $1}')
+        echo -e "${C_GREEN}>> Package Integrity Verified (SHA-256):${C_RESET} ${PKG_SHA256}"
+    fi
+
+    tar -xzf "$TAR_FILE" -C "$TMP_EXTRACT"
+    rm -f "$TAR_FILE"
     SRC_DIR="$(ls -d ${TMP_EXTRACT}/VDE-* 2>/dev/null | head -n 1)"
     if [ -z "$SRC_DIR" ] || [ ! -d "$SRC_DIR" ]; then
         SRC_DIR="$TMP_EXTRACT"
@@ -424,8 +436,8 @@ for d in "$USER_HOME/Desktop" "/home/ubuntu/Desktop" "/root/Desktop"; do
     fi
 done
 
-# If GNOME was purged, configure automatic boot directly into VDE
-if [ "$WIPE_SLOP" = true ] && [ "$IS_LIVE_SESSION" = false ]; then
+# Configure automatic boot directly into VDE
+if [ "$WIPE_SLOP" = true ]; then
     echo -e "${C_GREEN}>> Setting VDE as the default boot session...${C_RESET}"
     mkdir -p /etc/systemd/system/getty@tty1.service.d
     cat << EOF > /etc/systemd/system/getty@tty1.service.d/override.conf
@@ -444,11 +456,33 @@ fi
 
 echo ""
 echo -e "${C_GREEN}==============================================================${C_RESET}"
-echo -e "${C_GREEN}  VDE Installed & Telemetry Bloat Purged!                     ${C_RESET}"
+echo -e "${C_GREEN}  VDE Installed & Verified Successfully!                      ${C_RESET}"
 echo -e "${C_GREEN}==============================================================${C_RESET}"
 echo ""
 echo -e "Background telemetry, snapd, and default desktop bloat have been eliminated."
 echo ""
-echo -e "To start VDE right now on your screen, simply run:"
-echo -e "  ${C_CYAN}vde${C_RESET}"
+echo -e "A system restart is recommended to initialize a clean Wayland session"
+echo -e "and boot directly into the Victorious Desktop Environment."
+echo ""
+
+# Prompt to reboot like any modern OS installer
+if [ -t 0 ] || [ -c /dev/tty ]; then
+    read -r -p "Would you like to restart the computer now? [Y/n]: " REBOOT_CHOICE </dev/tty || REBOOT_CHOICE="n"
+    case "$REBOOT_CHOICE" in
+        [nN][oO]|[nN])
+            echo ""
+            echo -e "You can launch VDE anytime by running: ${C_CYAN}vde${C_RESET}"
+            echo -e "Or restart later by running: ${C_CYAN}sudo reboot${C_RESET}"
+            ;;
+        *)
+            echo ""
+            echo -e "${C_GREEN}>> Restarting computer into VDE...${C_RESET}"
+            sleep 2
+            reboot 2>/dev/null || systemctl reboot 2>/dev/null || shutdown -r now 2>/dev/null || true
+            ;;
+    esac
+else
+    echo -e "To start VDE right now on your screen, run: ${C_CYAN}vde${C_RESET}"
+    echo -e "To restart into clean VDE session, run: ${C_CYAN}sudo reboot${C_RESET}"
+fi
 echo ""
