@@ -2,25 +2,48 @@
 # Launches a native Virtual Machine for testing VDE ISOs on top of Ubuntu Server backbone
 
 param (
-    [string]$IsoPath = "vde-live-amd64.iso",
+    [string]$IsoPath = "",
     [string]$VmName = "VDE-Live-Test",
     [int]$RamMB = 2048,
-    [int]$Cpus = 2
+    [int]$Cpus = 2,
+    [ValidateSet("server", "lubuntu", "budgie", "vde", "custom")]
+    [string]$Preset = "server"
 )
 
 $VBoxManage = "C:\Program Files\Oracle\VirtualBox\VBoxManage.exe"
 $VBoxGUI    = "C:\Program Files\Oracle\VirtualBox\VirtualBox.exe"
+$VBoxVM     = "C:\Program Files\Oracle\VirtualBox\VirtualBoxVM.exe"
 
 if (-not (Test-Path $VBoxManage)) {
     Write-Error "VirtualBox not found at $VBoxManage"
     exit 1
 }
 
-# Resolve ISO path: check for built VDE live ISO, or fallback to Ubuntu Server backbone ISO in C:\Users\Victor\ISO
+# Resolve ISO path based on Preset or explicit IsoPath
+if (-not $IsoPath) {
+    switch ($Preset) {
+        "server" {
+            $IsoPath = "C:\Users\Victor\ISO\ubuntu-26.04.1-live-server-amd64.iso"
+        }
+        "lubuntu" {
+            $IsoPath = "C:\Users\Victor\ISO\lubuntu-26.10-desktop-amd64.iso"
+        }
+        "budgie" {
+            $IsoPath = "C:\Users\Victor\ISO\ubuntu-budgie-26.10-desktop-amd64.iso"
+        }
+        "vde" {
+            $IsoPath = "vde-live-amd64.iso"
+        }
+        Default {
+            $IsoPath = "C:\Users\Victor\ISO\ubuntu-26.04.1-live-server-amd64.iso"
+        }
+    }
+}
+
 if (-not (Test-Path $IsoPath)) {
     $fallbackIso = "C:\Users\Victor\ISO\ubuntu-26.04.1-live-server-amd64.iso"
     if (Test-Path $fallbackIso) {
-        Write-Host "Notice: $IsoPath not yet generated. Attaching Ubuntu Server backbone ISO:" -ForegroundColor Yellow
+        Write-Host "Notice: Selected ISO ($IsoPath) not found. Attaching Ubuntu Server backbone ISO:" -ForegroundColor Yellow
         Write-Host "  $fallbackIso" -ForegroundColor Yellow
         $IsoPath = $fallbackIso
     } else {
@@ -31,7 +54,7 @@ if (-not (Test-Path $IsoPath)) {
 
 $resolvedIso = (Resolve-Path $IsoPath).Path
 Write-Host "==========================================================" -ForegroundColor Cyan
-Write-Host " VDE VirtualBox VM Manager" -ForegroundColor Cyan
+Write-Host " Victorious Desktop Environment (VDE) - VM Manager" -ForegroundColor Cyan
 Write-Host " Backbone ISO: $resolvedIso" -ForegroundColor Cyan
 Write-Host " RAM: ${RamMB} MB | CPUs: $Cpus | Graphics: VMSVGA 128MB" -ForegroundColor Cyan
 Write-Host "==========================================================" -ForegroundColor Cyan
@@ -67,31 +90,30 @@ Write-Host ">> Setting VM hardware parameters..."
     --boot3 none `
     --boot4 none
 
+# Force GUI frontend (prevents headless/separate mode)
+& $VBoxManage setextradata $VmName "GUI/DefaultFrontend" "gui"
+
 # Attach storage controller and ISO
-& $VBoxManage storagectl $VmName --name "IDE Controller" --add ide 2>$null || true
-& $VBoxManage storageattach $VmName `
-    --storagectl "IDE Controller" `
-    --port 0 `
-    --device 0 `
-    --type dvddrive `
-    --medium $resolvedIso 2>$null || true
+try {
+    & $VBoxManage storagectl $VmName --name "IDE Controller" --add ide 2>$null
+} catch {}
 
-# Update 1-click batch launcher
-$batPath = Join-Path (Get-Location) "Launch_VDE_VM.bat"
-@"
-@echo off
-title VDE Virtual Machine Runner
-echo ========================================================
-echo  Launching VDE Live OS ($VmName)
-echo  Backbone: Ubuntu Server 24.04
-echo ========================================================
-start "" "$VBoxGUI" --startvm "$VmName"
-"@ | Set-Content -Path $batPath -Encoding ASCII
+try {
+    & $VBoxManage storageattach $VmName `
+        --storagectl "IDE Controller" `
+        --port 0 `
+        --device 0 `
+        --type dvddrive `
+        --medium $resolvedIso 2>$null
+} catch {}
 
 Write-Host "==========================================================" -ForegroundColor Green
-Write-Host " VM '$VmName' is registered and ready in Oracle VirtualBox!" -ForegroundColor Green
-Write-Host " To display the VM window interactively on your screen:" -ForegroundColor Cyan
-Write-Host "   1. Open Oracle VirtualBox from your Windows Start Menu" -ForegroundColor White
-Write-Host "   2. Click 'VDE-Live-Test' in the left pane and press Start" -ForegroundColor White
-Write-Host "   OR double-click 'Launch_VDE_VM.bat' in your file explorer." -ForegroundColor White
+Write-Host " VM '$VmName' configured and ready in Oracle VirtualBox!" -ForegroundColor Green
+Write-Host " Attached ISO: $resolvedIso" -ForegroundColor Green
+Write-Host " Frontend Mode: Explicit GUI (Window Mode)" -ForegroundColor Green
 Write-Host "==========================================================" -ForegroundColor Green
+Write-Host " To start the VM:" -ForegroundColor Cyan
+Write-Host "   - Double-click 'Launch_VDE_VM.bat' in the project folder" -ForegroundColor White
+Write-Host "   OR" -ForegroundColor White
+Write-Host "   - Open VirtualBox from Start Menu, select '$VmName' and click Start" -ForegroundColor White
+Write-Host "==========================================================" -ForegroundColor Cyan
