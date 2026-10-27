@@ -62,4 +62,4 @@ Once installed, you can enter VDE in two ways:
 
 ## 📜 License & Privacy
 
-VDE is licensed under the MIT License. Designed with zero cloud telemetry, zero remote tracking, and strictly local AI inference.
+VDE is licensed under the VPL License. Designed with zero cloud telemetry, zero remote tracking, and strictly local AI inference.
