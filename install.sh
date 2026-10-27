@@ -378,6 +378,12 @@ if [ -z "$DBUS_SESSION_BUS_ADDRESS" ]; then
     fi
 fi
 
+# Release DRM KMS connector from zombie display servers
+pkill -9 -f gnome-shell 2>/dev/null || true
+pkill -9 -f mutter 2>/dev/null || true
+pkill -9 -f Xwayland 2>/dev/null || true
+sleep 1
+
 echo "=========================================================="
 echo " Starting Victorious Desktop Environment (VDE)..."
 echo " Compositor: Labwc (wlroots layer-shell)"
@@ -418,6 +424,10 @@ if [ -n "$WAYLAND_DISPLAY" ] || [ -n "$DISPLAY" ]; then
         exec labwc -s /usr/local/bin/vde-bar "$@"
     }
 else
+    pkill -9 -f gnome-shell 2>/dev/null || true
+    pkill -9 -f mutter 2>/dev/null || true
+    pkill -9 -f Xwayland 2>/dev/null || true
+    sleep 1
     exec /usr/local/bin/vde-session "$@"
 fi
 EOF
