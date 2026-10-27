@@ -1,0 +1,23 @@
+{
+  "name": "vde-shell",
+  "version": "1.0.0",
+  "description": "VDE Desktop Shell - Windows 11 Ergonomics & Frosted Acrylic Layer-Shell",
+  "main": "app.ts",
+  "type": "module",
+  "scripts": {
+    "sass": "sass style/style.scss style.css",
+    "build": "sass style/style.scss style.css && ags bundle app.ts vde-bar",
+    "start": "sass style/style.scss style.css && ags run app.ts",
+    "compile-tokens": "python ../tokens/compile_tokens.py"
+  },
+  "dependencies": {
+    "astal": "^0.1.0",
+    "@astal/gtk4": "^0.1.0",
+    "@astal/io": "^0.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "sass": "^1.77.0",
+    "typescript": "^5.5.0"
+  }
+}

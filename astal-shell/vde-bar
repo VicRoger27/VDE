@@ -1,0 +1,24 @@
+#!/bin/sh
+# VDE Taskbar & Quick Settings Shell Runner
+# Executable entrypoint for Astal / AGS v2
+
+SCRIPT_DIR="$(dirname "$(realpath "$0" 2>/dev/null || readlink -f "$0" 2>/dev/null || echo "$0")")"
+cd "$SCRIPT_DIR"
+
+# Ensure style.css is compiled
+if [ ! -f "style.css" ]; then
+    if command -v python3 >/dev/null 2>&1; then
+        python3 build_css.py
+    fi
+fi
+
+# Run Astal Shell via ags or astal CLI
+if command -v ags >/dev/null 2>&1; then
+    exec ags run app.ts "$@"
+elif command -v astal >/dev/null 2>&1; then
+    exec astal -i app.ts "$@"
+else
+    echo "[VDE Shell Error] Neither 'ags' nor 'astal' command found in PATH." >&2
+    echo "Please install Astal (AGS v2) or run inside the VDE development container." >&2
+    exit 1
+fi

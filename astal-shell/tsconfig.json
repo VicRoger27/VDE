@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "lib": ["ESNext", "DOM"],
+    "strict": true,
+    "skipLibCheck": true,
+    "jsx": "react-jsx",
+    "jsxImportSource": "astal/gtk4",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./*"]
+    }
+  },
+  "include": ["**/*.ts", "**/*.tsx"]
+}

@@ -1,0 +1,294 @@
+/* VDE Astal Shell - Compiled GTK4 CSS */
+* {
+    font-family: 'Segoe UI Variable', 'Inter', 'Cantarell', system-ui, -apple-system, sans-serif;
+    font-size: 13px;
+    color: #ffffff;
+    box-shadow: none;
+    outline: none;
+}
+
+/* ------------------------------------------------------------- */
+/* Floating Taskbar Window & Container                           */
+/* ------------------------------------------------------------- */
+.vde-taskbar-window {
+    background: transparent;
+}
+
+.vde-taskbar-container {
+    background-color: rgba(32, 32, 32, 0.82);
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    border-radius: 12px;
+    min-height: 48px;
+    padding: 0 6px;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.32);
+}
+
+.taskbar-left-zone {
+    padding-left: 6px;
+}
+
+.taskbar-center-dock {
+    padding: 0 4px;
+}
+
+.taskbar-right-zone {
+    padding-right: 4px;
+}
+
+/* ------------------------------------------------------------- */
+/* Start Button Widget                                           */
+/* ------------------------------------------------------------- */
+.vde-start-button {
+    min-width: 44px;
+    min-height: 40px;
+    border-radius: 8px;
+    background: transparent;
+    border: 1px solid transparent;
+    padding: 0 8px;
+}
+
+.vde-start-button:hover {
+    background-color: #383838;
+}
+
+.vde-start-button:active {
+    background-color: #282828;
+}
+
+.vde-start-button.active-inference {
+    border: 1px solid rgba(96, 205, 255, 0.45);
+    box-shadow: 0 0 10px rgba(96, 205, 255, 0.45);
+}
+
+.start-icon-wrapper {
+    min-width: 24px;
+    min-height: 24px;
+}
+
+/* ------------------------------------------------------------- */
+/* Pinned & Running Task Items                                   */
+/* ------------------------------------------------------------- */
+.vde-task-items {
+    padding: 0 2px;
+}
+
+.vde-task-button {
+    min-width: 44px;
+    min-height: 40px;
+    border-radius: 8px;
+    background: transparent;
+    border: none;
+    padding: 2px 8px 0 8px;
+}
+
+.vde-task-button:hover {
+    background-color: #383838;
+}
+
+.vde-task-button:active {
+    background-color: #282828;
+}
+
+.task-icon {
+    min-width: 24px;
+    min-height: 24px;
+}
+
+/* Indicators */
+.indicator-line.idle {
+    min-width: 0px;
+    min-height: 3px;
+    background-color: transparent;
+}
+
+.indicator-line.running {
+    min-width: 4px;
+    min-height: 4px;
+    border-radius: 9999px;
+    background-color: #60cdff;
+    margin-top: 2px;
+}
+
+.indicator-line.focused {
+    min-width: 16px;
+    min-height: 3px;
+    border-radius: 9999px;
+    background-color: #60cdff;
+    margin-top: 2px;
+}
+
+.vde-workspace-pill {
+    min-width: 36px;
+    min-height: 36px;
+    border-radius: 8px;
+    background: transparent;
+    border: none;
+}
+
+.vde-workspace-pill:hover {
+    background-color: #383838;
+}
+
+/* ------------------------------------------------------------- */
+/* Quick Settings Pill & Clock Button                            */
+/* ------------------------------------------------------------- */
+.vde-quicksettings-pill {
+    min-height: 36px;
+    border-radius: 8px;
+    background: transparent;
+    border: 1px solid transparent;
+    padding: 4px 10px;
+}
+
+.vde-quicksettings-pill:hover {
+    background-color: #383838;
+}
+
+.vde-quicksettings-pill:active {
+    background-color: #282828;
+}
+
+.vde-clock-button {
+    min-height: 36px;
+    border-radius: 8px;
+    background: transparent;
+    border: none;
+    padding: 2px 8px;
+}
+
+.vde-clock-button:hover {
+    background-color: #383838;
+}
+
+.clock-time {
+    font-size: 13px;
+    font-weight: 500;
+    color: #ffffff;
+}
+
+.clock-date {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.54);
+    margin-top: -2px;
+}
+
+.show-desktop-strip {
+    min-width: 6px;
+    min-height: 32px;
+    border-radius: 2px;
+    background: transparent;
+    border: none;
+    margin-left: 2px;
+}
+
+.show-desktop-strip:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+}
+
+/* ------------------------------------------------------------- */
+/* Quick Settings Flyout Window                                  */
+/* ------------------------------------------------------------- */
+.vde-flyout-window {
+    background: transparent;
+}
+
+.quicksettings-card {
+    background-color: #2c2c2c;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: 16px;
+    min-width: 360px;
+    padding: 16px;
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.45);
+}
+
+.toggle-tile {
+    min-height: 48px;
+    border-radius: 8px;
+    background-color: #2d2d2d;
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    padding: 8px 12px;
+}
+
+.toggle-tile:hover {
+    background-color: #383838;
+}
+
+.toggle-tile.active {
+    background-color: #0078d4;
+    border-color: #60cdff;
+}
+
+.toggle-tile.active .toggle-label,
+.toggle-tile.active .toggle-status {
+    color: #ffffff;
+}
+
+.toggle-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #ffffff;
+}
+
+.toggle-status {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.54);
+}
+
+.slider-icon-btn {
+    background: transparent;
+    border: none;
+    padding: 4px;
+    border-radius: 4px;
+}
+
+.slider-icon-btn:hover {
+    background-color: #383838;
+}
+
+.fluent-slider trough {
+    background-color: #3e3e3e;
+    border-radius: 9999px;
+    min-height: 4px;
+}
+
+.fluent-slider highlight {
+    background-color: #60cdff;
+    border-radius: 9999px;
+    min-height: 4px;
+}
+
+.fluent-slider slider {
+    background-color: #ffffff;
+    border: 3px solid #60cdff;
+    border-radius: 9999px;
+    min-width: 14px;
+    min-height: 14px;
+}
+
+.divider {
+    min-height: 1px;
+    background-color: rgba(255, 255, 255, 0.08);
+    margin: 4px 0;
+}
+
+.battery-label {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.78);
+}
+
+.power-btn {
+    min-width: 32px;
+    min-height: 32px;
+    border-radius: 8px;
+    background-color: #2d2d2d;
+    border: 1px solid rgba(255, 255, 255, 0.09);
+}
+
+.power-btn:hover {
+    background-color: #383838;
+}
+
+.power-btn.shutdown:hover {
+    background-color: #c42b1c;
+    border-color: #c42b1c;
+}
