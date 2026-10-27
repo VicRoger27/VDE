@@ -24,8 +24,8 @@ fi
 command -v swaybg >/dev/null 2>&1 && swaybg -c '#18181b' &
 
 # Audio Infrastructure
-command -v pipewire >/dev/null 2>&1 && pipewire &
-command -v wireplumber >/dev/null 2>&1 && wireplumber &
+pgrep -x pipewire >/dev/null 2>&1 || (command -v pipewire >/dev/null 2>&1 && pipewire &)
+pgrep -x wireplumber >/dev/null 2>&1 || (command -v wireplumber >/dev/null 2>&1 && wireplumber &)
 
 # Taskbar & Shell Runner (Astal / Waybar fallback)
 if ! pgrep -x waybar >/dev/null 2>&1; then
