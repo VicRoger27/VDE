@@ -4,22 +4,24 @@ echo ========================================================
 echo   Victorious Desktop Environment (VDE) - VM Runner
 echo ========================================================
 echo.
-echo Ensuring GUI and Fullscreen mode are enabled...
+echo 1. Clearing any stuck session locks or orphaned background processes...
+taskkill /f /im VirtualBoxVM.exe >nul 2>&1
+timeout /t 1 /nobreak >nul
+
+echo 2. Ensuring GUI and Fullscreen mode are configured...
 "C:\Program Files\Oracle\VirtualBox\VBoxManage.exe" setextradata "VDE-Live-Test" "GUI/DefaultFrontend" "gui" >nul 2>&1
 "C:\Program Files\Oracle\VirtualBox\VBoxManage.exe" setextradata "VDE-Live-Test" "GUI/Fullscreen" "true" >nul 2>&1
 
 echo.
-echo Launching VDE in Fullscreen Window...
+echo 3. Launching VDE Virtual Machine in Fullscreen Window...
 echo.
-echo [TIP] Press [Right Ctrl + F] on your keyboard to toggle in/out of Fullscreen!
+echo [HOTKEY] Press [Right Ctrl + F] on your keyboard to toggle Fullscreen!
 echo.
 start "" "C:\Program Files\Oracle\VirtualBox\VirtualBoxVM.exe" --startvm "VDE-Live-Test"
 
-echo VM launch signal sent.
+echo Launch signal dispatched.
 echo.
-echo If the VM window does not appear in 3 seconds:
-echo 1. Open "Oracle VM VirtualBox" from your Windows Start Menu.
-echo 2. Click "VDE-Live-Test" in the machine list.
-echo 3. Click the green "Start" button.
+echo If you prefer to launch from the VirtualBox Manager:
+echo - Click 'VDE-Live-Test' in the list and click 'Start'.
 echo ========================================================
-timeout /t 5
+timeout /t 4

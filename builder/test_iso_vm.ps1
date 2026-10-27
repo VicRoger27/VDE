@@ -60,13 +60,15 @@ Write-Host " Backbone ISO: $resolvedIso" -ForegroundColor Cyan
 Write-Host " RAM: ${RamMB} MB | CPUs: $Cpus | Graphics: VMSVGA 128MB" -ForegroundColor Cyan
 Write-Host "==========================================================" -ForegroundColor Cyan
 
-# Terminate existing running instance if active
+# Terminate existing running instance if active and clear orphaned locks
 $running = & $VBoxManage list runningvms | Select-String "`"$VmName`""
 if ($running) {
     Write-Host ">> Powering off active instance of '$VmName'..." -ForegroundColor Yellow
     & $VBoxManage controlvm $VmName poweroff 2>$null
     Start-Sleep -Seconds 1
 }
+# Clear any lingering orphaned VM worker processes locking the session
+Stop-Process -Name VirtualBoxVM -Force -ErrorAction SilentlyContinue
 
 # Check if VM definition exists; reconfigure or recreate
 $existing = & $VBoxManage list vms | Select-String "`"$VmName`""
