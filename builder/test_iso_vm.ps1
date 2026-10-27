@@ -7,8 +7,7 @@ param (
     [int]$RamMB = 2048,
     [int]$Cpus = 2,
     [ValidateSet("server", "lubuntu", "budgie", "vde", "custom")]
-    [string]$Preset = "server",
-    [switch]$Fullscreen = $true
+    [string]$Preset = "server"
 )
 
 $VBoxManage = "C:\Program Files\Oracle\VirtualBox\VBoxManage.exe"
@@ -93,10 +92,9 @@ Write-Host ">> Setting VM hardware parameters..."
     --boot3 none `
     --boot4 none
 
-# Force GUI frontend (prevents headless/separate mode) and Fullscreen state
+# Force clean standard windowed mode (avoids Windows 11 DWM fullscreen lock on boot)
 & $VBoxManage setextradata $VmName "GUI/DefaultFrontend" "gui"
-$fullscreenVal = if ($Fullscreen) { "true" } else { "false" }
-& $VBoxManage setextradata $VmName "GUI/Fullscreen" $fullscreenVal
+& $VBoxManage setextradata $VmName "GUI/Fullscreen" $null
 
 # Attach storage controller and ISO
 try {
@@ -115,7 +113,7 @@ try {
 Write-Host "==========================================================" -ForegroundColor Green
 Write-Host " VM '$VmName' configured and ready in Oracle VirtualBox!" -ForegroundColor Green
 Write-Host " Attached ISO: $resolvedIso" -ForegroundColor Green
-Write-Host " Frontend Mode: Explicit GUI (Fullscreen: $fullscreenVal)" -ForegroundColor Green
+Write-Host " Frontend Mode: Standard Window (Press Right Ctrl + F to toggle Fullscreen)" -ForegroundColor Green
 Write-Host "==========================================================" -ForegroundColor Green
 Write-Host " To start the VM:" -ForegroundColor Cyan
 Write-Host "   - Double-click 'Launch_VDE_VM.bat' in the project folder" -ForegroundColor White
