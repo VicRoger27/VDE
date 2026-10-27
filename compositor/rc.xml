@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- 
   VDE (Victorious Desktop Environment) - Labwc Compositor Configuration
-  Designed for Windows 11 Ergonomics, Snapping, and Sub-500MB Idle RAM
+  Designed for Fluent Ergonomics, Snapping, and Sub-500MB Idle RAM
 -->
 <labwc_config>
   <core>
@@ -49,7 +49,7 @@
     <default />
 
     <!-- ============================================== -->
-    <!-- Windows 11 Snap & Window Ergonomics            -->
+    <!-- Fluent Snap & Window Ergonomics                -->
     <!-- ============================================== -->
     <!-- Super + Left: Snap Left Half -->
     <keybind key="W-Left">
@@ -90,7 +90,7 @@
       <action name="Close" />
     </keybind>
 
-    <!-- Alt + Tab: Windows-style switcher -->
+    <!-- Alt + Tab: Interactive task switcher -->
     <keybind key="A-Tab">
       <action name="NextWindow" />
     </keybind>

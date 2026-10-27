@@ -1,7 +1,7 @@
 {
   "name": "vde-shell",
   "version": "1.0.0",
-  "description": "VDE Desktop Shell - Windows 11 Ergonomics & Frosted Acrylic Layer-Shell",
+  "description": "VDE Desktop Shell - Fluent Ergonomics & Frosted Acrylic Layer-Shell",
   "main": "app.ts",
   "type": "module",
   "scripts": {

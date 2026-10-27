@@ -1,19 +1,19 @@
 # Victorious Desktop Environment (VDE)
 
-An ultra-lightweight, privacy-centric Linux desktop environment capturing modern Windows 11 aesthetics, dark Mica/acrylic styling, sub-500 MB idle RAM consumption, and zero telemetry.
+An ultra-lightweight, privacy-centric Linux desktop environment capturing modern fluent acrylic aesthetics, dark Mica styling, sub-500 MB idle RAM consumption, and zero telemetry.
 
 ---
 
 ## ⚡ 1-Command Quick Install
 
-### 🟢 Universal One-Liner (Try Ubuntu, Live USB, Ubuntu Server, or Installed Linux)
+### 🟢 Universal One-Liner (Live USB, Ubuntu Server, Debian, or Installed Linux)
 Open a terminal (or switch to a virtual console via `Ctrl + Alt + F3`) and run:
 
 ```bash
 wget -qO- https://raw.githubusercontent.com/VicRoger27/VDE/main/install.sh | sudo bash
 ```
 
-> **Note**: Uses native `wget` directly to avoid Canonical `snap` sandbox permission restrictions (`snap-confine`).
+> **Note**: Uses native `wget` directly to avoid sandboxed `snap` packaging permission restrictions (`snap-confine`).
 
 ---
 
@@ -21,8 +21,8 @@ wget -qO- https://raw.githubusercontent.com/VicRoger27/VDE/main/install.sh | sud
 
 | Mode | Command | Description |
 | :--- | :--- | :--- |
-| **Clean Replace (Default)** | `wget -qO- https://raw.githubusercontent.com/VicRoger27/VDE/main/install.sh \| sudo bash` | Purges Canonical `snapd`, telemetry (`whoopsie`, `apport`, `ubuntu-report`), and GNOME bloat, installing clean VDE. |
-| **Coexist Mode** | `wget -qO- https://raw.githubusercontent.com/VicRoger27/VDE/main/install.sh \| sudo bash -s -- --keep-gnome` | Installs VDE alongside your existing desktop without removing GNOME. |
+| **Clean Replace (Default)** | `wget -qO- https://raw.githubusercontent.com/VicRoger27/VDE/main/install.sh \| sudo bash` | Purges background `snapd`, telemetry services (`whoopsie`, `apport`, `ubuntu-report`), and default desktop bloat, installing clean VDE. |
+| **Coexist Mode** | `wget -qO- https://raw.githubusercontent.com/VicRoger27/VDE/main/install.sh \| sudo bash -s -- --keep-gnome` | Installs VDE alongside your existing desktop without removing existing components. |
 
 Alternatively, install from source:
 ```bash
@@ -46,7 +46,7 @@ Once installed, launch VDE anytime:
 
 ---
 
-## ⌨️ Windows 11 Ergonomics & Shortcuts
+## ⌨️ Fluent Ergonomics & Shortcuts
 
 | Shortcut | Action |
 | :--- | :--- |
@@ -56,7 +56,7 @@ Once installed, launch VDE anytime:
 | <kbd>Super</kbd> + <kbd>↑</kbd> | Maximize Window |
 | <kbd>Super</kbd> + <kbd>↓</kbd> | Minimize / Restore Window |
 | <kbd>Super</kbd> + <kbd>Alt</kbd> + <kbd>Arrows</kbd> | 4-Corner Quadrant Snap (Top-Left, Top-Right, Bottom-Left, Bottom-Right) |
-| <kbd>Alt</kbd> + <kbd>Tab</kbd> | Windows-style Task Switcher |
+| <kbd>Alt</kbd> + <kbd>Tab</kbd> | Interactive Task Switcher |
 | <kbd>Alt</kbd> + <kbd>F4</kbd> | Close Active Window |
 | <kbd>Super</kbd> + <kbd>E</kbd> | Open File Explorer |
 | <kbd>Super</kbd> + <kbd>L</kbd> | Lock Screen |
@@ -71,7 +71,7 @@ Once installed, launch VDE anytime:
 - **Taskbar & Shell (`vde-bar`)**: Built with Astal & GTK4, with automated dark Mica Waybar fallback featuring centered taskbar items, start menu button, system tray, audio flyout, and clock.
 - **Start Menu Runner (`vde-launcher`)**: Hardware-accelerated Qt6 / QML with real-time inotify `.desktop` indexing and local llama.cpp vision client.
 - **Settings Hub (`crossings`)**: Two-pane interactive card-based customization center for theme accents, display scaling, and privacy controls.
-- **Memory Footprint**: Target < 500 MB idle RAM (under 250 MB on minimal Ubuntu Server base).
+- **Memory Footprint**: Target < 500 MB idle RAM (under 250 MB on minimal server base).
 
 ---
 
@@ -80,3 +80,9 @@ Once installed, launch VDE anytime:
 VDE is licensed under the **VPL License**. 
 
 Designed strictly with **zero cloud telemetry**, **zero remote tracking**, and exclusively **local on-device processing**.
+
+---
+
+## ⚖️ Trademark Disclaimer
+
+All product names, logos, brands, and registered trademarks mentioned or referenced are the property of their respective owners. All company, product, and service names used in this project are strictly for identification, reference, and compatibility purposes only. Use of these names, logos, and brands does not imply endorsement, affiliation, or sponsorship.

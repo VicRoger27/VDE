@@ -6,7 +6,7 @@
 # Default Action:
 #   - Automatically clears and waits for Ubuntu background apt locks
 #   - Downloads sources without git dependency (via native wget/tarball)
-#   - Purges GNOME, GDM, Snapd, and all Canonical telemetry slop
+#   - Purges GNOME, GDM, Snapd, and background telemetry bloat
 #   - Installs the ultra-lightweight VDE stack (Labwc, Astal, Qt6/QML, Crossings)
 #   - Drops idle memory to sub-500 MB (sub-250 MB on minimal base)
 # ==============================================================================
@@ -53,7 +53,7 @@ else
     echo -e "${C_GREEN}>> Target User:${C_RESET} ${TARGET_USER} (${USER_HOME})"
 fi
 
-# Parse Flags: Default is to WIPE Canonical slop and GNOME unless explicitly told to coexist
+# Parse Flags: Default is to WIPE telemetry bloat and GNOME unless explicitly told to coexist
 WIPE_SLOP=true
 
 for arg in "$@"; do
@@ -147,11 +147,11 @@ else
     echo -e "${C_GREEN}>> Sources staged in:${C_RESET} ${SRC_DIR}"
 fi
 
-# 4. Wipe GNOME, Snaps, and Canonical Telemetry Slop
+# 4. Wipe GNOME, Snaps, and Telemetry Bloat
 if [ "$WIPE_SLOP" = true ]; then
     echo ""
     echo -e "${C_RED}==============================================================${C_RESET}"
-    echo -e "${C_RED}>> [PURGE] Stripping GNOME, Canonical Snaps & Telemetry Slop...${C_RESET}"
+    echo -e "${C_RED}>> [PURGE] Stripping GNOME, Snap Daemon & Telemetry Bloat...${C_RESET}"
     echo -e "${C_RED}==============================================================${C_RESET}"
 
     if command -v apt-get >/dev/null 2>&1; then
@@ -164,14 +164,14 @@ if [ "$WIPE_SLOP" = true ]; then
             echo -e "${C_YELLOW}>> Running inside active desktop terminal. Deferring display switch to end...${C_RESET}"
         fi
 
-        # 2. Purge Canonical Snapd & snaps
-        echo -e "${C_YELLOW}>> Purging Canonical Snap daemon (snapd)...${C_RESET}"
+        # 2. Purge Snapd & snaps
+        echo -e "${C_YELLOW}>> Purging Snap daemon (snapd)...${C_RESET}"
         systemctl stop snapd.service snapd.socket 2>/dev/null || true
         apt_run purge -y snapd 2>/dev/null || true
         rm -rf /var/cache/snapd /var/lib/snapd /snap /root/snap "$USER_HOME/snap" 2>/dev/null || true
 
-        # 3. Purge Canonical Telemetry and Tracking
-        echo -e "${C_YELLOW}>> Purging Canonical tracking, metrics & crash telemetry...${C_RESET}"
+        # 3. Purge Tracking and Telemetry
+        echo -e "${C_YELLOW}>> Purging background tracking, metrics & crash telemetry...${C_RESET}"
         apt_run purge -y \
             whoopsie \
             popularity-contest \
@@ -201,7 +201,7 @@ if [ "$WIPE_SLOP" = true ]; then
     elif command -v pacman >/dev/null 2>&1; then
         pacman -Rns --noconfirm gnome gnome-extra gdm 2>/dev/null || true
     fi
-    echo -e "${C_GREEN}>> Canonical slop and GNOME purged successfully.${C_RESET}"
+    echo -e "${C_GREEN}>> Distro bloat and GNOME purged successfully.${C_RESET}"
 fi
 
 # 5. Install Clean VDE Dependencies
@@ -430,10 +430,10 @@ fi
 
 echo ""
 echo -e "${C_GREEN}==============================================================${C_RESET}"
-echo -e "${C_GREEN}  VDE Installed & Canonical Slop Purged!                      ${C_RESET}"
+echo -e "${C_GREEN}  VDE Installed & Telemetry Bloat Purged!                     ${C_RESET}"
 echo -e "${C_GREEN}==============================================================${C_RESET}"
 echo ""
-echo -e "Canonical telemetry, snapd, and GNOME bloat have been eliminated."
+echo -e "Background telemetry, snapd, and default desktop bloat have been eliminated."
 echo ""
 echo -e "To start VDE right now on your screen, simply run:"
 echo -e "  ${C_CYAN}vde${C_RESET}"
