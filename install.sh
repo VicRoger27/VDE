@@ -397,6 +397,15 @@ export WLR_RENDERER=${WLR_RENDERER:-gles2}
 export WLR_RENDERER_ALLOW_SOFTWARE=1
 export WLR_NO_HARDWARE_CURSORS=1
 
+# Ensure XDG_RUNTIME_DIR is set and accessible
+if [ -z "$XDG_RUNTIME_DIR" ]; then
+    export XDG_RUNTIME_DIR="/run/user/$(id -u)"
+    if [ ! -d "$XDG_RUNTIME_DIR" ]; then
+        mkdir -p "$XDG_RUNTIME_DIR" 2>/dev/null || true
+        chmod 0700 "$XDG_RUNTIME_DIR" 2>/dev/null || true
+    fi
+fi
+
 if [ -n "$WAYLAND_DISPLAY" ] || [ -n "$DISPLAY" ]; then
     echo ">> Running VDE on display..."
     labwc -s /usr/local/bin/vde-bar "$@" || {
@@ -524,7 +533,19 @@ if [ "$IS_LIVE_SESSION" = true ]; then
             echo ""
             echo -e "${C_GREEN}>> Launching Victorious Desktop Environment (VDE)...${C_RESET}"
             sleep 1
-            exec /usr/local/bin/vde
+            if [ -n "$SUDO_USER" ] && [ "$SUDO_USER" != "root" ]; then
+                USER_UID=$(id -u "$SUDO_USER")
+                USER_RUNTIME="/run/user/$USER_UID"
+                mkdir -p "$USER_RUNTIME" 2>/dev/null || true
+                chown "$SUDO_USER:$SUDO_USER" "$USER_RUNTIME" 2>/dev/null || true
+                chmod 0700 "$USER_RUNTIME" 2>/dev/null || true
+                exec su - "$SUDO_USER" -c "export DISPLAY='$DISPLAY' WAYLAND_DISPLAY='$WAYLAND_DISPLAY' XDG_RUNTIME_DIR='$USER_RUNTIME' WLR_RENDERER=gles2 WLR_RENDERER_ALLOW_SOFTWARE=1; /usr/local/bin/vde"
+            else
+                export XDG_RUNTIME_DIR="/run/user/$(id -u)"
+                mkdir -p "$XDG_RUNTIME_DIR" 2>/dev/null || true
+                chmod 0700 "$XDG_RUNTIME_DIR" 2>/dev/null || true
+                exec /usr/local/bin/vde
+            fi
             ;;
     esac
 else
