@@ -84,8 +84,31 @@ def test_desktop_files():
                 print(f"  [OK] {f} valid.")
     assert count >= 12, f"Expected at least 12 desktop entries, found {count}"
 
+def test_core_components_presence():
+    print("[5/6] Verifying Core Components Presence & Non-Zero Sizing...")
+    inst_path = os.path.join(REPO_DIR, "install.sh")
+    with open(inst_path, "r", encoding="utf-8") as f:
+        content = f.read()
+
+    start = content.find("CORE_COMPONENTS=(")
+    end = content.find(")", start)
+    block = content[start:end]
+
+    files = []
+    for line in block.splitlines():
+        line = line.strip().strip('"').strip("'")
+        if line and not line.startswith("CORE_COMPONENTS"):
+            files.append(line)
+
+    assert len(files) >= 20, f"Expected >= 20 core components, found {len(files)}"
+    for rel_path in files:
+        full_path = os.path.join(REPO_DIR, rel_path)
+        assert os.path.exists(full_path), f"Missing core component: {rel_path}"
+        assert os.path.getsize(full_path) > 0, f"Empty core component: {rel_path}"
+        print(f"  [OK] {rel_path} ({os.path.getsize(full_path)} bytes)")
+
 def test_installer_integrity():
-    print("[5/5] Verifying install.sh Components & Multi-Distro Support...")
+    print("[6/6] Verifying install.sh Components & Multi-Distro Support...")
     inst_path = os.path.join(REPO_DIR, "install.sh")
     assert os.path.exists(inst_path), "install.sh missing"
     with open(inst_path, "r", encoding="utf-8") as f:
@@ -109,5 +132,6 @@ if __name__ == "__main__":
     test_xml_configs()
     test_waybar_config()
     test_desktop_files()
+    test_core_components_presence()
     test_installer_integrity()
     print("\n[SUCCESS] ALL VDE STACK VERIFICATION TESTS PASSED (100% HEALTHY).")
