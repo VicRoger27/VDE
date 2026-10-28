@@ -384,6 +384,13 @@ if [ -n "$USER_HOME" ]; then
     mkdir -p "$USER_FOOT"
     cp -f /etc/xdg/foot/* "$USER_FOOT/" 2>/dev/null || true
 
+    # Deploy default VDE wallpaper to user profile
+    USER_VDE="$USER_HOME/.config/vde"
+    mkdir -p "$USER_VDE"
+    if [ -f "$SRC_DIR/assets/wallpapers/default.png" ]; then
+        cp -f "$SRC_DIR/assets/wallpapers/default.png" "$USER_VDE/wallpaper.png" 2>/dev/null || true
+    fi
+
     chown -R "$TARGET_USER:$TARGET_USER" "$USER_HOME/.config" 2>/dev/null || true
 fi
 

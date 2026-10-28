@@ -380,17 +380,52 @@ if HAS_GTK:
             sub.get_style_context().add_class("page-subtitle")
             page.pack_start(sub, False, False, 0)
 
-            # Wallpaper Palette Card
+            # Wallpaper Presets Card
             card1 = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=12)
             card1.get_style_context().add_class("card")
             page.pack_start(card1, False, False, 0)
 
-            ct1 = Gtk.Label(label="Dark Mica Wallpaper", xalign=0)
+            ct1 = Gtk.Label(label="High-Definition Wallpapers", xalign=0)
             ct1.get_style_context().add_class("card-title")
             card1.pack_start(ct1, False, False, 0)
 
+            flow_box = Gtk.FlowBox()
+            flow_box.set_valign(Gtk.Align.START)
+            flow_box.set_max_children_per_line(3)
+            flow_box.set_selection_mode(Gtk.SelectionMode.NONE)
+            card1.pack_start(flow_box, False, False, 0)
+
+            wallpapers_imgs = [
+                ("Default VDE Mica (Logo)", "/usr/share/vde/assets/wallpapers/default.png"),
+                ("Mica Dark Obsidian", "/usr/share/vde/assets/wallpapers/vde_mica_dark.png"),
+                ("Abstract Fluent Flow", "/usr/share/vde/assets/wallpapers/vde_abstract_flow.png"),
+                ("Aurora Ribbon", "/usr/share/vde/assets/wallpapers/vde_aurora_ribbon.png"),
+                ("Cosmic Deep Nebula", "/usr/share/vde/assets/wallpapers/vde_cosmic_nebula.png"),
+                ("Crystal Waves", "/usr/share/vde/assets/wallpapers/vde_crystal_waves.png")
+            ]
+
+            for name, path in wallpapers_imgs:
+                btn = Gtk.Button(label=f"🖼️ {name}")
+                btn.get_style_context().add_class("card-btn")
+                btn.connect("clicked", lambda b, p=path: self.set_wallpaper_image(p))
+                flow_box.add(btn)
+
+            browse_btn = Gtk.Button(label="📁 Browse Custom Image...")
+            browse_btn.get_style_context().add_class("card-btn")
+            browse_btn.connect("clicked", self.on_browse_wallpaper)
+            card1.pack_start(browse_btn, False, False, 0)
+
+            # Solid Color Palette Card
+            card_colors = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=12)
+            card_colors.get_style_context().add_class("card")
+            page.pack_start(card_colors, False, False, 0)
+
+            ct_c = Gtk.Label(label="Solid Accent Wallpapers", xalign=0)
+            ct_c.get_style_context().add_class("card-title")
+            card_colors.pack_start(ct_c, False, False, 0)
+
             wall_grid = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
-            card1.pack_start(wall_grid, False, False, 0)
+            card_colors.pack_start(wall_grid, False, False, 0)
 
             wallpapers = [
                 ("Mica Zinc", "#18181b"),
@@ -431,6 +466,50 @@ if HAS_GTK:
                 acc_grid.pack_start(btn, True, True, 0)
 
             self.stack.add_named(scrolled, "personalization")
+
+        def set_wallpaper_image(self, file_path):
+            conf_dir = os.path.expanduser("~/.config/vde")
+            os.makedirs(conf_dir, exist_ok=True)
+            target = os.path.join(conf_dir, "wallpaper.png")
+            try:
+                shutil.copyfile(file_path, target)
+            except Exception:
+                pass
+            subprocess.call(["pkill", "-9", "swaybg"])
+            subprocess.Popen(["swaybg", "-i", target, "-m", "fill"])
+
+        def on_browse_wallpaper(self, widget):
+            dialog = Gtk.FileChooserDialog(
+                title="Choose VDE Desktop Wallpaper",
+                parent=self.window,
+                action=Gtk.FileChooserAction.OPEN
+            )
+            dialog.add_buttons(
+                Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
+                Gtk.STOCK_OPEN, Gtk.ResponseType.OK
+            )
+            filter_img = Gtk.FileFilter()
+            filter_img.set_name("Images (*.png, *.jpg, *.jpeg)")
+            filter_img.add_mime_type("image/png")
+            filter_img.add_mime_type("image/jpeg")
+            filter_img.add_pattern("*.png")
+            filter_img.add_pattern("*.jpg")
+            filter_img.add_pattern("*.jpeg")
+            dialog.add_filter(filter_img)
+
+            # Suggest custom background directory if it exists
+            unsloth_dir = "/media/windows/Images/Unsloth"
+            if os.path.exists(unsloth_dir):
+                dialog.set_current_folder(unsloth_dir)
+            elif os.path.exists(os.path.expanduser("~/Pictures")):
+                dialog.set_current_folder(os.path.expanduser("~/Pictures"))
+
+            response = dialog.run()
+            if response == Gtk.ResponseType.OK:
+                selected_file = dialog.get_filename()
+                if selected_file:
+                    self.set_wallpaper_image(selected_file)
+            dialog.destroy()
 
         def set_wallpaper(self, color_hex):
             subprocess.call(["pkill", "-9", "swaybg"])
