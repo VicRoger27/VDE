@@ -71,15 +71,6 @@ for iface in $(ip -o link show | awk -F': ' '{print $2}' | grep -v 'lo' | cut -d
     ethtool -K "$iface" tso off gso off gro off 2>/dev/null || true
 done
 
-# Proactively neutralize legacy display managers (GDM, LightDM, SDDM, LXDM) to prevent console lockups
-echo -e "${C_CYAN}>> Neutralizing legacy display managers (GDM, LightDM, SDDM, LXDM)...${C_RESET}"
-if command -v systemctl >/dev/null 2>&1; then
-    systemctl stop gdm gdm3 display-manager lightdm sddm lxdm nodm xdm 2>/dev/null || true
-    systemctl mask --now gdm gdm3 display-manager lightdm sddm lxdm nodm xdm 2>/dev/null || true
-    systemctl set-default multi-user.target 2>/dev/null || true
-fi
-pkill -9 -f "gdm|sddm|lightdm|lxdm|gnome-shell|mutter|kwin|xfwm4|cinnamon|marco|openbox|Xwayland" 2>/dev/null || true
-
 # Parse Flags: Default is to WIPE telemetry bloat and GNOME unless explicitly told to coexist
 WIPE_SLOP=true
 
@@ -708,7 +699,7 @@ ExecStart=-/sbin/agetty --autologin ${TARGET_USER} --noclear %I \$TERM
 Type=idle
 EOF
     systemctl daemon-reload 2>/dev/null || true
-    systemctl disable --now display-manager gdm3 gdm lightdm sddm lxdm nodm xdm 2>/dev/null || true
+    systemctl disable display-manager gdm3 gdm lightdm sddm lxdm nodm xdm 2>/dev/null || true
     systemctl mask display-manager gdm3 gdm lightdm sddm lxdm nodm xdm 2>/dev/null || true
     systemctl enable getty@tty1.service 2>/dev/null || true
     systemctl set-default multi-user.target 2>/dev/null || true
