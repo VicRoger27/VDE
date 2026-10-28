@@ -484,48 +484,14 @@ for d in "$USER_HOME/Desktop" "/home/ubuntu/Desktop" "/root/Desktop"; do
     fi
 done
 
-# Configure Standalone Systemd Service (True OS Desktop, NOT a nested app)
-echo -e "${C_GREEN}>> Creating standalone systemd display service (vde.service)...${C_RESET}"
-cat << EOF > /etc/systemd/system/vde.service
-[Unit]
-Description=Victorious Desktop Environment (VDE)
-Documentation=https://github.com/i2qq/VDE
-After=systemd-user-sessions.service plymouth-quit-wait.service systemd-logind.service
-Conflicts=gdm3.service gdm.service lightdm.service sddm.service
-Wants=systemd-user-sessions.service
-
-[Service]
-Type=simple
-User=${TARGET_USER}
-Group=${TARGET_USER}
-PAMName=login
-WorkingDirectory=${USER_HOME}
-TTYPath=/dev/tty1
-StandardInput=tty
-StandardOutput=journal
-StandardError=journal
-UtmpIdentifier=tty1
-UtmpMode=user
-Environment=XDG_SESSION_TYPE=wayland
-Environment=XDG_CURRENT_DESKTOP=VDE
-Environment=XDG_SESSION_DESKTOP=VDE
-Environment=WLR_RENDERER=gles2
-Environment=WLR_RENDERER_ALLOW_SOFTWARE=1
-Environment=WLR_NO_HARDWARE_CURSORS=1
-ExecStart=/usr/local/bin/vde-session
-Restart=always
-RestartSec=1
-
-[Install]
-WantedBy=graphical.target
-EOF
-
-# Configure automatic TTY1 login fallback
+# Configure Seamless Standalone System Console & Autologin (TTY1)
+echo -e "${C_GREEN}>> Configuring automatic direct VDE boot on TTY1 with PAM logind seat...${C_RESET}"
 mkdir -p /etc/systemd/system/getty@tty1.service.d
 cat << EOF > /etc/systemd/system/getty@tty1.service.d/override.conf
 [Service]
 ExecStart=
 ExecStart=-/sbin/agetty --autologin ${TARGET_USER} --noclear %I \$TERM
+Type=idle
 EOF
 
 mkdir -p /etc/profile.d
@@ -535,12 +501,12 @@ if [ -z "$WAYLAND_DISPLAY" ] && [ "$(tty)" = "/dev/tty1" ]; then
 fi
 EOF
 
-# Mask old display managers and enable VDE service
+# Mask old display managers (GDM/LightDM/SDDM) to eliminate memory bloat and boot hangs
 systemctl daemon-reload 2>/dev/null || true
 systemctl disable --now gdm3 gdm lightdm sddm 2>/dev/null || true
 systemctl mask gdm3 gdm lightdm sddm 2>/dev/null || true
-systemctl enable vde.service 2>/dev/null || true
-systemctl set-default graphical.target 2>/dev/null || true
+systemctl enable getty@tty1.service 2>/dev/null || true
+systemctl set-default multi-user.target 2>/dev/null || true
 
 echo ""
 echo -e "${C_GREEN}==============================================================${C_RESET}"
@@ -575,7 +541,7 @@ if [ "$IS_LIVE_SESSION" = true ]; then
             systemctl stop gdm3 gdm lightdm sddm 2>/dev/null || true
             pkill -9 -f gnome-shell 2>/dev/null || true
             pkill -9 -f mutter 2>/dev/null || true
-            systemctl restart vde.service 2>/dev/null || true
+            systemctl restart getty@tty1.service 2>/dev/null || true
             chvt 1 2>/dev/null || true
             ;;
     esac
@@ -597,7 +563,7 @@ else
                 systemctl stop gdm3 gdm lightdm sddm 2>/dev/null || true
                 pkill -9 -f gnome-shell 2>/dev/null || true
                 pkill -9 -f mutter 2>/dev/null || true
-                systemctl restart vde.service 2>/dev/null || true
+                systemctl restart getty@tty1.service 2>/dev/null || true
                 chvt 1 2>/dev/null || true
                 ;;
         esac
