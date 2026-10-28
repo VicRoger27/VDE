@@ -561,60 +561,8 @@ echo ""
 echo -e "Background telemetry, snapd, and default desktop bloat have been eliminated."
 echo -e "VDE is configured as the standalone system desktop environment."
 echo ""
-
-# Smart Session Hand-off: Live RAM vs Installed System
-if [ "$IS_LIVE_SESSION" = true ]; then
-    echo -e "${C_YELLOW}>> [LIVE SESSION DETECTED]${C_RESET}"
-    echo -e "You are currently running in RAM ('Try Ubuntu' mode)."
-    echo ""
-    echo -e "To switch into VDE right now on your screen:"
-    if [ -t 0 ] || [ -c /dev/tty ]; then
-        read -r -p "Would you like to launch VDE now? [Y/n]: " LAUNCH_CHOICE </dev/tty || LAUNCH_CHOICE="y"
-    else
-        LAUNCH_CHOICE="y"
-    fi
-    case "$LAUNCH_CHOICE" in
-        [nN][oO]|[nN])
-            echo ""
-            echo -e "You can launch VDE anytime by running: ${C_CYAN}vde${C_RESET}"
-            ;;
-        *)
-            echo ""
-            echo -e "${C_GREEN}>> Switching to Victorious Desktop Environment (TTY1)...${C_RESET}"
-            sleep 1
-            # Release DRM display and start standalone VDE on TTY1
-            systemctl stop gdm3 gdm lightdm sddm 2>/dev/null || true
-            pkill -9 -f gnome-shell 2>/dev/null || true
-            pkill -9 -f mutter 2>/dev/null || true
-            systemctl restart getty@tty1.service 2>/dev/null || true
-            chvt 1 2>/dev/null || true
-            ;;
-    esac
-else
-    # On Installed Hard Drive Systems, prompt to restart or switch
-    echo -e "A system restart is recommended to boot cleanly into VDE."
-    echo ""
-    if [ -t 0 ] || [ -c /dev/tty ]; then
-        read -r -p "Would you like to switch to VDE right now? [Y/n]: " SWITCH_CHOICE </dev/tty || SWITCH_CHOICE="y"
-        case "$SWITCH_CHOICE" in
-            [nN][oO]|[nN])
-                echo ""
-                echo -e "You can launch VDE anytime by running: ${C_CYAN}vde${C_RESET}"
-                echo -e "Or restart later by running: ${C_CYAN}sudo reboot${C_RESET}"
-                ;;
-            *)
-                echo ""
-                echo -e "${C_GREEN}>> Starting VDE system session...${C_RESET}"
-                systemctl stop gdm3 gdm lightdm sddm 2>/dev/null || true
-                pkill -9 -f gnome-shell 2>/dev/null || true
-                pkill -9 -f mutter 2>/dev/null || true
-                systemctl restart getty@tty1.service 2>/dev/null || true
-                chvt 1 2>/dev/null || true
-                ;;
-        esac
-    else
-        echo -e "To start VDE right now on your screen, run: ${C_CYAN}vde${C_RESET}"
-        echo -e "To restart into clean VDE session, run: ${C_CYAN}sudo reboot${C_RESET}"
-    fi
-fi
+echo -e "${C_CYAN}>> READY TO LAUNCH VDE:${C_RESET}"
+echo -e "  To launch VDE right now on this screen, run:  ${C_GREEN}vde${C_RESET}"
+echo -e "  To restart directly into clean VDE:           ${C_GREEN}sudo reboot${C_RESET}"
 echo ""
+exit 0

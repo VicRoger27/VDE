@@ -91,7 +91,7 @@ def test_installer_integrity():
     with open(inst_path, "r", encoding="utf-8") as f:
         content = f.read()
     assert "vde.service" in content, "vde.service missing from install.sh"
-    assert "chvt 1" in content, "chvt 1 missing from install.sh"
+    assert "vde-session" in content, "vde-session missing from install.sh"
     assert "trap '' HUP PIPE" in content, "Signal protection missing"
     print("  [OK] install.sh integrity checks passed.")
 
