@@ -35,7 +35,9 @@ if [ -z "$DBUS_SESSION_BUS_ADDRESS" ]; then
     fi
 fi
 
-# 6. Release DRM KMS connector from zombie display servers
+# 6. Release DRM KMS connector from GDM and zombie display servers
+systemctl stop gdm gdm3 lightdm sddm 2>/dev/null || true
+pkill -9 -f gdm 2>/dev/null || true
 pkill -9 -f gnome-shell 2>/dev/null || true
 pkill -9 -f mutter 2>/dev/null || true
 pkill -9 -f Xwayland 2>/dev/null || true
@@ -44,7 +46,7 @@ sleep 1
 echo "=========================================================="
 echo " Starting Victorious Desktop Environment (VDE)..."
 echo " Compositor: Labwc (wlroots layer-shell)"
-echo " Shell: Waybar Dark Mica & Wofi"
+echo " Shell: Windhawk Taskbar & Windows 11 Start Menu"
 echo " Settings: Crossings Hub"
 echo " Applications: VDE Fluent Suite"
 echo "=========================================================="

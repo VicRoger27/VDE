@@ -6,7 +6,9 @@
 unset WAYLAND_DISPLAY
 unset DISPLAY
 
-# Ensure DRM KMS is released from any background remnants
+# Force release DRM KMS from GDM and background display managers
+systemctl stop gdm gdm3 lightdm sddm 2>/dev/null || true
+pkill -9 -f gdm 2>/dev/null || true
 pkill -9 -f gnome-shell 2>/dev/null || true
 pkill -9 -f mutter 2>/dev/null || true
 pkill -9 -f Xwayland 2>/dev/null || true

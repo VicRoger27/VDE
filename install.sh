@@ -538,8 +538,8 @@ EOF
 
 # Mask old display managers (GDM/LightDM/SDDM) to eliminate memory bloat and boot hangs
 systemctl daemon-reload 2>/dev/null || true
-systemctl disable --now gdm3 gdm lightdm sddm 2>/dev/null || true
-systemctl mask gdm3 gdm lightdm sddm 2>/dev/null || true
+systemctl disable --now display-manager gdm3 gdm lightdm sddm 2>/dev/null || true
+systemctl mask display-manager gdm3 gdm lightdm sddm 2>/dev/null || true
 systemctl enable getty@tty1.service 2>/dev/null || true
 systemctl set-default multi-user.target 2>/dev/null || true
 
