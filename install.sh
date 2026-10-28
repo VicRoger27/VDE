@@ -57,7 +57,7 @@ USER_HOME=$(getent passwd "$TARGET_USER" | cut -d: -f6 || echo "/home/$TARGET_US
 # Detect Live Session (Try Ubuntu / Casper / Live ISOs across distros)
 IS_LIVE_SESSION=false
 if [ -d "/rofs" ] || [ -f "/run/casper-iso-path" ] || [ -d "/lib/live/mount" ] || [ -d "/run/initramfs/live" ] || \
-   [ "$TARGET_USER" = "ubuntu" ] || [ "$TARGET_USER" = "lubuntu" ] || [ "$TARGET_USER" = "kubuntu" ] || [ "$TARGET_USER" = "xubuntu" ] || \
+   [ "$TARGET_USER" = "ubuntu" ] || [ "$TARGET_USER" = "lubuntu" ] || [ "$TARGET_USER" = "kubuntu" ] || [ "$TARGET_USER" = "xubuntu" ] || [ "$TARGET_USER" = "budgie" ] || \
    [ "$TARGET_USER" = "live" ] || [ "$TARGET_USER" = "liveuser" ] || [ "$TARGET_USER" = "mint" ] || [ "$TARGET_USER" = "zorin" ] || \
    [ "$TARGET_USER" = "tc" ] || [ "$TARGET_USER" = "archiso" ] || [ "$TARGET_USER" = "anon" ]; then
     IS_LIVE_SESSION=true
@@ -176,7 +176,7 @@ elif command -v tce-load >/dev/null 2>&1; then
     PKG_MGR="tce"
 else
     echo -e "${C_RED}[Error] Unsupported package manager.${C_RESET}"
-    echo -e "VDE supports: apt (Debian/Ubuntu/Lubuntu/Xubuntu/Kubuntu/MATE/Cinnamon/Studio/Unity/Server/Zorin/Lite/Elementary/MX/Parrot/RPi),"
+    echo -e "VDE supports: apt (Debian/Ubuntu/Lubuntu/Xubuntu/Kubuntu/Budgie/MATE/Cinnamon/Studio/Unity/Server/Zorin/Lite/Elementary/MX/Parrot/RPi),"
     echo -e "              zypper/transactional-update (openSUSE Tumbleweed/Leap/Server/MicroOS/Leap Micro Server),"
     echo -e "              dnf/rpm-ostree (Fedora/Bazzite), pacman (Arch/CachyOS), xbps (Void),"
     echo -e "              eopkg (Solus), apk (Alpine), and tce (TinyCore)."
@@ -333,6 +333,7 @@ if [ "$WIPE_SLOP" = true ]; then
                 plasma-desktop plasma-workspace sddm kde-standard kubuntu-desktop \
                 xfce4 xfce4-session xubuntu-desktop lightdm \
                 lxqt lubuntu-desktop \
+                budgie-desktop budgie-desktop-minimal ubuntu-budgie-desktop budgie-core \
                 mate-desktop ubuntu-mate-desktop \
                 cinnamon ubuntu-cinnamon-desktop \
                 unity ubuntu-unity-desktop \
@@ -676,7 +677,7 @@ Categories=System;
 EOF
 
 # Create desktop shortcuts on live desktop and user desktops
-for d in "$USER_HOME/Desktop" "/home/$TARGET_USER/Desktop" "/home/ubuntu/Desktop" "/home/lubuntu/Desktop" "/home/kubuntu/Desktop" "/home/xubuntu/Desktop" "/home/live/Desktop" "/home/liveuser/Desktop" "/home/tc/Desktop" "/home/alarm/Desktop" "/home/pi/Desktop" "/root/Desktop"; do
+for d in "$USER_HOME/Desktop" "/home/$TARGET_USER/Desktop" "/home/ubuntu/Desktop" "/home/lubuntu/Desktop" "/home/kubuntu/Desktop" "/home/xubuntu/Desktop" "/home/budgie/Desktop" "/home/live/Desktop" "/home/liveuser/Desktop" "/home/tc/Desktop" "/home/alarm/Desktop" "/home/pi/Desktop" "/root/Desktop"; do
     if [ -d "$d" ]; then
         for dt in crossmanager crossminal crosspad crossings crossbin crossnip crossculator crosslock; do
             if [ -f "/usr/share/applications/$dt.desktop" ]; then
