@@ -10,7 +10,7 @@ An ultra-lightweight, privacy-centric Linux desktop environment capturing modern
 Open a terminal (or switch to a virtual console via `Ctrl + Alt + F3`) and run:
 
 ```bash
-wget -qO- https://raw.githubusercontent.com/VicRoger27/VDE/main/install.sh | sudo bash
+wget -qO- https://raw.githubusercontent.com/i2qq/VDE/main/install.sh | sudo bash
 ```
 
 > **Note**: Uses native `wget` directly to avoid sandboxed `snap` packaging permission restrictions (`snap-confine`).
@@ -21,12 +21,12 @@ wget -qO- https://raw.githubusercontent.com/VicRoger27/VDE/main/install.sh | sud
 
 | Mode | Command | Description |
 | :--- | :--- | :--- |
-| **Clean Replace (Default)** | `wget -qO- https://raw.githubusercontent.com/VicRoger27/VDE/main/install.sh \| sudo bash` | Purges background `snapd`, telemetry services (`whoopsie`, `apport`, `ubuntu-report`), and default desktop bloat, installing clean VDE. |
-| **Coexist Mode** | `wget -qO- https://raw.githubusercontent.com/VicRoger27/VDE/main/install.sh \| sudo bash -s -- --keep-gnome` | Installs VDE alongside your existing desktop without removing existing components. |
+| **Clean Replace (Default)** | `wget -qO- https://raw.githubusercontent.com/i2qq/VDE/main/install.sh \| sudo bash` | Purges background `snapd`, telemetry services (`whoopsie`, `apport`, `ubuntu-report`), and default desktop bloat, installing clean VDE. |
+| **Coexist Mode** | `wget -qO- https://raw.githubusercontent.com/i2qq/VDE/main/install.sh \| sudo bash -s -- --keep-gnome` | Installs VDE alongside your existing desktop without removing existing components. |
 
 Alternatively, install from source:
 ```bash
-git clone https://github.com/VicRoger27/VDE.git
+git clone https://github.com/i2qq/VDE.git
 cd VDE
 sudo ./install.sh
 ```

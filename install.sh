@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # ==============================================================================
 # Victorious Desktop Environment (VDE) - Universal System Installer
-# https://github.com/VicRoger27/VDE
+# https://github.com/i2qq/VDE
 #
 # Core Capabilities:
 #   - Automatic apt lock resolution and VirtualBox throughput acceleration
@@ -24,8 +24,8 @@ trap '' HUP PIPE
 set -eo pipefail
 
 VDE_VERSION="1.0.0"
-REPO_TARBALL="https://github.com/VicRoger27/VDE/archive/refs/heads/main.tar.gz?v=$(date +%s 2>/dev/null || echo 1)"
-REPO_URL="https://github.com/VicRoger27/VDE.git"
+REPO_TARBALL="https://github.com/i2qq/VDE/archive/refs/heads/main.tar.gz?v=$(date +%s 2>/dev/null || echo 1)"
+REPO_URL="https://github.com/i2qq/VDE.git"
 INSTALL_PREFIX="/usr/share/vde"
 BIN_PREFIX="/usr/local/bin"
 
@@ -47,7 +47,7 @@ echo ""
 if [ "$EUID" -ne 0 ]; then
     echo -e "${C_RED}[Error] This installer must be run as root.${C_RESET}"
     echo -e "Please run with sudo:"
-    echo -e "  ${C_YELLOW}wget -qO- https://raw.githubusercontent.com/VicRoger27/VDE/main/install.sh | sudo bash${C_RESET}"
+    echo -e "  ${C_YELLOW}wget -qO- https://raw.githubusercontent.com/i2qq/VDE/main/install.sh | sudo bash${C_RESET}"
     exit 1
 fi
 
@@ -482,7 +482,7 @@ echo -e "${C_GREEN}>> Creating standalone systemd display service (vde.service).
 cat << EOF > /etc/systemd/system/vde.service
 [Unit]
 Description=Victorious Desktop Environment (VDE)
-Documentation=https://github.com/VicRoger27/VDE
+Documentation=https://github.com/i2qq/VDE
 After=systemd-user-sessions.service plymouth-quit-wait.service systemd-logind.service
 Conflicts=gdm3.service gdm.service lightdm.service sddm.service
 Wants=systemd-user-sessions.service
