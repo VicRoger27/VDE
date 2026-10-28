@@ -86,3 +86,9 @@ Designed strictly with **zero cloud telemetry**, **zero remote tracking**, and e
 ## ⚖️ Trademark Disclaimer
 
 All product names, logos, brands, and registered trademarks mentioned or referenced are the property of their respective owners. All company, product, and service names used in this project are strictly for identification, reference, and compatibility purposes only. Use of these names, logos, and brands does not imply endorsement, affiliation, or sponsorship.
+
+---
+
+## ❗Warranty Disclaimer
+
+Please view **NOTICE.md** for all warranty
