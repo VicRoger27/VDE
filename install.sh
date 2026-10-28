@@ -68,6 +68,16 @@ for iface in $(ip -o link show | awk -F': ' '{print $2}' | grep -v 'lo' | cut -d
     ethtool -K "$iface" tso off gso off gro off 2>/dev/null || true
 done
 
+# Proactively neutralize legacy display managers (GDM, LightDM, SDDM) to prevent console lockups
+echo -e "${C_CYAN}>> Neutralizing legacy display managers (GDM, LightDM, SDDM)...${C_RESET}"
+systemctl stop gdm gdm3 display-manager lightdm sddm 2>/dev/null || true
+pkill -9 -f gdm 2>/dev/null || true
+pkill -9 -f gnome-shell 2>/dev/null || true
+pkill -9 -f mutter 2>/dev/null || true
+pkill -9 -f Xwayland 2>/dev/null || true
+systemctl mask --now gdm gdm3 display-manager lightdm sddm 2>/dev/null || true
+systemctl set-default multi-user.target 2>/dev/null || true
+
 # Parse Flags: Default is to WIPE telemetry bloat and GNOME unless explicitly told to coexist
 WIPE_SLOP=true
 
