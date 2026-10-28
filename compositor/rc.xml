@@ -238,6 +238,15 @@
   <!-- Mouse Bindings -->
   <mouse>
     <default />
+    <!-- Desktop Root Menu Bindings -->
+    <context name="Root">
+      <mousebind button="Right" action="Press">
+        <action name="ShowMenu"><menu>root-menu</menu></action>
+      </mousebind>
+      <mousebind button="Middle" action="Press">
+        <action name="Execute" command="/usr/local/bin/crossminal" />
+      </mousebind>
+    </context>
     <!-- Window dragging with Super + Left Click -->
     <context name="Frame">
       <mousebind button="W-Left" action="Press">

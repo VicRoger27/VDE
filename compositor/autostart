@@ -41,8 +41,8 @@ fi
 pgrep -x pipewire >/dev/null 2>&1 || (command -v pipewire >/dev/null 2>&1 && pipewire &)
 pgrep -x wireplumber >/dev/null 2>&1 || (command -v wireplumber >/dev/null 2>&1 && wireplumber &)
 
-# Wait 0.5s for compositor Wayland socket & layer-shell protocol to settle
-sleep 0.5
+# Wait 1.2s for compositor Wayland socket & layer-shell protocol to settle
+sleep 1.2
 
 # 6. Taskbar Shell (Waybar with Windhawk Acrylic styling)
 if ! pgrep -x waybar >/dev/null 2>&1; then

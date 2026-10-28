@@ -16,22 +16,17 @@ if [ -f "$SCRIPT_DIR/waybar_config.jsonc" ]; then
 fi
 
 if command -v waybar >/dev/null 2>&1; then
-    # 1. Try launching with primary Windhawk taskbar configuration
-    waybar -c "$CONFIG_FILE" -s "$STYLE_FILE" "$@" &
-    WAYBAR_PID=$!
-    sleep 0.8
-
-    # 2. Verify process is healthy
-    if kill -0 $WAYBAR_PID 2>/dev/null; then
-        wait $WAYBAR_PID
-        exit 0
-    fi
-
-    # 3. If primary failed (e.g. wlr/taskbar module unsupported in standard distribution packages), launch resilient safe config
-    echo "[VDE Shell] Primary waybar config exited. Launching resilient safe config..." >&2
-    if [ -f "$SAFE_CONFIG" ]; then
-        exec waybar -c "$SAFE_CONFIG" -s "$STYLE_FILE" "$@"
-    fi
+    while true; do
+        if [ -f "$CONFIG_FILE" ]; then
+            waybar -c "$CONFIG_FILE" -s "$STYLE_FILE" "$@" 2>/tmp/waybar.log || \
+            waybar -c "$SAFE_CONFIG" -s "$STYLE_FILE" "$@" 2>/tmp/waybar_safe.log
+        elif [ -f "$SAFE_CONFIG" ]; then
+            waybar -c "$SAFE_CONFIG" -s "$STYLE_FILE" "$@" 2>/tmp/waybar_safe.log
+        else
+            waybar "$@"
+        fi
+        sleep 1
+    done
 elif command -v ags >/dev/null 2>&1; then
     exec ags run app.ts "$@"
 else

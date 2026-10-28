@@ -15,11 +15,10 @@
 
 /* Main Taskbar Container (Acrylic Glassmorphism) */
 window#waybar {
-  background: linear-gradient(180deg, rgba(28, 28, 34, 0.72) 0%, rgba(14, 14, 18, 0.86) 100%);
+  background: rgba(18, 18, 22, 0.88);
   border-top: 1px solid rgba(255, 255, 255, 0.14);
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
   color: #f4f4f5;
-  transition: all 0.25s cubic-bezier(0, 0, 0.2, 1);
+  transition: all 0.2s ease;
 }
 
 /* Tooltip (Windows 11 Acrylic Style) */
@@ -59,12 +58,15 @@ tooltip label {
 }
 
 /* --------------------------------------------------------------------------
- * Center Modules: Pinned App Launchers (Start, Terminal, Files, Settings, Snip)
+ * Center Modules: Pinned App Launchers (Start, Terminal, Files, Notepad, Settings, Paint, Calc, Snip)
  * -------------------------------------------------------------------------- */
 #custom-start,
 #custom-terminal,
 #custom-files,
+#custom-pad,
 #custom-settings,
+#custom-paint,
+#custom-calc,
 #custom-snip {
   padding: 0 11px;
   margin: 5px 3px;
@@ -73,7 +75,7 @@ tooltip label {
   font-size: 15px;
   background: transparent;
   border: 1px solid transparent;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.15s ease;
 }
 
 /* Start Button (Windows 11 Accent Glow) */
@@ -87,30 +89,32 @@ tooltip label {
   color: #7dd3fc;
   background: rgba(56, 189, 248, 0.15);
   border: 1px solid rgba(56, 189, 248, 0.35);
-  box-shadow: 0 0 14px rgba(56, 189, 248, 0.28);
 }
 
 #custom-start:active {
   background: rgba(56, 189, 248, 0.25);
-  transform: scale(0.96);
 }
 
 /* Pinned Launcher Button Hover & Active States */
 #custom-terminal:hover,
 #custom-files:hover,
+#custom-pad:hover,
 #custom-settings:hover,
+#custom-paint:hover,
+#custom-calc:hover,
 #custom-snip:hover {
-  background: rgba(255, 255, 255, 0.09);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.18);
 }
 
 #custom-terminal:active,
 #custom-files:active,
+#custom-pad:active,
 #custom-settings:active,
+#custom-paint:active,
+#custom-calc:active,
 #custom-snip:active {
-  background: rgba(255, 255, 255, 0.05);
-  transform: scale(0.96);
+  background: rgba(255, 255, 255, 0.08);
 }
 
 /* --------------------------------------------------------------------------
@@ -166,7 +170,7 @@ tooltip label {
   border: 1px solid rgba(255, 255, 255, 0.06);
   color: #e4e4e7;
   font-size: 12px;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.15s ease;
 }
 
 #tray {
@@ -195,14 +199,12 @@ tooltip label {
 #pulseaudio:hover,
 #network:hover,
 #clock:hover {
-  background-color: rgba(255, 255, 255, 0.11);
-  border-color: rgba(255, 255, 255, 0.16);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  background-color: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.18);
 }
 
 #pulseaudio:active,
 #network:active,
 #clock:active {
-  background-color: rgba(255, 255, 255, 0.07);
-  transform: scale(0.97);
+  background-color: rgba(255, 255, 255, 0.08);
 }

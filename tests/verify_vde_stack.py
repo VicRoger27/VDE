@@ -64,7 +64,7 @@ def test_waybar_config():
     data = json.loads(clean_json)
     assert "modules-center" in data, "modules-center missing from Waybar config"
     assert "custom/start" in data["modules-center"], "custom/start missing"
-    assert "wlr/taskbar" in data["modules-center"], "wlr/taskbar missing"
+    assert "custom/terminal" in data["modules-center"], "custom/terminal missing"
     print("  [OK] waybar_config.jsonc structure valid and verified.")
 
 def test_desktop_files():
