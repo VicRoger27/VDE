@@ -54,11 +54,14 @@ fi
 TARGET_USER="${SUDO_USER:-$USER}"
 USER_HOME=$(getent passwd "$TARGET_USER" | cut -d: -f6 || echo "/home/$TARGET_USER")
 
-# Detect Live Session (Try Ubuntu / Casper)
+# Detect Live Session (Try Ubuntu / Casper / Live ISOs across distros)
 IS_LIVE_SESSION=false
-if [ -d "/rofs" ] || [ -f "/run/casper-iso-path" ] || [ "$TARGET_USER" = "ubuntu" ] || [ "$TARGET_USER" = "lubuntu" ]; then
+if [ -d "/rofs" ] || [ -f "/run/casper-iso-path" ] || [ -d "/lib/live/mount" ] || [ -d "/run/initramfs/live" ] || \
+   [ "$TARGET_USER" = "ubuntu" ] || [ "$TARGET_USER" = "lubuntu" ] || [ "$TARGET_USER" = "kubuntu" ] || [ "$TARGET_USER" = "xubuntu" ] || \
+   [ "$TARGET_USER" = "live" ] || [ "$TARGET_USER" = "liveuser" ] || [ "$TARGET_USER" = "mint" ] || [ "$TARGET_USER" = "zorin" ] || \
+   [ "$TARGET_USER" = "tc" ] || [ "$TARGET_USER" = "archiso" ] || [ "$TARGET_USER" = "anon" ]; then
     IS_LIVE_SESSION=true
-    echo -e "${C_GREEN}>> Detected Live Session (Try Ubuntu / RAM mode)${C_RESET}"
+    echo -e "${C_GREEN}>> Detected Live Session (RAM / Live ISO mode)${C_RESET}"
 else
     echo -e "${C_GREEN}>> Target User:${C_RESET} ${TARGET_USER} (${USER_HOME})"
 fi
@@ -68,15 +71,14 @@ for iface in $(ip -o link show | awk -F': ' '{print $2}' | grep -v 'lo' | cut -d
     ethtool -K "$iface" tso off gso off gro off 2>/dev/null || true
 done
 
-# Proactively neutralize legacy display managers (GDM, LightDM, SDDM) to prevent console lockups
-echo -e "${C_CYAN}>> Neutralizing legacy display managers (GDM, LightDM, SDDM)...${C_RESET}"
-systemctl stop gdm gdm3 display-manager lightdm sddm 2>/dev/null || true
-pkill -9 -f gdm 2>/dev/null || true
-pkill -9 -f gnome-shell 2>/dev/null || true
-pkill -9 -f mutter 2>/dev/null || true
-pkill -9 -f Xwayland 2>/dev/null || true
-systemctl mask --now gdm gdm3 display-manager lightdm sddm 2>/dev/null || true
-systemctl set-default multi-user.target 2>/dev/null || true
+# Proactively neutralize legacy display managers (GDM, LightDM, SDDM, LXDM) to prevent console lockups
+echo -e "${C_CYAN}>> Neutralizing legacy display managers (GDM, LightDM, SDDM, LXDM)...${C_RESET}"
+if command -v systemctl >/dev/null 2>&1; then
+    systemctl stop gdm gdm3 display-manager lightdm sddm lxdm nodm xdm 2>/dev/null || true
+    systemctl mask --now gdm gdm3 display-manager lightdm sddm lxdm nodm xdm 2>/dev/null || true
+    systemctl set-default multi-user.target 2>/dev/null || true
+fi
+pkill -9 -f "gdm|sddm|lightdm|lxdm|gnome-shell|mutter|kwin|xfwm4|cinnamon|marco|openbox|Xwayland" 2>/dev/null || true
 
 # Parse Flags: Default is to WIPE telemetry bloat and GNOME unless explicitly told to coexist
 WIPE_SLOP=true
@@ -133,18 +135,56 @@ apt_run() {
     done
 }
 
-# 2. Detect Package Manager
-echo -e "${C_CYAN}>> Detecting host environment...${C_RESET}"
+# 2. Detect Host Distribution and Package Manager
+echo -e "${C_CYAN}>> Detecting host distribution and package manager...${C_RESET}"
+
+DISTRO_ID="unknown"
+DISTRO_NAME="Linux"
+DISTRO_LIKE=""
+DISTRO_VERSION=""
+
+if [ -f /etc/os-release ]; then
+    . /etc/os-release
+    DISTRO_ID="${ID:-unknown}"
+    DISTRO_NAME="${PRETTY_NAME:-$NAME}"
+    DISTRO_LIKE="${ID_LIKE:-}"
+    DISTRO_VERSION="${VERSION_ID:-}"
+elif [ -f /etc/issue ]; then
+    DISTRO_NAME=$(head -n 1 /etc/issue | cut -d'\' -f1 | tr -d '\r\n')
+fi
+
+# Package Manager Detection across all requested ecosystems
 if command -v apt-get >/dev/null 2>&1; then
     PKG_MGR="apt"
-elif command -v pacman >/dev/null 2>&1; then
-    PKG_MGR="pacman"
+elif command -v zypper >/dev/null 2>&1; then
+    PKG_MGR="zypper"
+elif command -v transactional-update >/dev/null 2>&1; then
+    PKG_MGR="transactional-update"
 elif command -v dnf >/dev/null 2>&1; then
     PKG_MGR="dnf"
+elif command -v rpm-ostree >/dev/null 2>&1; then
+    PKG_MGR="rpm-ostree"
+elif command -v pacman >/dev/null 2>&1; then
+    PKG_MGR="pacman"
+elif command -v xbps-install >/dev/null 2>&1; then
+    PKG_MGR="xbps"
+elif command -v eopkg >/dev/null 2>&1; then
+    PKG_MGR="eopkg"
+elif command -v apk >/dev/null 2>&1; then
+    PKG_MGR="apk"
+elif command -v tce-load >/dev/null 2>&1; then
+    PKG_MGR="tce"
 else
-    echo -e "${C_RED}[Error] Unsupported package manager. VDE currently supports apt, pacman, and dnf.${C_RESET}"
+    echo -e "${C_RED}[Error] Unsupported package manager.${C_RESET}"
+    echo -e "VDE supports: apt (Debian/Ubuntu/Lubuntu/Xubuntu/Kubuntu/MATE/Cinnamon/Studio/Unity/Server/Zorin/Lite/Elementary/MX/Parrot/RPi),"
+    echo -e "              zypper (openSUSE Tumbleweed/Leap/Server/MicroOS/Leap Micro),"
+    echo -e "              dnf/rpm-ostree (Fedora/Bazzite), pacman (Arch/CachyOS), xbps (Void),"
+    echo -e "              eopkg (Solus), apk (Alpine), and tce (TinyCore)."
     exit 1
 fi
+
+echo -e "   Detected OS: ${C_GREEN}${DISTRO_NAME} (${DISTRO_ID})${C_RESET}"
+echo -e "   Package Manager: ${C_GREEN}${PKG_MGR}${C_RESET}"
 
 # 3. Locate or Download Source Code
 SCRIPT_DIR="$(dirname "$(realpath "$0" 2>/dev/null || readlink -f "$0" 2>/dev/null || echo "$0")")"
@@ -164,8 +204,40 @@ else
     elif command -v curl >/dev/null 2>&1; then
         curl -sSL "$REPO_TARBALL" -o "$TAR_FILE"
     else
-        apt_run update -y
-        apt_run install -y --no-install-recommends wget ca-certificates
+        echo -e "${C_YELLOW}>> Installing curl/wget bootstrap utility via ${PKG_MGR}...${C_RESET}"
+        case "$PKG_MGR" in
+            apt)
+                apt_run update -y
+                apt_run install -y --no-install-recommends wget ca-certificates
+                ;;
+            zypper)
+                zypper --non-interactive in -y wget ca-certificates 2>/dev/null || true
+                ;;
+            transactional-update)
+                transactional-update --non-interactive pkg in -y wget ca-certificates 2>/dev/null || true
+                ;;
+            dnf)
+                dnf install -y wget ca-certificates 2>/dev/null || true
+                ;;
+            rpm-ostree)
+                rpm-ostree install --apply-live wget ca-certificates 2>/dev/null || true
+                ;;
+            pacman)
+                pacman -Sy --noconfirm wget ca-certificates 2>/dev/null || true
+                ;;
+            xbps)
+                xbps-install -Sy -y wget ca-certificates 2>/dev/null || true
+                ;;
+            eopkg)
+                eopkg it -y wget ca-certificates 2>/dev/null || true
+                ;;
+            apk)
+                apk add --no-cache wget ca-certificates 2>/dev/null || true
+                ;;
+            tce)
+                su - "${TARGET_USER}" -c "tce-load -wi wget ca-certificates" 2>/dev/null || true
+                ;;
+        esac
         wget -qO "$TAR_FILE" "$REPO_TARBALL"
     fi
 
@@ -232,119 +304,209 @@ if [ $VERIFY_FAILED -ne 0 ]; then
 fi
 echo -e "${C_GREEN}>> All core VDE components cryptographically verified (100% PASS).${C_RESET}"
 
-# 5. Wipe GNOME, Snaps, and Telemetry Bloat
+# 5. Wipe Legacy Desktop, Snaps, and Telemetry Bloat
 if [ "$WIPE_SLOP" = true ]; then
     echo ""
     echo -e "${C_RED}==============================================================${C_RESET}"
-    echo -e "${C_RED}>> [PURGE] Stripping GNOME, Snap Daemon & Telemetry Bloat...${C_RESET}"
+    echo -e "${C_RED}>> [PURGE] Stripping Legacy Desktops, Snaps & Telemetry Bloat...${C_RESET}"
     echo -e "${C_RED}==============================================================${C_RESET}"
 
-    if command -v apt-get >/dev/null 2>&1; then
-        # 1. Purge Snapd & snaps
-        echo -e "${C_YELLOW}>> Purging Snap daemon (snapd)...${C_RESET}"
-        systemctl stop snapd.service snapd.socket 2>/dev/null || true
-        apt_run purge -y snapd 2>/dev/null || true
-        rm -rf /var/cache/snapd /var/lib/snapd /snap /root/snap "$USER_HOME/snap" 2>/dev/null || true
+    case "$PKG_MGR" in
+        apt)
+            echo -e "${C_YELLOW}>> Purging Snap daemon (snapd)...${C_RESET}"
+            systemctl stop snapd.service snapd.socket 2>/dev/null || true
+            apt_run purge -y snapd 2>/dev/null || true
+            rm -rf /var/cache/snapd /var/lib/snapd /snap /root/snap "$USER_HOME/snap" 2>/dev/null || true
 
-        # 2. Purge Tracking and Telemetry
-        echo -e "${C_YELLOW}>> Purging background tracking, metrics & crash telemetry...${C_RESET}"
-        apt_run purge -y \
-            whoopsie \
-            popularity-contest \
-            ubuntu-report \
-            apport \
-            apport-symptoms \
-            landscape-common 2>/dev/null || true
+            echo -e "${C_YELLOW}>> Purging background tracking, metrics & crash telemetry...${C_RESET}"
+            apt_run purge -y \
+                whoopsie \
+                popularity-contest \
+                ubuntu-report \
+                apport \
+                apport-symptoms \
+                landscape-common 2>/dev/null || true
 
-        # 3. Purge GNOME Shell and heavy bloat
-        echo -e "${C_YELLOW}>> Purging GNOME Shell, GDM, and legacy desktop bloat...${C_RESET}"
-        apt_run purge -y \
-            gnome-shell \
-            gnome-session \
-            gdm3 \
-            ubuntu-desktop \
-            ubuntu-desktop-minimal \
-            gnome-initial-setup \
-            mutter \
-            mesa-vulkan-drivers 2>/dev/null || true
+            echo -e "${C_YELLOW}>> Purging legacy desktop environments and display managers...${C_RESET}"
+            apt_run purge -y \
+                gnome-shell gnome-session gdm3 gdm ubuntu-desktop ubuntu-desktop-minimal gnome-initial-setup mutter \
+                plasma-desktop plasma-workspace sddm kde-standard kubuntu-desktop \
+                xfce4 xfce4-session xubuntu-desktop lightdm \
+                lxqt lubuntu-desktop \
+                mate-desktop ubuntu-mate-desktop \
+                cinnamon ubuntu-cinnamon-desktop \
+                unity ubuntu-unity-desktop \
+                ubuntu-studio-desktop 2>/dev/null || true
 
-        # 4. Autoremove residual orphaned packages
-        echo -e "${C_YELLOW}>> Cleaning residual packages and unused dependencies...${C_RESET}"
-        apt_run autoremove -y --purge 2>/dev/null || true
-        apt-get clean 2>/dev/null || true
-    elif command -v dnf >/dev/null 2>&1; then
-        dnf remove -y @gnome-desktop gdm 2>/dev/null || true
-    elif command -v pacman >/dev/null 2>&1; then
-        pacman -Rns --noconfirm gnome gnome-extra gdm 2>/dev/null || true
-    fi
-    echo -e "${C_GREEN}>> Distro bloat and GNOME purged successfully.${C_RESET}"
+            echo -e "${C_YELLOW}>> Cleaning residual packages and unused dependencies...${C_RESET}"
+            apt_run autoremove -y --purge 2>/dev/null || true
+            apt-get clean 2>/dev/null || true
+            ;;
+        zypper)
+            echo -e "${C_YELLOW}>> Neutralizing openSUSE legacy display managers and desktop patterns...${C_RESET}"
+            zypper --non-interactive rm -y gdm sddm lightdm patterns-gnome-gnome patterns-kde-kde 2>/dev/null || true
+            ;;
+        transactional-update)
+            echo -e "${C_YELLOW}>> Immutable openSUSE: Masking display managers...${C_RESET}"
+            systemctl mask --now gdm sddm lightdm 2>/dev/null || true
+            ;;
+        dnf)
+            echo -e "${C_YELLOW}>> Purging Fedora legacy desktop packages...${C_RESET}"
+            dnf remove -y @gnome-desktop @kde-desktop @xfce-desktop-environment gdm sddm lightdm 2>/dev/null || true
+            ;;
+        rpm-ostree)
+            echo -e "${C_YELLOW}>> Neutralizing display managers on atomic desktop...${C_RESET}"
+            systemctl mask --now gdm sddm lightdm 2>/dev/null || true
+            ;;
+        pacman)
+            echo -e "${C_YELLOW}>> Purging Arch/CachyOS legacy desktop packages...${C_RESET}"
+            pacman -Rns --noconfirm gnome gnome-extra plasma sddm gdm lightdm xfce4 lxqt 2>/dev/null || true
+            ;;
+        xbps)
+            echo -e "${C_YELLOW}>> Neutralizing Void Linux display managers...${C_RESET}"
+            xbps-remove -y gdm sddm lightdm 2>/dev/null || true
+            ;;
+        eopkg)
+            echo -e "${C_YELLOW}>> Neutralizing Solus display managers...${C_RESET}"
+            eopkg rm -y gdm sddm lightdm 2>/dev/null || true
+            ;;
+        apk)
+            echo -e "${C_YELLOW}>> Neutralizing Alpine display managers...${C_RESET}"
+            apk del gdm sddm lightdm 2>/dev/null || true
+            ;;
+        tce)
+            echo -e "${C_YELLOW}>> TinyCore: Zero legacy bloat to remove.${C_RESET}"
+            ;;
+    esac
+    echo -e "${C_GREEN}>> Distro bloat and legacy environments purged successfully.${C_RESET}"
 fi
 
 # 6. Install Clean VDE Dependencies
 echo ""
 echo -e "${C_CYAN}>> [1/5] Installing lightweight VDE Wayland stack...${C_RESET}"
-if command -v apt-get >/dev/null 2>&1; then
-    if command -v add-apt-repository >/dev/null 2>&1; then
-        add-apt-repository -y universe 2>/dev/null || true
-    fi
-    apt_run update -y
-    apt_run install -y --no-install-recommends \
-        labwc \
-        waybar \
-        swaybg \
-        wofi \
-        foot \
-        xterm \
-        pcmanfm \
-        python3 \
-        python3-gi \
-        gir1.2-gtk-3.0 \
-        gir1.2-vte-2.91 \
-        espeak-ng \
-        wlr-randr \
-        pipewire \
-        wireplumber \
-        pulseaudio-utils \
-        wayland-protocols \
-        libgl1-mesa-dri \
-        libglib2.0-bin \
-        brightnessctl \
-        grim \
-        slurp \
-        wl-clipboard \
-        polkitd \
-        xdg-utils \
-        dbus-x11 \
-        fonts-dejavu-core \
-        fonts-font-awesome \
-        fonts-noto-color-emoji \
-        libnotify-bin 2>/dev/null || \
-    apt_run install -y --no-install-recommends \
-        labwc \
-        waybar \
-        swaybg \
-        wofi \
-        foot \
-        xterm \
-        pcmanfm \
-        python3 \
-        python3-gi \
-        gir1.2-gtk-3.0 \
-        pipewire \
-        wireplumber \
-        wayland-protocols \
-        libgl1-mesa-dri \
-        brightnessctl \
-        grim \
-        slurp \
-        wl-clipboard \
-        polkitd \
-        xdg-utils
-elif command -v pacman >/dev/null 2>&1; then
-    pacman -Syu --noconfirm --needed labwc waybar swaybg wofi foot xterm pcmanfm python python-gobject gtk3 vte3 espeak-ng pipewire wireplumber brightnessctl grim slurp wl-clipboard polkit xdg-utils
-elif command -v dnf >/dev/null 2>&1; then
-    dnf install -y labwc waybar swaybg wofi foot xterm pcmanfm python3 python3-gobject gtk3 vte291 espeak-ng pipewire wireplumber brightnessctl grim slurp wl-clipboard polkit xdg-utils
-fi
+
+case "$PKG_MGR" in
+    apt)
+        if command -v add-apt-repository >/dev/null 2>&1; then
+            add-apt-repository -y universe 2>/dev/null || true
+        fi
+        apt_run update -y
+        apt_run install -y --no-install-recommends \
+            labwc waybar swaybg wofi foot xterm pcmanfm \
+            python3 python3-gi gir1.2-gtk-3.0 gir1.2-vte-2.91 \
+            espeak-ng pipewire wireplumber pulseaudio-utils \
+            wayland-protocols libgl1-mesa-dri libglib2.0-bin \
+            brightnessctl grim slurp wl-clipboard polkitd xdg-utils \
+            dbus-x11 fonts-dejavu-core fonts-font-awesome fonts-noto-color-emoji libnotify-bin 2>/dev/null || \
+        apt_run install -y --no-install-recommends \
+            labwc waybar swaybg wofi foot xterm pcmanfm \
+            python3 python3-gi gir1.2-gtk-3.0 \
+            pipewire wireplumber wayland-protocols \
+            libgl1-mesa-dri brightnessctl grim slurp wl-clipboard polkitd xdg-utils
+        ;;
+    zypper)
+        echo -e "${C_CYAN}>> Installing openSUSE packages via zypper...${C_RESET}"
+        zypper --non-interactive refresh 2>/dev/null || true
+        zypper --non-interactive in --no-recommends -y \
+            labwc waybar swaybg wofi foot xterm pcmanfm \
+            python3 python3-gobject typelib-1_0-Gtk-3_0 typelib-1_0-Vte-2_91 \
+            espeak-ng pipewire wireplumber pulseaudio-utils \
+            wayland-protocols Mesa-dri brightnessctl grim slurp wl-clipboard \
+            polkit xdg-utils dbus-1-x11 dejavu-fonts fontawesome-fonts noto-coloremoji-fonts libnotify-tools 2>/dev/null || \
+        zypper --non-interactive in --no-recommends -y \
+            labwc waybar swaybg wofi foot xterm pcmanfm \
+            python3 python3-gobject typelib-1_0-Gtk-3_0 \
+            pipewire wireplumber Mesa-dri brightnessctl grim slurp wl-clipboard polkit xdg-utils
+        ;;
+    transactional-update)
+        echo -e "${C_CYAN}>> Immutable openSUSE detected. Installing packages via transactional-update...${C_RESET}"
+        transactional-update --non-interactive pkg in --no-recommends -y \
+            labwc waybar swaybg wofi foot xterm pcmanfm \
+            python3 python3-gobject typelib-1_0-Gtk-3_0 typelib-1_0-Vte-2_91 \
+            pipewire wireplumber Mesa-dri brightnessctl grim slurp wl-clipboard polkit xdg-utils 2>/dev/null || true
+        ;;
+    dnf)
+        echo -e "${C_CYAN}>> Installing Fedora packages via dnf...${C_RESET}"
+        dnf install -y \
+            labwc waybar swaybg wofi foot xterm pcmanfm \
+            python3 python3-gobject gtk3 vte291 \
+            espeak-ng pipewire wireplumber pulseaudio-utils \
+            wayland-protocols mesa-dri-drivers brightnessctl grim slurp wl-clipboard \
+            polkit xdg-utils dbus-x11 dejavu-sans-fonts fontawesome-fonts google-noto-emoji-fonts libnotify 2>/dev/null || \
+        dnf install -y \
+            labwc waybar swaybg wofi foot xterm pcmanfm \
+            python3 python3-gobject gtk3 \
+            pipewire wireplumber mesa-dri-drivers brightnessctl grim slurp wl-clipboard polkit xdg-utils
+        ;;
+    rpm-ostree)
+        echo -e "${C_CYAN}>> Installing packages on Bazzite / Atomic Fedora...${C_RESET}"
+        if command -v dnf >/dev/null 2>&1; then
+            dnf install -y \
+                labwc waybar swaybg wofi foot xterm pcmanfm \
+                python3 python3-gobject gtk3 vte291 pipewire wireplumber mesa-dri-drivers \
+                brightnessctl grim slurp wl-clipboard polkit xdg-utils 2>/dev/null || true
+        else
+            rpm-ostree install --idempotent --apply-live \
+                labwc waybar swaybg wofi foot xterm pcmanfm \
+                python3 python3-gobject gtk3 vte291 pipewire wireplumber mesa-dri-drivers \
+                brightnessctl grim slurp wl-clipboard polkit xdg-utils 2>/dev/null || true
+        fi
+        ;;
+    pacman)
+        echo -e "${C_CYAN}>> Installing Arch/CachyOS packages via pacman...${C_RESET}"
+        pacman -Sy --noconfirm 2>/dev/null || true
+        pacman -S --noconfirm --needed \
+            labwc waybar swaybg wofi foot xterm pcmanfm \
+            python python-gobject gtk3 vte3 \
+            espeak-ng pipewire wireplumber pulseaudio-utils \
+            wayland-protocols mesa brightnessctl grim slurp wl-clipboard \
+            polkit xdg-utils ttf-dejavu ttf-font-awesome noto-fonts-emoji libnotify 2>/dev/null || \
+        pacman -S --noconfirm --needed \
+            labwc waybar swaybg wofi foot xterm pcmanfm \
+            python python-gobject gtk3 \
+            pipewire wireplumber mesa brightnessctl grim slurp wl-clipboard polkit xdg-utils
+        ;;
+    xbps)
+        echo -e "${C_CYAN}>> Installing Void Linux packages via xbps-install...${C_RESET}"
+        xbps-install -Sy 2>/dev/null || true
+        xbps-install -y \
+            labwc waybar swaybg wofi foot xterm pcmanfm \
+            python3 python3-gobject gtk+3 vte3 \
+            espeak-ng pipewire wireplumber alsa-utils \
+            wayland-protocols MesaLib-dri brightnessctl grim slurp wl-clipboard \
+            polkit xdg-utils dejavu-fonts font-awesome noto-fonts-emoji libnotify 2>/dev/null || \
+        xbps-install -y \
+            labwc waybar swaybg wofi foot xterm pcmanfm \
+            python3 python3-gobject gtk+3 \
+            pipewire wireplumber MesaLib-dri brightnessctl grim slurp wl-clipboard polkit xdg-utils
+        ;;
+    eopkg)
+        echo -e "${C_CYAN}>> Installing Solus packages via eopkg...${C_RESET}"
+        eopkg it -y \
+            labwc waybar swaybg wofi foot xterm pcmanfm \
+            python3 python-gobject gtk3 vte \
+            espeak-ng pipewire wireplumber \
+            brightnessctl grim slurp wl-clipboard polkit xdg-utils 2>/dev/null || true
+        ;;
+    apk)
+        echo -e "${C_CYAN}>> Installing Alpine Linux packages via apk...${C_RESET}"
+        apk update 2>/dev/null || true
+        apk add --no-cache \
+            labwc waybar swaybg wofi foot xterm pcmanfm \
+            python3 py3-gobject3 gtk+3.0 vte3 \
+            espeak-ng pipewire wireplumber \
+            wayland-protocols mesa-dri-gallium brightnessctl grim slurp wl-clipboard \
+            polkit xdg-utils dbus-x11 ttf-dejavu font-awesome-free font-noto-emoji libnotify bash shadow 2>/dev/null || \
+        apk add --no-cache \
+            labwc waybar swaybg wofi foot xterm pcmanfm \
+            python3 py3-gobject3 gtk+3.0 \
+            pipewire wireplumber mesa-dri-gallium brightnessctl grim slurp wl-clipboard polkit xdg-utils bash
+        ;;
+    tce)
+        echo -e "${C_CYAN}>> Loading TinyCore Linux extensions via tce-load...${C_RESET}"
+        su - "${TARGET_USER}" -c "tce-load -wi python3.9 gtk3 vte xterm pcmanfm wayland dbus polkit 2>/dev/null || true" || true
+        ;;
+esac
 
 # 7. Deploy VDE Shell Components
 echo -e "${C_CYAN}>> [2/5] Deploying VDE shell components to ${INSTALL_PREFIX}...${C_RESET}"
@@ -513,8 +675,8 @@ Type=Application
 Categories=System;
 EOF
 
-# Create desktop shortcuts on live desktop
-for d in "$USER_HOME/Desktop" "/home/ubuntu/Desktop" "/root/Desktop"; do
+# Create desktop shortcuts on live desktop and user desktops
+for d in "$USER_HOME/Desktop" "/home/$TARGET_USER/Desktop" "/home/ubuntu/Desktop" "/home/lubuntu/Desktop" "/home/kubuntu/Desktop" "/home/xubuntu/Desktop" "/home/live/Desktop" "/home/liveuser/Desktop" "/home/tc/Desktop" "/home/alarm/Desktop" "/home/pi/Desktop" "/root/Desktop"; do
     if [ -d "$d" ]; then
         for dt in crossmanager crossminal crosspad crossings crossbin crossnip crossculator crosslock; do
             if [ -f "/usr/share/applications/$dt.desktop" ]; then
@@ -529,29 +691,50 @@ for d in "$USER_HOME/Desktop" "/home/ubuntu/Desktop" "/root/Desktop"; do
     fi
 done
 
-# Configure Seamless Standalone System Console & Autologin (TTY1)
+# Configure Standalone System Console & Autologin (TTY1) across inits
 echo -e "${C_GREEN}>> Configuring automatic direct VDE boot on TTY1 with PAM logind seat...${C_RESET}"
-mkdir -p /etc/systemd/system/getty@tty1.service.d
-cat << EOF > /etc/systemd/system/getty@tty1.service.d/override.conf
+
+# 1. Systemd Autologin & Display Manager Neutralization
+if command -v systemctl >/dev/null 2>&1; then
+    mkdir -p /etc/systemd/system/getty@tty1.service.d
+    cat << EOF > /etc/systemd/system/getty@tty1.service.d/override.conf
 [Service]
 ExecStart=
 ExecStart=-/sbin/agetty --autologin ${TARGET_USER} --noclear %I \$TERM
 Type=idle
 EOF
+    systemctl daemon-reload 2>/dev/null || true
+    systemctl disable --now display-manager gdm3 gdm lightdm sddm lxdm nodm xdm 2>/dev/null || true
+    systemctl mask display-manager gdm3 gdm lightdm sddm lxdm nodm xdm 2>/dev/null || true
+    systemctl enable getty@tty1.service 2>/dev/null || true
+    systemctl set-default multi-user.target 2>/dev/null || true
+fi
 
+# 2. OpenRC Support (Alpine Linux, Gentoo, MX Linux sysv)
+if [ -f /etc/inittab ] && [ ! -d /run/systemd/system ]; then
+    sed -i "s|^tty1:.*|tty1::respawn:/sbin/getty -a ${TARGET_USER} 38400 tty1|" /etc/inittab 2>/dev/null || true
+fi
+
+# 3. Runit Support (Void Linux)
+if [ -d /etc/sv/agetty-tty1 ] && [ ! -d /run/systemd/system ]; then
+    echo "GETTY_ARGS=\"--autologin ${TARGET_USER} --noclear\"" > /etc/sv/agetty-tty1/conf 2>/dev/null || true
+fi
+
+# 4. TinyCore Linux Hook
+if [ -f /opt/bootlocal.sh ]; then
+    grep -q "vde-session" "/home/${TARGET_USER}/.profile" 2>/dev/null || {
+        echo '[ -z "$WAYLAND_DISPLAY" ] && exec /usr/local/bin/vde-session' >> "/home/${TARGET_USER}/.profile"
+    }
+fi
+
+# Universal TTY1 login autostart for all POSIX shells
 mkdir -p /etc/profile.d
 cat << 'EOF' > /etc/profile.d/99-vde-login.sh
-if [ -z "$WAYLAND_DISPLAY" ] && [ "$(tty)" = "/dev/tty1" ]; then
+if [ -z "$WAYLAND_DISPLAY" ] && [ "$(tty 2>/dev/null)" = "/dev/tty1" ]; then
     exec /usr/local/bin/vde-session
 fi
 EOF
-
-# Mask old display managers (GDM/LightDM/SDDM) to eliminate memory bloat and boot hangs
-systemctl daemon-reload 2>/dev/null || true
-systemctl disable --now display-manager gdm3 gdm lightdm sddm 2>/dev/null || true
-systemctl mask display-manager gdm3 gdm lightdm sddm 2>/dev/null || true
-systemctl enable getty@tty1.service 2>/dev/null || true
-systemctl set-default multi-user.target 2>/dev/null || true
+chmod +x /etc/profile.d/99-vde-login.sh 2>/dev/null || true
 
 echo ""
 echo -e "${C_GREEN}==============================================================${C_RESET}"

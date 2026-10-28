@@ -85,7 +85,7 @@ def test_desktop_files():
     assert count >= 12, f"Expected at least 12 desktop entries, found {count}"
 
 def test_installer_integrity():
-    print("[5/5] Verifying install.sh Components...")
+    print("[5/5] Verifying install.sh Components & Multi-Distro Support...")
     inst_path = os.path.join(REPO_DIR, "install.sh")
     assert os.path.exists(inst_path), "install.sh missing"
     with open(inst_path, "r", encoding="utf-8") as f:
@@ -93,7 +93,16 @@ def test_installer_integrity():
     assert "vde.service" in content, "vde.service missing from install.sh"
     assert "vde-session" in content, "vde-session missing from install.sh"
     assert "trap '' HUP PIPE" in content, "Signal protection missing"
-    print("  [OK] install.sh integrity checks passed.")
+
+    # Multi-Distro Package Managers & Ecosystems
+    for mgr in ["apt", "zypper", "dnf", "pacman", "xbps", "eopkg", "apk", "tce"]:
+        assert mgr in content, f"Package manager '{mgr}' missing from install.sh"
+
+    # Multi-Init System Handling
+    assert "getty@tty1" in content, "systemd autologin missing"
+    assert "inittab" in content, "OpenRC / sysv inittab missing"
+    assert "agetty-tty1" in content, "Runit support missing"
+    print("  [OK] install.sh multi-distro and init integrity checks passed.")
 
 if __name__ == "__main__":
     test_python_apps()
