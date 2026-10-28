@@ -177,7 +177,7 @@ elif command -v tce-load >/dev/null 2>&1; then
 else
     echo -e "${C_RED}[Error] Unsupported package manager.${C_RESET}"
     echo -e "VDE supports: apt (Debian/Ubuntu/Lubuntu/Xubuntu/Kubuntu/MATE/Cinnamon/Studio/Unity/Server/Zorin/Lite/Elementary/MX/Parrot/RPi),"
-    echo -e "              zypper (openSUSE Tumbleweed/Leap/Server/MicroOS/Leap Micro),"
+    echo -e "              zypper/transactional-update (openSUSE Tumbleweed/Leap/Server/MicroOS/Leap Micro Server),"
     echo -e "              dnf/rpm-ostree (Fedora/Bazzite), pacman (Arch/CachyOS), xbps (Void),"
     echo -e "              eopkg (Solus), apk (Alpine), and tce (TinyCore)."
     exit 1

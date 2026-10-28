@@ -3,9 +3,9 @@
 ### Highlights & Modifications
 1. **Multi-Distribution Host & Ecosystem Detection**:
    - Added automatic recognition and tailored configuration for all major Linux ecosystems and requested flavors:
-     - **Ubuntu & Official Flavors**: Ubuntu Desktop/Server, Lubuntu (LXQt), Xubuntu (XFCE), Kubuntu (KDE/Plasma), Ubuntu MATE, Ubuntu Cinnamon, Ubuntu Studio, Ubuntu Unity, Ubuntu Leap Micro Server.
+     - **Ubuntu & Official Flavors**: Ubuntu Desktop/Server, Lubuntu (LXQt), Xubuntu (XFCE), Kubuntu (KDE/Plasma), Ubuntu MATE, Ubuntu Cinnamon, Ubuntu Studio, Ubuntu Unity.
      - **Debian Family & Derivatives**: Debian GNU/Linux, Zorin OS, Linux Lite, Elementary OS, MX Linux, Parrot OS, Raspberry Pi OS (Raspbian).
-     - **openSUSE Family**: openSUSE Tumbleweed, openSUSE Leap, openSUSE Leap Micro, openSUSE MicroOS, openSUSE Tumbleweed Server, openSUSE Leap Server, openSUSE MicroOS Server.
+     - **openSUSE Family**: openSUSE Tumbleweed, openSUSE Leap, openSUSE Leap Micro, openSUSE MicroOS, openSUSE Tumbleweed Server, openSUSE Leap Server, openSUSE MicroOS Server, openSUSE Leap Micro Server.
      - **Fedora & Atomic Family**: Fedora Workstation/Server, Bazzite (Atomic rpm-ostree gaming OS).
      - **Arch Family**: Arch Linux, CachyOS, EndeavourOS, Manjaro.
      - **Independent & Lightweight Distros**: Void Linux (xbps), Solus (eopkg), Alpine Linux (apk), TinyCore Linux (tce).
