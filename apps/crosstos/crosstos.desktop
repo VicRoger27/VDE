@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=Crosstos
+Comment=Fluent Dark Mica Photos & Image Viewer
+Exec=/usr/local/bin/crosstos %F
+Icon=org.gnome.eog
+Terminal=false
+Type=Application
+Categories=Graphics;Viewer;RasterGraphics;
+MimeType=image/png;image/jpeg;image/webp;image/svg+xml;image/bmp;image/gif;
+Keywords=photos;pictures;viewer;image;crosstos;gallery;

@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+SCRIPT_DIR="$(dirname "$(realpath "$0" 2>/dev/null || readlink -f "$0" 2>/dev/null || echo "$0")")"
+if [ -f "$SCRIPT_DIR/crossnip.py" ]; then
+    exec python3 "$SCRIPT_DIR/crossnip.py" "$@"
+elif [ -f "/usr/share/vde/apps/crossnip/crossnip.py" ]; then
+    exec python3 "/usr/share/vde/apps/crossnip/crossnip.py" "$@"
+fi
+grim -g "$(slurp)" - | wl-copy

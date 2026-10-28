@@ -16,6 +16,7 @@
     "custom/terminal",
     "custom/files",
     "custom/settings",
+    "custom/snip",
     "wlr/taskbar"
   ],
 
@@ -39,20 +40,26 @@
 
   "custom/terminal": {
     "format": "  ",
-    "tooltip-format": "Terminal (Super+Enter / Super+T)",
-    "on-click": "/usr/local/bin/vde-terminal"
+    "tooltip-format": "Terminal (Crossminal)",
+    "on-click": "/usr/local/bin/crossminal"
   },
 
   "custom/files": {
     "format": " 📁 ",
-    "tooltip-format": "File Explorer (Super+E)",
-    "on-click": "sh -c 'pcmanfm ~ || thunar ~ || xdg-open ~'"
+    "tooltip-format": "File Explorer (Crossmanager)",
+    "on-click": "/usr/local/bin/crossmanager"
   },
 
   "custom/settings": {
     "format": " ⚙ ",
     "tooltip-format": "Crossings Settings (Super+I)",
     "on-click": "/usr/local/bin/crossings"
+  },
+
+  "custom/snip": {
+    "format": " ✂ ",
+    "tooltip-format": "Snipping Tool (Crossnip)",
+    "on-click": "/usr/local/bin/crossnip"
   },
 
   "wlr/taskbar": {
@@ -73,7 +80,8 @@
 
   "clock": {
     "format": "{:%I:%M %p\n%m/%d/%Y}",
-    "tooltip-format": "<big>{:%B %Y}</big>\n<tt><small>{calendar}</small></tt>"
+    "tooltip-format": "<big>{:%B %Y}</big>\n<tt><small>{calendar}</small></tt>",
+    "on-click": "/usr/local/bin/crosslock"
   },
 
   "pulseaudio": {

@@ -7,7 +7,12 @@
 #   - Automatic apt lock resolution and VirtualBox throughput acceleration
 #   - Automated SHA-256 cryptographic component verification
 #   - Complete removal of GNOME Shell, GDM, Snapd, and telemetry bloat
-#   - Installation of clean Wayland desktop stack (Labwc, Waybar, Wofi, Foot, Crossings)
+#   - Installation of clean Wayland desktop stack (Labwc, Waybar, Wofi, Foot)
+#   - Full suite of 12 native VDE Dark Mica applications:
+#       Crossings (Settings), Crosspad (Notepad), Crossminal (Terminal),
+#       Crossaint (Paint), Crosstos (Photos), Crossculator (Calculator),
+#       Crossmanager (File Explorer), Crosslock (Clock/Timer), Cross Bin (Recycle Bin),
+#       Cross Narrator (Accessibility), Crossnip (Snipping Tool), Crosslink (Phone Link)
 #   - Dedicated systemd graphical service (vde.service) on direct DRM/KMS hardware
 #   - True standalone OS desktop environment (NOT a nested app)
 #   - Sub-500 MB idle RAM consumption
@@ -179,11 +184,21 @@ CORE_COMPONENTS=(
     "compositor/environment"
     "compositor/menu.xml"
     "compositor/foot.ini"
-    "compositor/vde-terminal"
     "compositor/vde-session"
     "astal-shell/waybar_config.jsonc"
     "astal-shell/waybar_style.css"
     "apps/crossings/crossings_gui.py"
+    "apps/crosspad/crosspad.py"
+    "apps/crossminal/crossminal.py"
+    "apps/crossaint/crossaint.py"
+    "apps/crosstos/crosstos.py"
+    "apps/crossculator/crossculator.py"
+    "apps/crossmanager/crossmanager.py"
+    "apps/crosslock/crosslock.py"
+    "apps/crossbin/crossbin.py"
+    "apps/crossnarrator/crossnarrator.py"
+    "apps/crossnip/crossnip.py"
+    "apps/crosslink/crosslink.py"
 )
 
 for rel_path in "${CORE_COMPONENTS[@]}"; do
@@ -274,6 +289,8 @@ if command -v apt-get >/dev/null 2>&1; then
         python3 \
         python3-gi \
         gir1.2-gtk-3.0 \
+        gir1.2-vte-2.91 \
+        espeak-ng \
         wlr-randr \
         pipewire \
         wireplumber \
@@ -312,9 +329,9 @@ if command -v apt-get >/dev/null 2>&1; then
         polkitd \
         xdg-utils
 elif command -v pacman >/dev/null 2>&1; then
-    pacman -Syu --noconfirm --needed labwc waybar swaybg wofi foot xterm pcmanfm python python-gobject gtk3 pipewire wireplumber brightnessctl grim slurp wl-clipboard polkit xdg-utils
+    pacman -Syu --noconfirm --needed labwc waybar swaybg wofi foot xterm pcmanfm python python-gobject gtk3 vte3 espeak-ng pipewire wireplumber brightnessctl grim slurp wl-clipboard polkit xdg-utils
 elif command -v dnf >/dev/null 2>&1; then
-    dnf install -y labwc waybar swaybg wofi foot xterm pcmanfm python3 python3-gobject gtk3 pipewire wireplumber brightnessctl grim slurp wl-clipboard polkit xdg-utils
+    dnf install -y labwc waybar swaybg wofi foot xterm pcmanfm python3 python3-gobject gtk3 vte291 espeak-ng pipewire wireplumber brightnessctl grim slurp wl-clipboard polkit xdg-utils
 fi
 
 # 7. Deploy VDE Shell Components
@@ -391,8 +408,28 @@ chmod +x "${BIN_PREFIX}/vde-bar"
 cp -f "$SRC_DIR/qt-launcher/vde-launcher" "${BIN_PREFIX}/vde-launcher"
 chmod +x "${BIN_PREFIX}/vde-launcher"
 
-cp -f "$SRC_DIR/apps/crossings/crossings" "${BIN_PREFIX}/crossings"
-chmod +x "${BIN_PREFIX}/crossings"
+# Install all 12 VDE native applications to /usr/local/bin
+VDE_APPS=(
+    "crossings"
+    "crosspad"
+    "crossminal"
+    "crossaint"
+    "crosstos"
+    "crossculator"
+    "crossmanager"
+    "crosslock"
+    "crossbin"
+    "crossnarrator"
+    "crossnip"
+    "crosslink"
+)
+
+for app in "${VDE_APPS[@]}"; do
+    if [ -f "$SRC_DIR/apps/$app/$app" ]; then
+        cp -f "$SRC_DIR/apps/$app/$app" "${BIN_PREFIX}/$app"
+        chmod +x "${BIN_PREFIX}/$app"
+    fi
+done
 
 # 10. Register Sessions, Systemd Service & Desktop Shortcuts
 echo -e "${C_CYAN}>> [5/5] Registering desktop entries, systemd service & session...${C_RESET}"
@@ -410,27 +447,8 @@ EOF
 
 mkdir -p /usr/share/applications
 
-cat << 'EOF' > /usr/share/applications/crossings.desktop
-[Desktop Entry]
-Name=Crossings Settings
-Comment=VDE System & Personalization Hub
-Exec=/usr/local/bin/crossings
-Icon=/usr/share/vde/assets/icons/glm/settings.svg
-Terminal=false
-Type=Application
-Categories=Settings;DesktopSettings;
-EOF
-
-cat << 'EOF' > /usr/share/applications/vde-terminal.desktop
-[Desktop Entry]
-Name=VDE Terminal
-Comment=Fluent Dark Mica Terminal Emulator
-Exec=/usr/local/bin/vde-terminal
-Icon=utilities-terminal
-Terminal=false
-Type=Application
-Categories=System;TerminalEmulator;
-EOF
+# Copy all VDE application desktop entries
+cp -f "$SRC_DIR/apps/"*/*.desktop /usr/share/applications/ 2>/dev/null || true
 
 cat << 'EOF' > /usr/share/applications/vde.desktop
 [Desktop Entry]
@@ -443,10 +461,17 @@ Type=Application
 Categories=System;
 EOF
 
-# Create desktop shortcut on live desktop
+# Create desktop shortcuts on live desktop
 for d in "$USER_HOME/Desktop" "/home/ubuntu/Desktop" "/root/Desktop"; do
     if [ -d "$d" ]; then
-        cp -f /usr/share/applications/vde.desktop "$d/Launch_VDE.desktop"
+        for dt in crossmanager crossminal crosspad crossings crossbin crossnip crossculator crosslock; do
+            if [ -f "/usr/share/applications/$dt.desktop" ]; then
+                cp -f "/usr/share/applications/$dt.desktop" "$d/" 2>/dev/null || true
+                chmod +x "$d/$dt.desktop" 2>/dev/null || true
+                chown "$TARGET_USER:$TARGET_USER" "$d/$dt.desktop" 2>/dev/null || true
+            fi
+        done
+        cp -f /usr/share/applications/vde.desktop "$d/Launch_VDE.desktop" 2>/dev/null || true
         chmod +x "$d/Launch_VDE.desktop" 2>/dev/null || true
         chown -R "$TARGET_USER:$TARGET_USER" "$d/Launch_VDE.desktop" 2>/dev/null || true
     fi

@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=Crosslink
+Comment=Fluent Dark Mica Smartphone & Device Integration
+Exec=/usr/local/bin/crosslink
+Icon=preferences-system-network
+Terminal=false
+Type=Application
+Categories=Utility;Network;
+Keywords=phone;link;mobile;connect;kdeconnect;crosslink;

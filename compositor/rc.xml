@@ -103,7 +103,7 @@
     </keybind>
 
     <!-- ============================================== -->
-    <!-- VDE Shell Integration (Start & Terminal)       -->
+    <!-- VDE Shell Integration (Start & Apps)           -->
     <!-- ============================================== -->
     <!-- Super / Super + Space / Super_L / Super_R: Toggle Start Menu Launcher -->
     <keybind key="W-space">
@@ -127,24 +127,24 @@
       </action>
     </keybind>
 
-    <!-- Terminal: Super+Return, Super+T, Ctrl+Alt+T -->
+    <!-- Terminal: Crossminal (Super+Return, Super+T, Ctrl+Alt+T) -->
     <keybind key="W-Return">
       <action name="Execute">
-        <command>/usr/local/bin/vde-terminal</command>
+        <command>/usr/local/bin/crossminal</command>
       </action>
     </keybind>
     <keybind key="W-t">
       <action name="Execute">
-        <command>/usr/local/bin/vde-terminal</command>
+        <command>/usr/local/bin/crossminal</command>
       </action>
     </keybind>
     <keybind key="C-A-t">
       <action name="Execute">
-        <command>/usr/local/bin/vde-terminal</command>
+        <command>/usr/local/bin/crossminal</command>
       </action>
     </keybind>
 
-    <!-- Settings: Super+I, Super+S -->
+    <!-- Settings: Crossings (Super+I, Super+S) -->
     <keybind key="W-i">
       <action name="Execute">
         <command>/usr/local/bin/crossings</command>
@@ -156,10 +156,10 @@
       </action>
     </keybind>
 
-    <!-- File Explorer: Super+E -->
+    <!-- File Explorer: Crossmanager (Super+E) -->
     <keybind key="W-e">
       <action name="Execute">
-        <command>sh -c "pcmanfm ~ || thunar ~ || xdg-open ~"</command>
+        <command>/usr/local/bin/crossmanager</command>
       </action>
     </keybind>
 
@@ -172,6 +172,18 @@
     <keybind key="XF86Display">
       <action name="Execute">
         <command>/usr/local/bin/vde-display-toggle</command>
+      </action>
+    </keybind>
+
+    <!-- Snipping Tool: PrintScreen, Super+Shift+S -->
+    <keybind key="Print">
+      <action name="Execute">
+        <command>/usr/local/bin/crossnip</command>
+      </action>
+    </keybind>
+    <keybind key="W-S-s">
+      <action name="Execute">
+        <command>/usr/local/bin/crossnip</command>
       </action>
     </keybind>
 
@@ -208,13 +220,6 @@
     <keybind key="W-l">
       <action name="Execute">
         <command>swaylock -c 18181b || loginctl lock-session</command>
-      </action>
-    </keybind>
-
-    <!-- PrintScreen: Screenshot -->
-    <keybind key="Print">
-      <action name="Execute">
-        <command>sh -c 'grim -g "$(slurp)" - | wl-copy'</command>
       </action>
     </keybind>
   </keyboard>

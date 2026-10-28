@@ -2,21 +2,49 @@
 <openbox_menu>
   <menu id="root-menu" label="Victorious Desktop Environment">
     <separator label="Victorious Desktop (VDE)" />
-    <item label="Open Terminal">
-      <action name="Execute" command="foot || xterm || x-terminal-emulator || gnome-terminal" />
+    <item label="File Explorer (Crossmanager)">
+      <action name="Execute" command="/usr/local/bin/crossmanager" />
+    </item>
+    <item label="Terminal (Crossminal)">
+      <action name="Execute" command="/usr/local/bin/crossminal" />
     </item>
     <item label="Start Launcher">
-      <action name="Execute" command="vde-launcher" />
+      <action name="Execute" command="/usr/local/bin/vde-launcher" />
     </item>
-    <item label="File Manager">
-      <action name="Execute" command="xdg-open ~" />
+    <separator label="VDE Applications" />
+    <item label="Crosspad (Notepad)">
+      <action name="Execute" command="/usr/local/bin/crosspad" />
     </item>
-    <item label="Crossings Settings">
-      <action name="Execute" command="crossings" />
+    <item label="Crossaint (Paint)">
+      <action name="Execute" command="/usr/local/bin/crossaint" />
+    </item>
+    <item label="Crosstos (Photos)">
+      <action name="Execute" command="/usr/local/bin/crosstos" />
+    </item>
+    <item label="Crossculator (Calculator)">
+      <action name="Execute" command="/usr/local/bin/crossculator" />
+    </item>
+    <item label="Crosslock (Clock &amp; Timer)">
+      <action name="Execute" command="/usr/local/bin/crosslock" />
+    </item>
+    <item label="Crossnip (Snipping Tool)">
+      <action name="Execute" command="/usr/local/bin/crossnip" />
+    </item>
+    <item label="Cross Bin (Recycle Bin)">
+      <action name="Execute" command="/usr/local/bin/crossbin" />
+    </item>
+    <item label="Crosslink (Phone Link)">
+      <action name="Execute" command="/usr/local/bin/crosslink" />
+    </item>
+    <item label="Cross Narrator (Accessibility)">
+      <action name="Execute" command="/usr/local/bin/crossnarrator" />
+    </item>
+    <item label="Crossings (Settings)">
+      <action name="Execute" command="/usr/local/bin/crossings" />
     </item>
     <separator />
     <item label="Reload VDE Shell">
-      <action name="Execute" command="pkill -9 -f waybar 2>/dev/null; /usr/local/bin/vde-bar &amp;" />
+      <action name="Execute" command="pkill -9 -x waybar 2>/dev/null; /usr/local/bin/vde-bar &amp;" />
     </item>
     <item label="Reconfigure Window Manager">
       <action name="Reconfigure" />
