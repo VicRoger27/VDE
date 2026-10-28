@@ -383,6 +383,9 @@ gtk-font-name = Segoe UI Variable Text 10
 gtk-application-prefer-dark-theme = true
 gtk-decoration-layout = :minimize,maximize,close
 EOF
+if [ -f "$SRC_DIR/compositor/gtk.css" ]; then
+    cp -f "$SRC_DIR/compositor/gtk.css" /etc/gtk-3.0/gtk.css
+fi
 
 # Deploy Foot terminal styling
 mkdir -p /etc/xdg/foot
@@ -404,6 +407,9 @@ if [ -n "$USER_HOME" ]; then
     USER_GTK="$USER_HOME/.config/gtk-3.0"
     mkdir -p "$USER_GTK"
     cp -f /etc/gtk-3.0/settings.ini "$USER_GTK/settings.ini" 2>/dev/null || true
+    if [ -f "/etc/gtk-3.0/gtk.css" ]; then
+        cp -f /etc/gtk-3.0/gtk.css "$USER_GTK/gtk.css" 2>/dev/null || true
+    fi
 
     # Deploy default VDE wallpaper to user profile
     USER_VDE="$USER_HOME/.config/vde"

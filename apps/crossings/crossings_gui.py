@@ -146,6 +146,60 @@ button.card-btn {
 button.card-btn:hover {
     background: rgba(255, 255, 255, 0.15);
 }
+
+/* Windows 11 / Windhawk Titlebar Button Controls */
+headerbar button.titlebutton {
+    background: transparent;
+    border: none;
+    border-radius: 4px;
+    min-height: 28px;
+    min-width: 42px;
+    margin: 2px 1px;
+    padding: 0;
+    color: #a1a1aa;
+    transition: all 0.15s ease;
+}
+
+headerbar button.titlebutton:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: #ffffff;
+}
+
+headerbar button.titlebutton:active {
+    background: rgba(255, 255, 255, 0.04);
+}
+
+headerbar button.titlebutton.close:hover {
+    background-color: #c42b1c;
+    color: #ffffff;
+}
+
+headerbar button.titlebutton.close:active {
+    background-color: #a82315;
+    color: #ffffff;
+}
+
+/* Modern Rounded Floating Scrollbars */
+scrollbar {
+    background: transparent;
+    border: none;
+}
+scrollbar trough {
+    background: transparent;
+    border: none;
+}
+scrollbar slider {
+    background-color: rgba(255, 255, 255, 0.18);
+    border-radius: 999px;
+    border: none;
+    min-width: 6px;
+    min-height: 6px;
+    margin: 3px;
+    transition: all 0.2s ease;
+}
+scrollbar slider:hover {
+    background-color: rgba(255, 255, 255, 0.38);
+}
 """
 
 def run_cmd(cmd_list):

@@ -1,4 +1,8 @@
-/* VDE Dark Mica / Acrylic Taskbar Styling */
+/* ==============================================================================
+ * VDE Dark Mica / Windhawk Acrylic Taskbar Styling
+ * Inspired by Windows 11 with Windhawk Taskbar Acrylic & Styler Mods
+ * High-translucency glassmorphism, glowing indicator pills, and refined spacing
+ * ============================================================================== */
 
 * {
   border: none;
@@ -9,97 +13,196 @@
   min-height: 0;
 }
 
+/* Main Taskbar Container (Acrylic Glassmorphism) */
 window#waybar {
-  background-color: rgba(24, 24, 27, 0.88);
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  background: linear-gradient(180deg, rgba(28, 28, 34, 0.72) 0%, rgba(14, 14, 18, 0.86) 100%);
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
   color: #f4f4f5;
-  transition-property: background-color;
-  transition-duration: 0.25s;
+  transition: all 0.25s cubic-bezier(0, 0, 0.2, 1);
 }
 
+/* Tooltip (Windows 11 Acrylic Style) */
+tooltip {
+  background: rgba(20, 20, 24, 0.94);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+  padding: 6px 12px;
+}
+
+tooltip label {
+  color: #fafafa;
+  font-size: 12px;
+}
+
+/* --------------------------------------------------------------------------
+ * Left Module: VDE Brand Pill
+ * -------------------------------------------------------------------------- */
+#custom-vde_pill {
+  font-size: 11px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.45);
+  letter-spacing: 1.5px;
+  padding: 0 14px;
+  margin: 6px 4px 6px 8px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 20px;
+  transition: all 0.2s ease;
+}
+
+#custom-vde_pill:hover {
+  color: #38bdf8;
+  background: rgba(56, 189, 248, 0.08);
+  border-color: rgba(56, 189, 248, 0.2);
+}
+
+/* --------------------------------------------------------------------------
+ * Center Modules: Pinned App Launchers (Start, Terminal, Files, Settings, Snip)
+ * -------------------------------------------------------------------------- */
 #custom-start,
 #custom-terminal,
 #custom-files,
 #custom-settings,
-#custom-snip,
-#custom-vde_pill {
-  padding: 0 10px;
-  margin: 4px 2px;
-  border-radius: 6px;
+#custom-snip {
+  padding: 0 11px;
+  margin: 5px 3px;
+  border-radius: 7px;
   color: #f4f4f5;
   font-size: 15px;
-  transition: all 0.2s cubic-bezier(0, 0, 0.2, 1);
+  background: transparent;
+  border: 1px solid transparent;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+/* Start Button (Windows 11 Accent Glow) */
 #custom-start {
   color: #38bdf8;
   font-size: 18px;
-  padding: 0 12px;
+  padding: 0 13px;
 }
 
-#custom-start:hover,
+#custom-start:hover {
+  color: #7dd3fc;
+  background: rgba(56, 189, 248, 0.15);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  box-shadow: 0 0 14px rgba(56, 189, 248, 0.28);
+}
+
+#custom-start:active {
+  background: rgba(56, 189, 248, 0.25);
+  transform: scale(0.96);
+}
+
+/* Pinned Launcher Button Hover & Active States */
 #custom-terminal:hover,
 #custom-files:hover,
 #custom-settings:hover,
 #custom-snip:hover {
-  background-color: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.09);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
 }
 
-#custom-start:active,
 #custom-terminal:active,
 #custom-files:active,
 #custom-settings:active,
 #custom-snip:active {
-  background-color: rgba(255, 255, 255, 0.04);
+  background: rgba(255, 255, 255, 0.05);
+  transform: scale(0.96);
 }
 
+/* --------------------------------------------------------------------------
+ * Taskbar Window List (Windhawk Taskbar Styler Indicators)
+ * -------------------------------------------------------------------------- */
 #wlr-taskbar {
-  margin: 4px 0;
+  margin: 5px 2px;
 }
 
 #wlr-taskbar button {
-  padding: 0 8px;
-  margin: 0 2px;
-  border-radius: 6px;
-  background-color: transparent;
+  padding: 0 10px;
+  margin: 0 3px;
+  border-radius: 7px;
+  background-color: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
   color: #f4f4f5;
-  border-bottom: 2px solid transparent;
-  transition: all 0.2s cubic-bezier(0, 0, 0.2, 1);
+  border-bottom: 3px solid transparent;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+/* Running App Hover */
 #wlr-taskbar button:hover {
-  background-color: rgba(255, 255, 255, 0.08);
+  background-color: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.18);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
 }
 
+/* Active Window (Windhawk Glowing Cyan Bottom Indicator Bar) */
 #wlr-taskbar button.active {
-  background-color: rgba(255, 255, 255, 0.06);
-  border-bottom: 2px solid #38bdf8;
+  background-color: rgba(255, 255, 255, 0.09);
+  border-color: rgba(255, 255, 255, 0.14);
+  border-bottom: 3px solid #38bdf8;
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.22);
 }
 
-#clock,
+#wlr-taskbar button.minimized {
+  opacity: 0.6;
+  background-color: transparent;
+  border-bottom: 3px solid rgba(255, 255, 255, 0.2);
+}
+
+/* --------------------------------------------------------------------------
+ * Right Module: System Tray & Quick Controls (Unified Acrylic Island)
+ * -------------------------------------------------------------------------- */
+#tray,
 #pulseaudio,
 #network,
-#tray {
+#clock {
   padding: 2px 10px;
-  margin: 4px 2px;
-  border-radius: 6px;
+  margin: 5px 2px;
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
   color: #e4e4e7;
   font-size: 12px;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+#tray {
+  padding: 0 8px;
+}
+
+#tray > .passive {
+  -gtk-icon-effect: dim;
+}
+
+#tray > .needs-attention {
+  -gtk-icon-effect: highlight;
+  background-color: #ef4444;
 }
 
 #clock {
-  font-size: 11px;
-  font-weight: 500;
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 2px 12px;
+  margin-right: 8px;
+  text-align: center;
 }
 
-#clock:hover,
+/* Right Modules Hover */
+#tray:hover,
 #pulseaudio:hover,
-#network:hover {
-  background-color: rgba(255, 255, 255, 0.08);
+#network:hover,
+#clock:hover {
+  background-color: rgba(255, 255, 255, 0.11);
+  border-color: rgba(255, 255, 255, 0.16);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
 }
 
-#custom-vde_pill {
-  font-size: 11px;
-  color: rgba(255, 255, 255, 0.4);
-  letter-spacing: 1px;
+#pulseaudio:active,
+#network:active,
+#clock:active {
+  background-color: rgba(255, 255, 255, 0.07);
+  transform: scale(0.97);
 }

@@ -22,8 +22,8 @@
   <!-- Theme & Window Decorations -->
   <theme>
     <name>VDE-Dark</name>
-    <cornerRadius>8</cornerRadius>
-    <titleHeight>32</titleHeight>
+    <cornerRadius>10</cornerRadius>
+    <titleHeight>34</titleHeight>
     <titleLayout>NLIMC</titleLayout>
     <dropShadows>true</dropShadows>
     <font place="ActiveWindow">
