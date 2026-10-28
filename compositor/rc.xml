@@ -127,6 +127,16 @@
         <command>/usr/local/bin/vde-launcher</command>
       </action>
     </keybind>
+    <keybind key="W-a">
+      <action name="Execute">
+        <command>/usr/local/bin/vde-quicksettings</command>
+      </action>
+    </keybind>
+    <keybind key="W-n">
+      <action name="Execute">
+        <command>/usr/local/bin/vde-quicksettings</command>
+      </action>
+    </keybind>
 
     <!-- Terminal: Crossminal (Super+Return, Super+T, Ctrl+Alt+T) -->
     <keybind key="W-Return">

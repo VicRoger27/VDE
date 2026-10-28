@@ -35,6 +35,16 @@ def test_python_apps():
         py_compile.compile(full_path, doraise=True)
         print(f"  [OK] {rel_path} syntax valid.")
 
+    shell_scripts = [
+        "astal-shell/vde_startmenu.py",
+        "astal-shell/vde_quicksettings.py"
+    ]
+    for rel_path in shell_scripts:
+        full_path = os.path.join(REPO_DIR, rel_path)
+        assert os.path.exists(full_path), f"Missing: {full_path}"
+        py_compile.compile(full_path, doraise=True)
+        print(f"  [OK] {rel_path} syntax valid.")
+
 def test_xml_configs():
     print("[2/5] Verifying Compositor XML Configurations...")
     xmls = ["compositor/rc.xml", "compositor/menu.xml"]

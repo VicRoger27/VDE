@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 SCRIPT_DIR="$(dirname "$(realpath "$0" 2>/dev/null || readlink -f "$0" 2>/dev/null || echo "$0")")"
+
 if [ -f "$SCRIPT_DIR/crossminal.py" ] && python3 -c "import gi; gi.require_version('Vte', '2.91')" 2>/dev/null; then
     exec python3 "$SCRIPT_DIR/crossminal.py" "$@"
+elif [ -f "/usr/share/vde/apps/crossminal/crossminal.py" ] && python3 -c "import gi; gi.require_version('Vte', '2.91')" 2>/dev/null; then
+    exec python3 "/usr/share/vde/apps/crossminal/crossminal.py" "$@"
 fi
+
+# Fallback to system terminal
 exec /usr/local/bin/vde-terminal "$@"

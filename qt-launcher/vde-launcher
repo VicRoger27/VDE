@@ -1,11 +1,23 @@
 #!/bin/sh
 # VDE Start Menu Launcher Runner
-# Prioritizes Wofi with VDE Mica Theme, falling back to compiled binary or fuzzel
+# Prioritizes Native Windows 11 Fluent Acrylic Start Menu (vde_startmenu.py)
 
 SCRIPT_DIR="$(dirname "$(realpath "$0" 2>/dev/null || readlink -f "$0" 2>/dev/null || echo "$0")")"
-BUILD_BIN="$SCRIPT_DIR/build/vde-launcher"
 
-# If launcher is already open, toggle it closed
+# 1. Primary: Native Windows 11 Acrylic Start Menu
+if [ -f "/usr/share/vde/astal-shell/vde_startmenu.py" ] && command -v python3 >/dev/null 2>&1; then
+    exec python3 "/usr/share/vde/astal-shell/vde_startmenu.py" "$@"
+elif [ -f "$SCRIPT_DIR/../astal-shell/vde_startmenu.py" ] && command -v python3 >/dev/null 2>&1; then
+    exec python3 "$SCRIPT_DIR/../astal-shell/vde_startmenu.py" "$@"
+fi
+
+# 2. Secondary: Compiled Qt6 Start Menu Binary
+BUILD_BIN="$SCRIPT_DIR/build/vde-launcher"
+if [ -x "$BUILD_BIN" ]; then
+    exec "$BUILD_BIN" "$@"
+fi
+
+# 3. Fallbacks: Wofi / Fuzzel / Dmenu
 if pgrep -x wofi >/dev/null 2>&1; then
     pkill -x wofi
     exit 0
@@ -14,9 +26,7 @@ fi
 WOFI_CONF="/usr/share/vde/astal-shell/wofi_config"
 WOFI_STYLE="/usr/share/vde/astal-shell/wofi_style.css"
 
-if [ -x "$BUILD_BIN" ]; then
-    exec "$BUILD_BIN" "$@"
-elif command -v wofi >/dev/null 2>&1; then
+if command -v wofi >/dev/null 2>&1; then
     exec wofi --show drun --conf "$WOFI_CONF" --style "$WOFI_STYLE" "$@"
 elif command -v fuzzel >/dev/null 2>&1; then
     exec fuzzel "$@"

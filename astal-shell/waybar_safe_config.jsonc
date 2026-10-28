@@ -1,0 +1,110 @@
+{
+  "layer": "top",
+  "position": "bottom",
+  "height": 48,
+  "margin-bottom": 0,
+  "margin-left": 0,
+  "margin-right": 0,
+  "spacing": 4,
+
+  "modules-left": [
+    "custom/vde_pill"
+  ],
+
+  "modules-center": [
+    "custom/start",
+    "custom/terminal",
+    "custom/files",
+    "custom/pad",
+    "custom/settings",
+    "custom/paint",
+    "custom/calc",
+    "custom/snip"
+  ],
+
+  "modules-right": [
+    "tray",
+    "pulseaudio",
+    "network",
+    "clock"
+  ],
+
+  "custom/vde_pill": {
+    "format": " ❖ VDE ",
+    "tooltip": false,
+    "on-click": "/usr/local/bin/vde-launcher"
+  },
+
+  "custom/start": {
+    "format": " ⊞ ",
+    "tooltip-format": "Start Menu (Win Key)",
+    "on-click": "/usr/local/bin/vde-launcher"
+  },
+
+  "custom/terminal": {
+    "format": "  ",
+    "tooltip-format": "Terminal (Crossminal)",
+    "on-click": "/usr/local/bin/crossminal"
+  },
+
+  "custom/files": {
+    "format": "  ",
+    "tooltip-format": "File Explorer (Crossmanager)",
+    "on-click": "/usr/local/bin/crossmanager"
+  },
+
+  "custom/pad": {
+    "format": "  ",
+    "tooltip-format": "Notepad (Crosspad)",
+    "on-click": "/usr/local/bin/crosspad"
+  },
+
+  "custom/settings": {
+    "format": "  ",
+    "tooltip-format": "Settings (Crossings)",
+    "on-click": "/usr/local/bin/crossings"
+  },
+
+  "custom/paint": {
+    "format": "  ",
+    "tooltip-format": "Paint (Crossaint)",
+    "on-click": "/usr/local/bin/crossaint"
+  },
+
+  "custom/calc": {
+    "format": "  ",
+    "tooltip-format": "Calculator (Crossculator)",
+    "on-click": "/usr/local/bin/crossculator"
+  },
+
+  "custom/snip": {
+    "format": "  ",
+    "tooltip-format": "Snipping Tool (Crossnip)",
+    "on-click": "/usr/local/bin/crossnip"
+  },
+
+  "tray": {
+    "icon-size": 18,
+    "spacing": 8
+  },
+
+  "clock": {
+    "format": "{:%I:%M %p\n%m/%d/%Y}",
+    "tooltip-format": "Open Calendar & Quick Settings",
+    "on-click": "/usr/local/bin/vde-quicksettings"
+  },
+
+  "pulseaudio": {
+    "format": "🔊 {volume}%",
+    "format-muted": "🔇 Muted",
+    "on-click": "/usr/local/bin/vde-quicksettings"
+  },
+
+  "network": {
+    "format-wifi": " {signalStrength}%",
+    "format-ethernet": " Online",
+    "format-disconnected": "⚠ Offline",
+    "tooltip-format": "{ifname}",
+    "on-click": "/usr/local/bin/vde-quicksettings"
+  }
+}

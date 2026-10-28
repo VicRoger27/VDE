@@ -28,8 +28,9 @@
   ],
 
   "custom/vde_pill": {
-    "format": " :\\:V:/: VDE ",
-    "tooltip": false
+    "format": " ❖ VDE ",
+    "tooltip": false,
+    "on-click": "/usr/local/bin/vde-launcher"
   },
 
   "custom/start": {
@@ -80,23 +81,21 @@
 
   "clock": {
     "format": "{:%I:%M %p\n%m/%d/%Y}",
-    "tooltip-format": "<big>{:%B %Y}</big>\n<tt><small>{calendar}</small></tt>",
-    "on-click": "/usr/local/bin/crosslock"
+    "tooltip-format": "Quick Settings & Calendar",
+    "on-click": "/usr/local/bin/vde-quicksettings"
   },
 
   "pulseaudio": {
-    "format": "{icon} {volume}%",
+    "format": "🔊 {volume}%",
     "format-muted": "🔇 Muted",
-    "format-icons": {
-      "default": ["🔈", "🔉", "🔊"]
-    },
-    "on-click": "sh -c 'pavucontrol || pactl set-sink-mute @DEFAULT_SINK@ toggle || wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle'"
+    "on-click": "/usr/local/bin/vde-quicksettings"
   },
 
   "network": {
     "format-wifi": " {signalStrength}%",
-    "format-ethernet": "󰈀 Wired",
-    "format-disconnected": "󰖪 Offline",
-    "tooltip-format": "{ifname}: {ipaddr}/{cidr}"
+    "format-ethernet": " Online",
+    "format-disconnected": "⚠ Offline",
+    "tooltip-format": "{ifname}",
+    "on-click": "/usr/local/bin/vde-quicksettings"
   }
 }

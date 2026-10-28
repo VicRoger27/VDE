@@ -41,7 +41,10 @@ fi
 pgrep -x pipewire >/dev/null 2>&1 || (command -v pipewire >/dev/null 2>&1 && pipewire &)
 pgrep -x wireplumber >/dev/null 2>&1 || (command -v wireplumber >/dev/null 2>&1 && wireplumber &)
 
-# 6. Taskbar Shell (Waybar with VDE Dark Mica styling)
+# Wait 0.5s for compositor Wayland socket & layer-shell protocol to settle
+sleep 0.5
+
+# 6. Taskbar Shell (Waybar with Windhawk Acrylic styling)
 if ! pgrep -x waybar >/dev/null 2>&1; then
     if [ -x "/usr/local/bin/vde-bar" ]; then
         /usr/local/bin/vde-bar &

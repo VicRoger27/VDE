@@ -442,6 +442,14 @@ chmod +x "${BIN_PREFIX}/vde-bar"
 cp -f "$SRC_DIR/qt-launcher/vde-launcher" "${BIN_PREFIX}/vde-launcher"
 chmod +x "${BIN_PREFIX}/vde-launcher"
 
+cat << 'EOF' > "${BIN_PREFIX}/vde-quicksettings"
+#!/bin/sh
+if [ -f "/usr/share/vde/astal-shell/vde_quicksettings.py" ]; then
+    exec python3 "/usr/share/vde/astal-shell/vde_quicksettings.py" "$@"
+fi
+EOF
+chmod +x "${BIN_PREFIX}/vde-quicksettings"
+
 # Install all 12 VDE native applications to /usr/local/bin
 VDE_APPS=(
     "crossings"

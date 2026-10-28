@@ -1,23 +1,37 @@
 #!/bin/sh
-# VDE Taskbar Shell Runner
-# Executable entrypoint for Waybar with VDE Dark Mica Acrylic theme
+# VDE Taskbar Shell Runner (Resilient Waybar Engine with Windhawk Acrylic Theme)
 
 SCRIPT_DIR="$(dirname "$(realpath "$0" 2>/dev/null || readlink -f "$0" 2>/dev/null || echo "$0")")"
 cd "$SCRIPT_DIR" 2>/dev/null || true
 
 # Determine configuration and style paths
-CONFIG_FILE="$SCRIPT_DIR/waybar_config.jsonc"
-STYLE_FILE="$SCRIPT_DIR/waybar_style.css"
+CONFIG_FILE="/usr/share/vde/astal-shell/waybar_config.jsonc"
+STYLE_FILE="/usr/share/vde/astal-shell/waybar_style.css"
+SAFE_CONFIG="/usr/share/vde/astal-shell/waybar_safe_config.jsonc"
 
-if [ ! -f "$CONFIG_FILE" ]; then
-    CONFIG_FILE="/usr/share/vde/astal-shell/waybar_config.jsonc"
-fi
-if [ ! -f "$STYLE_FILE" ]; then
-    STYLE_FILE="/usr/share/vde/astal-shell/waybar_style.css"
+if [ -f "$SCRIPT_DIR/waybar_config.jsonc" ]; then
+    CONFIG_FILE="$SCRIPT_DIR/waybar_config.jsonc"
+    STYLE_FILE="$SCRIPT_DIR/waybar_style.css"
+    SAFE_CONFIG="$SCRIPT_DIR/waybar_safe_config.jsonc"
 fi
 
 if command -v waybar >/dev/null 2>&1; then
-    exec waybar -c "$CONFIG_FILE" -s "$STYLE_FILE" "$@"
+    # 1. Try launching with primary Windhawk taskbar configuration
+    waybar -c "$CONFIG_FILE" -s "$STYLE_FILE" "$@" &
+    WAYBAR_PID=$!
+    sleep 0.8
+
+    # 2. Verify process is healthy
+    if kill -0 $WAYBAR_PID 2>/dev/null; then
+        wait $WAYBAR_PID
+        exit 0
+    fi
+
+    # 3. If primary failed (e.g. wlr/taskbar module unsupported in standard distribution packages), launch resilient safe config
+    echo "[VDE Shell] Primary waybar config exited. Launching resilient safe config..." >&2
+    if [ -f "$SAFE_CONFIG" ]; then
+        exec waybar -c "$SAFE_CONFIG" -s "$STYLE_FILE" "$@"
+    fi
 elif command -v ags >/dev/null 2>&1; then
     exec ags run app.ts "$@"
 else
