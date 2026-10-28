@@ -21,6 +21,7 @@ window#waybar {
 #custom-terminal,
 #custom-files,
 #custom-settings,
+#custom-snip,
 #custom-vde_pill {
   padding: 0 10px;
   margin: 4px 2px;
@@ -39,14 +40,16 @@ window#waybar {
 #custom-start:hover,
 #custom-terminal:hover,
 #custom-files:hover,
-#custom-settings:hover {
+#custom-settings:hover,
+#custom-snip:hover {
   background-color: rgba(255, 255, 255, 0.08);
 }
 
 #custom-start:active,
 #custom-terminal:active,
 #custom-files:active,
-#custom-settings:active {
+#custom-settings:active,
+#custom-snip:active {
   background-color: rgba(255, 255, 255, 0.04);
 }
 

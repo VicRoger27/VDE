@@ -46,16 +46,16 @@ echo " Starting Victorious Desktop Environment (VDE)..."
 echo " Compositor: Labwc (wlroots layer-shell)"
 echo " Shell: Waybar Dark Mica & Wofi"
 echo " Settings: Crossings Hub"
-echo " Terminal: Foot Acrylic"
+echo " Applications: VDE Fluent Suite"
 echo "=========================================================="
 
 # 7. Launch Labwc Compositor
-labwc -s /usr/local/bin/vde-bar "$@"
+labwc "$@"
 EXIT_CODE=$?
 
 # If GLES2 hardware rendering exited with error, fallback to Pixman software renderer
 if [ $EXIT_CODE -ne 0 ]; then
     echo ">> [VDE] GLES2 renderer exited with code $EXIT_CODE. Retrying with Pixman software renderer..."
     export WLR_RENDERER=pixman
-    exec labwc -s /usr/local/bin/vde-bar "$@"
+    exec labwc "$@"
 fi
