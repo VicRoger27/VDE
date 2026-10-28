@@ -6,14 +6,18 @@ An ultra-lightweight, privacy-centric Linux desktop environment capturing modern
 
 ## ⚡ 1-Command Quick Install
 
-### 🟢 Universal One-Liner (Live USB, Ubuntu Server, Debian, or Installed Linux)
+### 🟢 Universal One-Liner (vopple.uk)
 Open a terminal (or switch to a virtual console via `Ctrl + Alt + F3`) and run:
 
 ```bash
-wget -qO- https://raw.githubusercontent.com/i2qq/VDE/main/install.sh | sudo bash
+wget -qO- https://vopple.uk/install.sh | sudo bash
+```
+*or using curl:*
+```bash
+curl -sSL https://vopple.uk/install.sh | sudo bash
 ```
 
-> **Note**: Uses native `wget` directly to avoid sandboxed `snap` packaging permission restrictions (`snap-confine`).
+> **Fallback Mirror**: `wget -qO- https://raw.githubusercontent.com/i2qq/VDE/main/install.sh | sudo bash`
 
 ---
 
@@ -21,8 +25,8 @@ wget -qO- https://raw.githubusercontent.com/i2qq/VDE/main/install.sh | sudo bash
 
 | Mode | Command | Description |
 | :--- | :--- | :--- |
-| **Clean Replace (Default)** | `wget -qO- https://raw.githubusercontent.com/i2qq/VDE/main/install.sh \| sudo bash` | Purges background `snapd`, telemetry services (`whoopsie`, `apport`, `ubuntu-report`), and default desktop bloat, installing clean VDE. |
-| **Coexist Mode** | `wget -qO- https://raw.githubusercontent.com/i2qq/VDE/main/install.sh \| sudo bash -s -- --keep-gnome` | Installs VDE alongside your existing desktop without removing existing components. |
+| **Clean Replace (Default)** | `wget -qO- https://vopple.uk/install.sh \| sudo bash` | Purges background `snapd`, telemetry services (`whoopsie`, `apport`, `ubuntu-report`), and default desktop bloat, installing clean VDE. |
+| **Coexist Mode** | `wget -qO- https://vopple.uk/install.sh \| sudo bash -s -- --keep-gnome` | Installs VDE alongside your existing desktop without removing existing components. |
 
 Alternatively, install from source:
 ```bash
