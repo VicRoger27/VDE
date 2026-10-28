@@ -174,6 +174,8 @@ if HAS_GTK:
     class CrossingsApp(Gtk.Window):
         def __init__(self):
             super().__init__(title="Settings — Crossings")
+            self.set_icon_name("crossings")
+            Gtk.Window.set_default_icon_name("crossings")
             self.set_default_size(920, 640)
             self.set_position(Gtk.WindowPosition.CENTER)
 
@@ -189,6 +191,7 @@ if HAS_GTK:
             # HeaderBar
             header = Gtk.HeaderBar()
             header.set_show_close_button(True)
+            header.set_decoration_layout(":minimize,maximize,close")
             header.props.title = "Settings"
             header.props.subtitle = "Crossings Hub"
             self.set_titlebar(header)
@@ -678,6 +681,9 @@ def main():
     if not HAS_GTK:
         print("[Crossings Error] PyGObject (Gtk 3) is required to run Crossings Settings.")
         sys.exit(1)
+
+    GLib.set_prgname("crossings")
+    GLib.set_application_name("Settings")
 
     app = CrossingsApp()
     app.connect("destroy", Gtk.main_quit)

@@ -108,6 +108,8 @@ PALETTE = [
 class CrossminalWindow(Gtk.Window):
     def __init__(self):
         super().__init__(title="Crossminal")
+        self.set_icon_name("crossminal")
+        Gtk.Window.set_default_icon_name("crossminal")
         self.set_default_size(840, 520)
         self.set_position(Gtk.WindowPosition.CENTER)
 
@@ -122,6 +124,7 @@ class CrossminalWindow(Gtk.Window):
         # HeaderBar
         self.header = Gtk.HeaderBar()
         self.header.set_show_close_button(True)
+        self.header.set_decoration_layout(":minimize,maximize,close")
         self.header.props.title = "Crossminal"
         self.header.props.subtitle = "Victorious Terminal"
         self.set_titlebar(self.header)
@@ -228,6 +231,9 @@ class CrossminalWindow(Gtk.Window):
                 page.vte.set_font_scale(max(0.6, min(2.5, scale)))
 
 def main():
+
+    GLib.set_prgname("crossminal")
+    GLib.set_application_name("Crossminal")
     if not HAS_GTK or not HAS_VTE:
         # Fallback cleanly to foot or xterm
         if os.path.exists("/usr/local/bin/vde-terminal"):

@@ -116,6 +116,8 @@ button.sec-btn:hover {
 class CrosslockApp(Gtk.Window):
     def __init__(self):
         super().__init__(title="Clock")
+        self.set_icon_name("crosslock")
+        Gtk.Window.set_default_icon_name("crosslock")
         self.set_default_size(520, 520)
         self.set_position(Gtk.WindowPosition.CENTER)
 
@@ -130,6 +132,7 @@ class CrosslockApp(Gtk.Window):
         # HeaderBar
         header = Gtk.HeaderBar()
         header.set_show_close_button(True)
+        header.set_decoration_layout(":minimize,maximize,close")
         header.props.title = "Clock & Timer"
         header.props.subtitle = "Crosslock"
         self.set_titlebar(header)
@@ -296,6 +299,9 @@ def main():
     if not HAS_GTK:
         print("[Crosslock Error] PyGObject is required.")
         sys.exit(1)
+
+    GLib.set_prgname("crosslock")
+    GLib.set_application_name("Crosslock")
 
     app = CrosslockApp()
     app.connect("destroy", Gtk.main_quit)

@@ -306,6 +306,8 @@ if command -v apt-get >/dev/null 2>&1; then
         xdg-utils \
         dbus-x11 \
         fonts-dejavu-core \
+        fonts-font-awesome \
+        fonts-noto-color-emoji \
         libnotify-bin 2>/dev/null || \
     apt_run install -y --no-install-recommends \
         labwc \
@@ -356,6 +358,9 @@ cp -f "$SRC_DIR/assets/icons/glm/"*.svg /usr/share/icons/hicolor/scalable/apps/ 
 if command -v gtk-update-icon-cache >/dev/null 2>&1; then
     gtk-update-icon-cache -f -t /usr/share/icons/hicolor 2>/dev/null || true
 fi
+if command -v fc-cache >/dev/null 2>&1; then
+    fc-cache -f 2>/dev/null || true
+fi
 
 # 8. Deploy Labwc & Foot Configurations
 echo -e "${C_CYAN}>> [3/5] Configuring Labwc compositor & Foot terminal...${C_RESET}"
@@ -366,6 +371,18 @@ cp -f "$SRC_DIR/compositor/environment" /etc/xdg/labwc/environment
 cp -f "$SRC_DIR/compositor/autostart" /etc/xdg/labwc/autostart
 cp -f "$SRC_DIR/compositor/menu.xml" /etc/xdg/labwc/menu.xml 2>/dev/null || true
 chmod +x /etc/xdg/labwc/autostart
+
+# Deploy Global GTK 3 Theme & Controls Configuration (Window Buttons & Icons)
+echo -e "${C_CYAN}>> Configuring GTK window controls & dark styling...${C_RESET}"
+mkdir -p /etc/gtk-3.0
+cat << 'EOF' > /etc/gtk-3.0/settings.ini
+[Settings]
+gtk-theme-name = Adwaita-dark
+gtk-icon-theme-name = hicolor
+gtk-font-name = Segoe UI Variable Text 10
+gtk-application-prefer-dark-theme = true
+gtk-decoration-layout = :minimize,maximize,close
+EOF
 
 # Deploy Foot terminal styling
 mkdir -p /etc/xdg/foot
@@ -383,6 +400,10 @@ if [ -n "$USER_HOME" ]; then
     USER_FOOT="$USER_HOME/.config/foot"
     mkdir -p "$USER_FOOT"
     cp -f /etc/xdg/foot/* "$USER_FOOT/" 2>/dev/null || true
+
+    USER_GTK="$USER_HOME/.config/gtk-3.0"
+    mkdir -p "$USER_GTK"
+    cp -f /etc/gtk-3.0/settings.ini "$USER_GTK/settings.ini" 2>/dev/null || true
 
     # Deploy default VDE wallpaper to user profile
     USER_VDE="$USER_HOME/.config/vde"

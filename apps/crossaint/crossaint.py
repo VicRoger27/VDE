@@ -66,6 +66,8 @@ button.tool-btn:checked {
 class CrossaintWindow(Gtk.Window):
     def __init__(self):
         super().__init__(title="Crossaint")
+        self.set_icon_name("crossaint")
+        Gtk.Window.set_default_icon_name("crossaint")
         self.set_default_size(960, 640)
         self.set_position(Gtk.WindowPosition.CENTER)
 
@@ -88,6 +90,7 @@ class CrossaintWindow(Gtk.Window):
         # HeaderBar
         self.header = Gtk.HeaderBar()
         self.header.set_show_close_button(True)
+        self.header.set_decoration_layout(":minimize,maximize,close")
         self.header.props.title = "Crossaint"
         self.header.props.subtitle = "Creative Canvas"
         self.set_titlebar(self.header)
@@ -354,6 +357,9 @@ def main():
     if not HAS_GTK:
         print("[Crossaint Error] PyGObject is required.")
         sys.exit(1)
+
+    GLib.set_prgname("crossaint")
+    GLib.set_application_name("Crossaint")
 
     app = CrossaintWindow()
     app.connect("destroy", Gtk.main_quit)

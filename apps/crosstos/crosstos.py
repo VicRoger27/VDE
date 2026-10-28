@@ -60,6 +60,8 @@ IMAGE_EXTENSIONS = ('.png', '.jpg', '.jpeg', '.webp', '.svg', '.bmp', '.gif')
 class CrosstosWindow(Gtk.Window):
     def __init__(self, initial_path=None):
         super().__init__(title="Crosstos")
+        self.set_icon_name("crosstos")
+        Gtk.Window.set_default_icon_name("crosstos")
         self.set_default_size(960, 640)
         self.set_position(Gtk.WindowPosition.CENTER)
 
@@ -81,6 +83,7 @@ class CrosstosWindow(Gtk.Window):
         # HeaderBar
         self.header = Gtk.HeaderBar()
         self.header.set_show_close_button(True)
+        self.header.set_decoration_layout(":minimize,maximize,close")
         self.header.props.title = "Crosstos"
         self.header.props.subtitle = "Photos"
         self.set_titlebar(self.header)
@@ -286,6 +289,9 @@ def main():
     if not HAS_GTK:
         print("[Crosstos Error] PyGObject is required.")
         sys.exit(1)
+
+    GLib.set_prgname("crosstos")
+    GLib.set_application_name("Crosstos")
 
     initial = sys.argv[1] if len(sys.argv) > 1 else None
     app = CrosstosWindow(initial)

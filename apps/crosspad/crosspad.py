@@ -106,6 +106,8 @@ button.accent-btn {
 class CrosspadTab(Gtk.Box):
     def __init__(self, filepath=None):
         super().__init__(orientation=Gtk.Orientation.VERTICAL, spacing=0)
+        self.set_icon_name("crosspad")
+        Gtk.Window.set_default_icon_name("crosspad")
         self.filepath = filepath
         self.filename = os.path.basename(filepath) if filepath else "Untitled"
         self.is_modified = False
@@ -153,6 +155,7 @@ class CrosspadApp(Gtk.Window):
         # HeaderBar
         self.header = Gtk.HeaderBar()
         self.header.set_show_close_button(True)
+        self.header.set_decoration_layout(":minimize,maximize,close")
         self.header.props.title = "Crosspad"
         self.header.props.subtitle = "Victorious Text Editor"
         self.set_titlebar(self.header)
@@ -351,6 +354,9 @@ def main():
     if not HAS_GTK:
         print("[Crosspad Error] PyGObject (Gtk 3) is required.")
         sys.exit(1)
+
+    GLib.set_prgname("crosspad")
+    GLib.set_application_name("Crosspad")
 
     app = CrosspadApp(sys.argv[1:])
     app.connect("destroy", Gtk.main_quit)

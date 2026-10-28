@@ -2,8 +2,9 @@
 Name=Cross Narrator
 Comment=Fluent Dark Mica Screen Reader & Accessibility Narrator
 Exec=/usr/local/bin/crossnarrator
-Icon=preferences-desktop-accessibility
+Icon=crossnarrator
 Terminal=false
 Type=Application
 Categories=Utility;Accessibility;
 Keywords=narrator;speech;accessibility;reader;crossnarrator;tts;
+StartupWMClass=crossnarrator

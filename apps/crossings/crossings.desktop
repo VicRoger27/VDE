@@ -2,9 +2,10 @@
 Name=Settings
 Comment=System and VDE Desktop Configuration
 Exec=crossings
-Icon=settings
+Icon=crossings
 Terminal=false
 Type=Application
 Categories=Settings;DesktopSettings;
 StartupNotify=true
 Keywords=preferences;settings;theme;display;sound;privacy;vde;
+StartupWMClass=crossings

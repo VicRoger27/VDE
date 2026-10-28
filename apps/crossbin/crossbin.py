@@ -107,6 +107,8 @@ def format_size(bytes_num):
 class CrossBinApp(Gtk.Window):
     def __init__(self):
         super().__init__(title="Recycle Bin")
+        self.set_icon_name("crossbin")
+        Gtk.Window.set_default_icon_name("crossbin")
         self.set_default_size(880, 520)
         self.set_position(Gtk.WindowPosition.CENTER)
 
@@ -126,6 +128,7 @@ class CrossBinApp(Gtk.Window):
         # HeaderBar
         header = Gtk.HeaderBar()
         header.set_show_close_button(True)
+        header.set_decoration_layout(":minimize,maximize,close")
         header.props.title = "Recycle Bin"
         header.props.subtitle = "Cross Bin"
         self.set_titlebar(header)
@@ -317,6 +320,9 @@ def main():
     if not HAS_GTK:
         print("[Cross Bin Error] PyGObject is required.")
         sys.exit(1)
+
+    GLib.set_prgname("crossbin")
+    GLib.set_application_name("Recycle Bin")
 
     app = CrossBinApp()
     app.connect("destroy", Gtk.main_quit)

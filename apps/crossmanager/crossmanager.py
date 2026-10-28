@@ -137,6 +137,8 @@ def format_size(bytes_num):
 class CrossmanagerApp(Gtk.Window):
     def __init__(self, start_dir=None):
         super().__init__(title="File Explorer")
+        self.set_icon_name("crossmanager")
+        Gtk.Window.set_default_icon_name("crossmanager")
         self.set_default_size(1040, 660)
         self.set_position(Gtk.WindowPosition.CENTER)
 
@@ -158,6 +160,7 @@ class CrossmanagerApp(Gtk.Window):
         # HeaderBar
         self.header = Gtk.HeaderBar()
         self.header.set_show_close_button(True)
+        self.header.set_decoration_layout(":minimize,maximize,close")
         self.header.props.title = "File Explorer"
         self.header.props.subtitle = self.current_path
         self.set_titlebar(self.header)
@@ -624,6 +627,9 @@ def main():
     if not HAS_GTK:
         print("[Crossmanager Error] PyGObject is required.")
         sys.exit(1)
+
+    GLib.set_prgname("crossmanager")
+    GLib.set_application_name("File Explorer")
 
     initial_dir = sys.argv[1] if len(sys.argv) > 1 else None
     app = CrossmanagerApp(initial_dir)

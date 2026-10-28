@@ -84,6 +84,8 @@ button.tool-btn:hover {
 class CrossnipApp(Gtk.Window):
     def __init__(self):
         super().__init__(title="Snipping Tool")
+        self.set_icon_name("crossnip")
+        Gtk.Window.set_default_icon_name("crossnip")
         self.set_default_size(780, 520)
         self.set_position(Gtk.WindowPosition.CENTER)
 
@@ -101,6 +103,7 @@ class CrossnipApp(Gtk.Window):
         # HeaderBar
         header = Gtk.HeaderBar()
         header.set_show_close_button(True)
+        header.set_decoration_layout(":minimize,maximize,close")
         header.props.title = "Snipping Tool"
         header.props.subtitle = "Crossnip"
         self.set_titlebar(header)
@@ -244,6 +247,9 @@ def main():
     if not HAS_GTK:
         print("[Crossnip Error] PyGObject is required.")
         sys.exit(1)
+
+    GLib.set_prgname("crossnip")
+    GLib.set_application_name("Snipping Tool")
 
     app = CrossnipApp()
     app.connect("destroy", Gtk.main_quit)

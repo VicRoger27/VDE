@@ -2,8 +2,9 @@
 Name=Crossminal
 Comment=Fluent Dark Mica Terminal Emulator
 Exec=/usr/local/bin/crossminal
-Icon=utilities-terminal
+Icon=crossminal
 Terminal=false
 Type=Application
 Categories=System;TerminalEmulator;
 Keywords=terminal;console;command;prompt;crossminal;shell;
+StartupWMClass=crossminal

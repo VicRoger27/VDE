@@ -2,8 +2,9 @@
 Name=Crossculator
 Comment=Fluent Dark Mica Standard & Scientific Calculator
 Exec=/usr/local/bin/crossculator
-Icon=accessories-calculator
+Icon=crossculator
 Terminal=false
 Type=Application
 Categories=Utility;Calculator;
 Keywords=calc;calculator;math;crossculator;
+StartupWMClass=crossculator

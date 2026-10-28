@@ -2,8 +2,9 @@
 Name=Recycle Bin
 Comment=Fluent Dark Mica Trash Manager
 Exec=/usr/local/bin/crossbin
-Icon=user-trash
+Icon=crossbin
 Terminal=false
 Type=Application
 Categories=System;Utility;
 Keywords=trash;recycle;bin;recovery;crossbin;
+StartupWMClass=crossbin

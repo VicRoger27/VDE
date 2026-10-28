@@ -2,8 +2,9 @@
 Name=Crossmanager
 Comment=Fluent Dark Mica File Explorer
 Exec=/usr/local/bin/crossmanager %U
-Icon=system-file-manager
+Icon=crossmanager
 Terminal=false
 Type=Application
 Categories=System;FileManager;
 Keywords=files;explorer;directory;folders;crossmanager;
+StartupWMClass=crossmanager

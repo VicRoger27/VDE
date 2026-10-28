@@ -2,8 +2,9 @@
 Name=Crossnip
 Comment=Fluent Dark Mica Snipping Tool
 Exec=/usr/local/bin/crossnip
-Icon=applets-screenshooter
+Icon=crossnip
 Terminal=false
 Type=Application
 Categories=Utility;Graphics;
 Keywords=screenshot;snip;snipping;capture;crossnip;screen;
+StartupWMClass=crossnip

@@ -94,6 +94,8 @@ button.sec-btn:hover {
 class CrosslinkApp(Gtk.Window):
     def __init__(self):
         super().__init__(title="Phone Link")
+        self.set_icon_name("crosslink")
+        Gtk.Window.set_default_icon_name("crosslink")
         self.set_default_size(720, 500)
         self.set_position(Gtk.WindowPosition.CENTER)
 
@@ -108,6 +110,7 @@ class CrosslinkApp(Gtk.Window):
         # HeaderBar
         header = Gtk.HeaderBar()
         header.set_show_close_button(True)
+        header.set_decoration_layout(":minimize,maximize,close")
         header.props.title = "Phone Link"
         header.props.subtitle = "Crosslink Device Hub"
         self.set_titlebar(header)
@@ -217,6 +220,9 @@ def main():
     if not HAS_GTK:
         print("[Crosslink Error] PyGObject is required.")
         sys.exit(1)
+
+    GLib.set_prgname("crosslink")
+    GLib.set_application_name("Crosslink")
 
     app = CrosslinkApp()
     app.connect("destroy", Gtk.main_quit)

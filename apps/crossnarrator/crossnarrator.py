@@ -80,6 +80,8 @@ button.sec-btn {
 class CrossNarratorApp(Gtk.Window):
     def __init__(self):
         super().__init__(title="Narrator")
+        self.set_icon_name("crossnarrator")
+        Gtk.Window.set_default_icon_name("crossnarrator")
         self.set_default_size(560, 480)
         self.set_position(Gtk.WindowPosition.CENTER)
 
@@ -96,6 +98,7 @@ class CrossNarratorApp(Gtk.Window):
         # HeaderBar
         header = Gtk.HeaderBar()
         header.set_show_close_button(True)
+        header.set_decoration_layout(":minimize,maximize,close")
         header.props.title = "Narrator"
         header.props.subtitle = "Cross Narrator"
         self.set_titlebar(header)
@@ -220,6 +223,9 @@ def main():
     if not HAS_GTK:
         print("[Cross Narrator Error] PyGObject is required.")
         sys.exit(1)
+
+    GLib.set_prgname("crossnarrator")
+    GLib.set_application_name("Narrator")
 
     app = CrossNarratorApp()
     app.connect("destroy", lambda w: (app.stop_speech(), Gtk.main_quit()))

@@ -108,6 +108,8 @@ button.eq-btn:hover {
 class CrossculatorWindow(Gtk.Window):
     def __init__(self):
         super().__init__(title="Calculator")
+        self.set_icon_name("crossculator")
+        Gtk.Window.set_default_icon_name("crossculator")
         self.set_default_size(360, 520)
         self.set_position(Gtk.WindowPosition.CENTER)
 
@@ -128,6 +130,7 @@ class CrossculatorWindow(Gtk.Window):
         # HeaderBar
         self.header = Gtk.HeaderBar()
         self.header.set_show_close_button(True)
+        self.header.set_decoration_layout(":minimize,maximize,close")
         self.header.props.title = "Calculator"
         self.header.props.subtitle = "Standard"
         self.set_titlebar(self.header)
@@ -324,6 +327,9 @@ def main():
     if not HAS_GTK:
         print("[Crossculator Error] PyGObject is required.")
         sys.exit(1)
+
+    GLib.set_prgname("crossculator")
+    GLib.set_application_name("Crossculator")
 
     app = CrossculatorWindow()
     app.connect("destroy", Gtk.main_quit)

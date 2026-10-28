@@ -24,6 +24,7 @@
     <name>VDE-Dark</name>
     <cornerRadius>8</cornerRadius>
     <titleHeight>32</titleHeight>
+    <titleLayout>NLIMC</titleLayout>
     <dropShadows>true</dropShadows>
     <font place="ActiveWindow">
       <name>Segoe UI Variable, Inter, Cantarell</name>

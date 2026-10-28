@@ -2,8 +2,9 @@
 Name=Crosslock
 Comment=Fluent Dark Mica Clock, Timer & Stopwatch
 Exec=/usr/local/bin/crosslock
-Icon=preferences-system-time
+Icon=crosslock
 Terminal=false
 Type=Application
 Categories=Utility;Clock;
 Keywords=clock;time;timer;stopwatch;alarm;crosslock;
+StartupWMClass=crosslock

@@ -28,7 +28,7 @@
   ],
 
   "custom/vde_pill": {
-    "format": "  VDE ",
+    "format": " :\\:V:/: VDE ",
     "tooltip": false
   },
 
@@ -45,26 +45,26 @@
   },
 
   "custom/files": {
-    "format": " 📁 ",
+    "format": "  ",
     "tooltip-format": "File Explorer (Crossmanager)",
     "on-click": "/usr/local/bin/crossmanager"
   },
 
   "custom/settings": {
-    "format": " ⚙ ",
+    "format": "  ",
     "tooltip-format": "Crossings Settings (Super+I)",
     "on-click": "/usr/local/bin/crossings"
   },
 
   "custom/snip": {
-    "format": " ✂ ",
+    "format": "  ",
     "tooltip-format": "Snipping Tool (Crossnip)",
     "on-click": "/usr/local/bin/crossnip"
   },
 
   "wlr/taskbar": {
     "format": "{icon}",
-    "icon-size": 20,
+    "icon-size": 22,
     "tooltip-format": "{title}",
     "on-click": "activate",
     "on-click-middle": "close",
