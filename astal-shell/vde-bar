@@ -1,31 +1,26 @@
 #!/bin/sh
-# VDE Taskbar & Quick Settings Shell Runner
-# Executable entrypoint for Astal / AGS v2
+# VDE Taskbar Shell Runner
+# Executable entrypoint for Waybar with VDE Dark Mica Acrylic theme
 
 SCRIPT_DIR="$(dirname "$(realpath "$0" 2>/dev/null || readlink -f "$0" 2>/dev/null || echo "$0")")"
-cd "$SCRIPT_DIR"
+cd "$SCRIPT_DIR" 2>/dev/null || true
 
-# Ensure style.css is compiled
-if [ ! -f "style.css" ]; then
-    if command -v python3 >/dev/null 2>&1; then
-        python3 build_css.py
-    fi
+# Determine configuration and style paths
+CONFIG_FILE="$SCRIPT_DIR/waybar_config.jsonc"
+STYLE_FILE="$SCRIPT_DIR/waybar_style.css"
+
+if [ ! -f "$CONFIG_FILE" ]; then
+    CONFIG_FILE="/usr/share/vde/astal-shell/waybar_config.jsonc"
+fi
+if [ ! -f "$STYLE_FILE" ]; then
+    STYLE_FILE="/usr/share/vde/astal-shell/waybar_style.css"
 fi
 
-# Prevent duplicate shell / bar instances
-if pgrep -x waybar >/dev/null 2>&1; then
-    exit 0
-fi
-
-# Run Astal Shell via ags or astal CLI, with Waybar fallback
-if command -v ags >/dev/null 2>&1; then
+if command -v waybar >/dev/null 2>&1; then
+    exec waybar -c "$CONFIG_FILE" -s "$STYLE_FILE" "$@"
+elif command -v ags >/dev/null 2>&1; then
     exec ags run app.ts "$@"
-elif command -v astal >/dev/null 2>&1; then
-    exec astal -i app.ts "$@"
-elif command -v waybar >/dev/null 2>&1; then
-    echo ">> [VDE Shell] Starting VDE Mica Taskbar via Waybar..."
-    exec waybar -c "$SCRIPT_DIR/waybar_config.jsonc" -s "$SCRIPT_DIR/waybar_style.css" "$@"
 else
-    echo "[VDE Shell Error] Neither 'ags', 'astal', nor 'waybar' found in PATH." >&2
+    echo "[VDE Shell Error] 'waybar' not found in PATH." >&2
     exit 1
 fi

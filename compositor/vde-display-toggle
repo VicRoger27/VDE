@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+# VDE Display Toggle / Mirror Runner
+# Handles Super+P and hardware Fn Display (XF86Display) keys
+
+if command -v wlr-randr >/dev/null 2>&1; then
+    OUTPUTS=$(wlr-randr 2>/dev/null | grep "^[^ ]" | awk '{print $1}')
+    OUTPUT_COUNT=$(echo "$OUTPUTS" | wc -w)
+    if [ "$OUTPUT_COUNT" -gt 1 ]; then
+        if command -v notify-send >/dev/null 2>&1; then
+            notify-send -a "VDE Display" "Multiple Displays Detected" "Found $OUTPUT_COUNT monitors. Opening Display Settings..." 2>/dev/null || true
+        fi
+    else
+        if command -v notify-send >/dev/null 2>&1; then
+            notify-send -a "VDE Display" "Display Settings" "Single display active." 2>/dev/null || true
+        fi
+    fi
+fi
+
+# Launch Crossings Settings to Display Page
+if [ -x "/usr/local/bin/crossings" ]; then
+    exec /usr/local/bin/crossings "$@"
+elif [ -x "/usr/share/vde/apps/crossings/crossings" ]; then
+    exec /usr/share/vde/apps/crossings/crossings "$@"
+fi

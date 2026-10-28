@@ -34,25 +34,25 @@
   "custom/start": {
     "format": " ⊞ ",
     "tooltip-format": "Start Menu (Win Key)",
-    "on-click": "vde-launcher || qdbus org.vde.Launcher /Launcher org.vde.Launcher.Toggle"
+    "on-click": "/usr/local/bin/vde-launcher"
   },
 
   "custom/terminal": {
     "format": "  ",
-    "tooltip-format": "Terminal (Super+Enter)",
-    "on-click": "foot"
+    "tooltip-format": "Terminal (Super+Enter / Super+T)",
+    "on-click": "/usr/local/bin/vde-terminal"
   },
 
   "custom/files": {
     "format": " 📁 ",
-    "tooltip-format": "File Explorer",
-    "on-click": "xdg-open ~"
+    "tooltip-format": "File Explorer (Super+E)",
+    "on-click": "sh -c 'pcmanfm ~ || thunar ~ || xdg-open ~'"
   },
 
   "custom/settings": {
     "format": " ⚙ ",
-    "tooltip-format": "Crossings Settings",
-    "on-click": "crossings"
+    "tooltip-format": "Crossings Settings (Super+I)",
+    "on-click": "/usr/local/bin/crossings"
   },
 
   "wlr/taskbar": {
@@ -82,7 +82,7 @@
     "format-icons": {
       "default": ["🔈", "🔉", "🔊"]
     },
-    "on-click": "pavucontrol || pactl set-sink-mute @DEFAULT_SINK@ toggle"
+    "on-click": "sh -c 'pavucontrol || pactl set-sink-mute @DEFAULT_SINK@ toggle || wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle'"
   },
 
   "network": {

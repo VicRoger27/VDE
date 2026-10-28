@@ -8,3 +8,5 @@ build/
 *.obj
 tools/
 scratch/
+__pycache__/
+*.pyc

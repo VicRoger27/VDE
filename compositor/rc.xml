@@ -42,6 +42,7 @@
     <windowRule identifier="vde-bar" serverDecoration="no" />
     <windowRule identifier="vde-launcher" serverDecoration="no" />
     <windowRule identifier="vde-quicksettings" serverDecoration="no" />
+    <windowRule identifier="waybar" serverDecoration="no" />
   </windowRules>
 
   <!-- Keyboard Keybindings -->
@@ -85,8 +86,11 @@
       <action name="SnapToRegion"><region>50% 50% 50% 50%</region></action>
     </keybind>
 
-    <!-- Alt + F4: Close Window -->
+    <!-- Alt + F4 / Super + Q: Close Window -->
     <keybind key="A-F4">
+      <action name="Close" />
+    </keybind>
+    <keybind key="W-q">
       <action name="Close" />
     </keybind>
 
@@ -101,57 +105,116 @@
     <!-- ============================================== -->
     <!-- VDE Shell Integration (Start & Terminal)       -->
     <!-- ============================================== -->
-    <!-- Super / Super + Space: Toggle Start Menu Launcher -->
+    <!-- Super / Super + Space / Super_L / Super_R: Toggle Start Menu Launcher -->
     <keybind key="W-space">
       <action name="Execute">
-        <command>/usr/local/bin/vde-launcher || wofi --show drun</command>
+        <command>/usr/local/bin/vde-launcher</command>
       </action>
     </keybind>
     <keybind key="Super_L">
       <action name="Execute">
-        <command>/usr/local/bin/vde-launcher || wofi --show drun</command>
+        <command>/usr/local/bin/vde-launcher</command>
       </action>
     </keybind>
-
-    <!-- Super + A: Toggle Quick Settings Flyout -->
-    <keybind key="W-a">
+    <keybind key="Super_R">
       <action name="Execute">
-        <command>qdbus org.vde.Shell /Shell org.vde.Shell.ToggleQuickSettings 2>/dev/null || true</command>
+        <command>/usr/local/bin/vde-launcher</command>
       </action>
     </keybind>
-
-    <!-- Super + N: Toggle Notifications / Calendar -->
-    <keybind key="W-n">
+    <keybind key="W-r">
       <action name="Execute">
-        <command>qdbus org.vde.Shell /Shell org.vde.Shell.ToggleCalendar 2>/dev/null || true</command>
+        <command>/usr/local/bin/vde-launcher</command>
       </action>
     </keybind>
 
-    <!-- Super + E: File Explorer -->
-    <keybind key="W-e">
-      <action name="Execute">
-        <command>xdg-open ~</command>
-      </action>
-    </keybind>
-
-    <!-- Super + Return: Terminal -->
+    <!-- Terminal: Super+Return, Super+T, Ctrl+Alt+T -->
     <keybind key="W-Return">
       <action name="Execute">
-        <command>foot || xterm || alacritty || x-terminal-emulator</command>
+        <command>/usr/local/bin/vde-terminal</command>
+      </action>
+    </keybind>
+    <keybind key="W-t">
+      <action name="Execute">
+        <command>/usr/local/bin/vde-terminal</command>
+      </action>
+    </keybind>
+    <keybind key="C-A-t">
+      <action name="Execute">
+        <command>/usr/local/bin/vde-terminal</command>
+      </action>
+    </keybind>
+
+    <!-- Settings: Super+I, Super+S -->
+    <keybind key="W-i">
+      <action name="Execute">
+        <command>/usr/local/bin/crossings</command>
+      </action>
+    </keybind>
+    <keybind key="W-s">
+      <action name="Execute">
+        <command>/usr/local/bin/crossings</command>
+      </action>
+    </keybind>
+
+    <!-- File Explorer: Super+E -->
+    <keybind key="W-e">
+      <action name="Execute">
+        <command>sh -c "pcmanfm ~ || thunar ~ || xdg-open ~"</command>
+      </action>
+    </keybind>
+
+    <!-- Display Toggle / Project / Mirror: Super+P, XF86Display -->
+    <keybind key="W-p">
+      <action name="Execute">
+        <command>/usr/local/bin/vde-display-toggle</command>
+      </action>
+    </keybind>
+    <keybind key="XF86Display">
+      <action name="Execute">
+        <command>/usr/local/bin/vde-display-toggle</command>
+      </action>
+    </keybind>
+
+    <!-- Audio Controls -->
+    <keybind key="XF86AudioRaiseVolume">
+      <action name="Execute">
+        <command>sh -c "wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+ || pactl set-sink-volume @DEFAULT_SINK@ +5%"</command>
+      </action>
+    </keybind>
+    <keybind key="XF86AudioLowerVolume">
+      <action name="Execute">
+        <command>sh -c "wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%- || pactl set-sink-volume @DEFAULT_SINK@ -5%"</command>
+      </action>
+    </keybind>
+    <keybind key="XF86AudioMute">
+      <action name="Execute">
+        <command>sh -c "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle || pactl set-sink-mute @DEFAULT_SINK@ toggle"</command>
+      </action>
+    </keybind>
+
+    <!-- Brightness Controls -->
+    <keybind key="XF86MonBrightnessUp">
+      <action name="Execute">
+        <command>brightnessctl set +10%</command>
+      </action>
+    </keybind>
+    <keybind key="XF86MonBrightnessDown">
+      <action name="Execute">
+        <command>brightnessctl set 10%-</command>
       </action>
     </keybind>
 
     <!-- Super + L: Lock Screen -->
     <keybind key="W-l">
       <action name="Execute">
-        <command>swaylock -c 202020 || loginctl lock-session</command>
+        <command>swaylock -c 18181b || loginctl lock-session</command>
       </action>
     </keybind>
 
     <!-- PrintScreen: Screenshot -->
     <keybind key="Print">
       <action name="Execute">
-        <command>grim -g "$(slurp)" - | wl-copy</command>
+        <command>sh -c 'grim -g "$(slurp)" - | wl-copy'</command>
       </action>
     </keybind>
   </keyboard>

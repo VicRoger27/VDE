@@ -5,10 +5,19 @@
 SCRIPT_DIR="$(dirname "$(realpath "$0" 2>/dev/null || readlink -f "$0" 2>/dev/null || echo "$0")")"
 BUILD_BIN="$SCRIPT_DIR/build/vde-launcher"
 
+# If launcher is already open, toggle it closed
+if pgrep -x wofi >/dev/null 2>&1; then
+    pkill -x wofi
+    exit 0
+fi
+
+WOFI_CONF="/usr/share/vde/astal-shell/wofi_config"
+WOFI_STYLE="/usr/share/vde/astal-shell/wofi_style.css"
+
 if [ -x "$BUILD_BIN" ]; then
     exec "$BUILD_BIN" "$@"
 elif command -v wofi >/dev/null 2>&1; then
-    exec wofi --show drun --conf "/usr/share/vde/astal-shell/wofi_config" --style "/usr/share/vde/astal-shell/wofi_style.css" "$@"
+    exec wofi --show drun --conf "$WOFI_CONF" --style "$WOFI_STYLE" "$@"
 elif command -v fuzzel >/dev/null 2>&1; then
     exec fuzzel "$@"
 elif command -v dmenu-wl >/dev/null 2>&1 || command -v dmenu >/dev/null 2>&1; then

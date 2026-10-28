@@ -1,15 +1,20 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# Victorious Desktop Environment (VDE) - Universal Terminal Installer
+# Victorious Desktop Environment (VDE) - Universal System Installer
 # https://github.com/VicRoger27/VDE
 #
-# Default Action:
-#   - Automatically clears and waits for Ubuntu background apt locks
-#   - Downloads sources without git dependency (via native wget/tarball)
-#   - Purges GNOME, GDM, Snapd, and background telemetry bloat
-#   - Installs the ultra-lightweight VDE stack (Labwc, Astal, Qt6/QML, Crossings)
-#   - Drops idle memory to sub-500 MB (sub-250 MB on minimal base)
+# Core Capabilities:
+#   - Automatic apt lock resolution and VirtualBox throughput acceleration
+#   - Automated SHA-256 cryptographic component verification
+#   - Complete removal of GNOME Shell, GDM, Snapd, and telemetry bloat
+#   - Installation of clean Wayland desktop stack (Labwc, Waybar, Wofi, Foot, Crossings)
+#   - Dedicated systemd graphical service (vde.service) on direct DRM/KMS hardware
+#   - True standalone OS desktop environment (NOT a nested app)
+#   - Sub-500 MB idle RAM consumption
 # ==============================================================================
+
+# Ignore SIGHUP and SIGPIPE to protect installation from terminal closure
+trap '' HUP PIPE
 
 set -eo pipefail
 
@@ -98,42 +103,42 @@ wait_for_dpkg_lock() {
 # Helper: Resilient apt-get wrapper with automatic lock waiting and retry
 apt_run() {
     export DEBIAN_FRONTEND=noninteractive
-    local max_tries=5
-    local attempt=1
-    while true; do
-        wait_for_dpkg_lock
-        if apt-get "$@"; then
-            return 0
-        else
-            echo -e "${C_YELLOW}>> apt-get was busy. Waiting 3s to retry ($attempt/$max_tries)...${C_RESET}"
-            wait_for_dpkg_lock
-            sleep 3
-            attempt=$((attempt + 1))
-            if [ "$attempt" -gt "$max_tries" ]; then
-                echo -e "${C_RED}[Error] apt-get failed after $max_tries attempts.${C_RESET}"
-                return 1
-            fi
+    wait_for_dpkg_lock
+    local retries=3
+    local count=0
+    until apt-get "$@"; do
+        count=$((count + 1))
+        if [ $count -ge $retries ]; then
+            echo -e "${C_RED}[Error] apt-get failed after $retries attempts.${C_RESET}"
+            return 1
         fi
+        echo -e "${C_YELLOW}>> apt-get busy or interrupted. Retrying in 3 seconds ($count/$retries)...${C_RESET}"
+        wait_for_dpkg_lock
+        sleep 3
     done
 }
 
-# 2. Enable Universe repository on Ubuntu/Debian
-if command -v add-apt-repository >/dev/null 2>&1; then
-    echo -e "${C_CYAN}>> Ensuring universe repository is enabled...${C_RESET}"
-    wait_for_dpkg_lock
-    add-apt-repository -y universe 2>/dev/null || true
+# 2. Detect Package Manager
+echo -e "${C_CYAN}>> Detecting host environment...${C_RESET}"
+if command -v apt-get >/dev/null 2>&1; then
+    PKG_MGR="apt"
+elif command -v pacman >/dev/null 2>&1; then
+    PKG_MGR="pacman"
+elif command -v dnf >/dev/null 2>&1; then
+    PKG_MGR="dnf"
+else
+    echo -e "${C_RED}[Error] Unsupported package manager. VDE currently supports apt, pacman, and dnf.${C_RESET}"
+    exit 1
 fi
 
-# 3. Locate or Fetch Repository Sources (Zero git package dependency)
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" 2>/dev/null && pwd || echo "")"
-SRC_DIR=""
-
-if [ -f "$SCRIPT_DIR/tokens/theme.json" ] && [ -d "$SCRIPT_DIR/compositor" ]; then
+# 3. Locate or Download Source Code
+SCRIPT_DIR="$(dirname "$(realpath "$0" 2>/dev/null || readlink -f "$0" 2>/dev/null || echo "$0")")"
+if [ -d "$SCRIPT_DIR/compositor" ] && [ -d "$SCRIPT_DIR/assets" ]; then
     SRC_DIR="$SCRIPT_DIR"
-    echo -e "${C_GREEN}>> Using local VDE source tree:${C_RESET} ${SRC_DIR}"
+    echo -e "${C_GREEN}>> Installing from local repository:${C_RESET} ${SRC_DIR}"
 else
-    TMP_EXTRACT="/tmp/vde-extract"
-    echo -e "${C_YELLOW}>> Fetching latest VDE release from GitHub...${C_RESET}"
+    echo -e "${C_CYAN}>> Downloading latest VDE release from GitHub...${C_RESET}"
+    TMP_EXTRACT="/tmp/vde-install"
     rm -rf "$TMP_EXTRACT"
     mkdir -p "$TMP_EXTRACT"
     TAR_FILE="/tmp/vde-main.tar.gz"
@@ -173,8 +178,12 @@ CORE_COMPONENTS=(
     "compositor/rc.xml"
     "compositor/environment"
     "compositor/menu.xml"
+    "compositor/foot.ini"
+    "compositor/vde-terminal"
+    "compositor/vde-session"
     "astal-shell/waybar_config.jsonc"
     "astal-shell/waybar_style.css"
+    "apps/crossings/crossings_gui.py"
 )
 
 for rel_path in "${CORE_COMPONENTS[@]}"; do
@@ -206,22 +215,13 @@ if [ "$WIPE_SLOP" = true ]; then
     echo -e "${C_RED}==============================================================${C_RESET}"
 
     if command -v apt-get >/dev/null 2>&1; then
-        # 1. If running outside GUI (on TTY/console), safely stop GDM
-        if [ -z "$WAYLAND_DISPLAY" ] && [ -z "$DISPLAY" ]; then
-            echo -e "${C_YELLOW}>> Stopping display managers...${C_RESET}"
-            systemctl stop gdm3 2>/dev/null || systemctl stop gdm 2>/dev/null || true
-            pkill -9 -f gnome-shell 2>/dev/null || true
-        else
-            echo -e "${C_YELLOW}>> Running inside active desktop terminal. Deferring display switch to end...${C_RESET}"
-        fi
-
-        # 2. Purge Snapd & snaps
+        # 1. Purge Snapd & snaps
         echo -e "${C_YELLOW}>> Purging Snap daemon (snapd)...${C_RESET}"
         systemctl stop snapd.service snapd.socket 2>/dev/null || true
         apt_run purge -y snapd 2>/dev/null || true
         rm -rf /var/cache/snapd /var/lib/snapd /snap /root/snap "$USER_HOME/snap" 2>/dev/null || true
 
-        # 3. Purge Tracking and Telemetry
+        # 2. Purge Tracking and Telemetry
         echo -e "${C_YELLOW}>> Purging background tracking, metrics & crash telemetry...${C_RESET}"
         apt_run purge -y \
             whoopsie \
@@ -231,7 +231,7 @@ if [ "$WIPE_SLOP" = true ]; then
             apport-symptoms \
             landscape-common 2>/dev/null || true
 
-        # 4. Purge GNOME Shell and heavy bloat
+        # 3. Purge GNOME Shell and heavy bloat
         echo -e "${C_YELLOW}>> Purging GNOME Shell, GDM, and legacy desktop bloat...${C_RESET}"
         apt_run purge -y \
             gnome-shell \
@@ -243,7 +243,7 @@ if [ "$WIPE_SLOP" = true ]; then
             mutter \
             mesa-vulkan-drivers 2>/dev/null || true
 
-        # 5. Autoremove residual orphaned packages
+        # 4. Autoremove residual orphaned packages
         echo -e "${C_YELLOW}>> Cleaning residual packages and unused dependencies...${C_RESET}"
         apt_run autoremove -y --purge 2>/dev/null || true
         apt-get clean 2>/dev/null || true
@@ -255,7 +255,7 @@ if [ "$WIPE_SLOP" = true ]; then
     echo -e "${C_GREEN}>> Distro bloat and GNOME purged successfully.${C_RESET}"
 fi
 
-# 5. Install Clean VDE Dependencies
+# 6. Install Clean VDE Dependencies
 echo ""
 echo -e "${C_CYAN}>> [1/5] Installing lightweight VDE Wayland stack...${C_RESET}"
 if command -v apt-get >/dev/null 2>&1; then
@@ -270,10 +270,16 @@ if command -v apt-get >/dev/null 2>&1; then
         wofi \
         foot \
         xterm \
-        wayland-protocols \
-        libgl1-mesa-dri \
+        pcmanfm \
+        python3 \
+        python3-gi \
+        gir1.2-gtk-3.0 \
+        wlr-randr \
         pipewire \
         wireplumber \
+        pulseaudio-utils \
+        wayland-protocols \
+        libgl1-mesa-dri \
         libglib2.0-bin \
         brightnessctl \
         grim \
@@ -282,7 +288,8 @@ if command -v apt-get >/dev/null 2>&1; then
         polkitd \
         xdg-utils \
         dbus-x11 \
-        fonts-dejavu-core 2>/dev/null || \
+        fonts-dejavu-core \
+        libnotify-bin 2>/dev/null || \
     apt_run install -y --no-install-recommends \
         labwc \
         waybar \
@@ -290,11 +297,14 @@ if command -v apt-get >/dev/null 2>&1; then
         wofi \
         foot \
         xterm \
-        wayland-protocols \
-        libgl1-mesa-dri \
+        pcmanfm \
+        python3 \
+        python3-gi \
+        gir1.2-gtk-3.0 \
         pipewire \
         wireplumber \
-        libglib2.0-bin \
+        wayland-protocols \
+        libgl1-mesa-dri \
         brightnessctl \
         grim \
         slurp \
@@ -302,12 +312,12 @@ if command -v apt-get >/dev/null 2>&1; then
         polkitd \
         xdg-utils
 elif command -v pacman >/dev/null 2>&1; then
-    pacman -Syu --noconfirm --needed labwc vulkan-intel vulkan-radeon pipewire wireplumber foot glib2 brightnessctl grim slurp wl-clipboard polkit xdg-utils
+    pacman -Syu --noconfirm --needed labwc waybar swaybg wofi foot xterm pcmanfm python python-gobject gtk3 pipewire wireplumber brightnessctl grim slurp wl-clipboard polkit xdg-utils
 elif command -v dnf >/dev/null 2>&1; then
-    dnf install -y labwc pipewire wireplumber foot glib2 brightnessctl grim slurp wl-clipboard polkit xdg-utils
+    dnf install -y labwc waybar swaybg wofi foot xterm pcmanfm python3 python3-gobject gtk3 pipewire wireplumber brightnessctl grim slurp wl-clipboard polkit xdg-utils
 fi
 
-# 6. Deploy VDE Shell Components
+# 7. Deploy VDE Shell Components
 echo -e "${C_CYAN}>> [2/5] Deploying VDE shell components to ${INSTALL_PREFIX}...${C_RESET}"
 mkdir -p "${INSTALL_PREFIX}"
 cp -rf "$SRC_DIR/assets" "${INSTALL_PREFIX}/"
@@ -321,7 +331,6 @@ fi
 chmod -R +x "${INSTALL_PREFIX}/astal-shell" 2>/dev/null || true
 chmod -R +x "${INSTALL_PREFIX}/qt-launcher" 2>/dev/null || true
 chmod -R +x "${INSTALL_PREFIX}/apps" 2>/dev/null || true
-chmod +x "${INSTALL_PREFIX}/astal-shell/vde-bar" 2>/dev/null || true
 
 # Register VDE modern vector icon suite as default system icons
 echo -e "${C_CYAN}>> Registering VDE modern vector icon suite...${C_RESET}"
@@ -331,133 +340,63 @@ if command -v gtk-update-icon-cache >/dev/null 2>&1; then
     gtk-update-icon-cache -f -t /usr/share/icons/hicolor 2>/dev/null || true
 fi
 
-# 7. Deploy Labwc Configurations
-echo -e "${C_CYAN}>> [3/5] Configuring Labwc compositor...${C_RESET}"
+# 8. Deploy Labwc & Foot Configurations
+echo -e "${C_CYAN}>> [3/5] Configuring Labwc compositor & Foot terminal...${C_RESET}"
 mkdir -p /etc/xdg/labwc
 cp -f "$SRC_DIR/compositor/rc.xml" /etc/xdg/labwc/rc.xml
 cp -f "$SRC_DIR/compositor/themerc" /etc/xdg/labwc/themerc
 cp -f "$SRC_DIR/compositor/environment" /etc/xdg/labwc/environment
 cp -f "$SRC_DIR/compositor/autostart" /etc/xdg/labwc/autostart
 cp -f "$SRC_DIR/compositor/menu.xml" /etc/xdg/labwc/menu.xml 2>/dev/null || true
+chmod +x /etc/xdg/labwc/autostart
+
+# Deploy Foot terminal styling
+mkdir -p /etc/xdg/foot
+if [ -f "$SRC_DIR/compositor/foot.ini" ]; then
+    cp -f "$SRC_DIR/compositor/foot.ini" /etc/xdg/foot/foot.ini
+fi
 
 # Deploy to target user's local config
 if [ -n "$USER_HOME" ]; then
     USER_LABWC="$USER_HOME/.config/labwc"
     mkdir -p "$USER_LABWC"
     cp -f /etc/xdg/labwc/* "$USER_LABWC/" 2>/dev/null || true
+    chmod +x "$USER_LABWC/autostart" 2>/dev/null || true
+
+    USER_FOOT="$USER_HOME/.config/foot"
+    mkdir -p "$USER_FOOT"
+    cp -f /etc/xdg/foot/* "$USER_FOOT/" 2>/dev/null || true
+
     chown -R "$TARGET_USER:$TARGET_USER" "$USER_HOME/.config" 2>/dev/null || true
 fi
 
-# 8. Install Executable Commands in /usr/local/bin
+# 9. Install Executable Commands in /usr/local/bin
 echo -e "${C_CYAN}>> [4/5] Installing executable commands in ${BIN_PREFIX}...${C_RESET}"
 
-cat << 'EOF' > "${BIN_PREFIX}/vde-session"
-#!/usr/bin/env bash
-export XDG_CURRENT_DESKTOP=VDE
-export XDG_SESSION_DESKTOP=VDE
-export XDG_SESSION_TYPE=wayland
-
-# Guarantee universal Wayland rendering across VMs and hardware (OpenGL ES 2 + software fallback)
-export WLR_RENDERER=${WLR_RENDERER:-gles2}
-export WLR_RENDERER_ALLOW_SOFTWARE=1
-export WLR_NO_HARDWARE_CURSORS=1
-
-# Ensure XDG_RUNTIME_DIR is set and accessible
-if [ -z "$XDG_RUNTIME_DIR" ]; then
-    export XDG_RUNTIME_DIR="/run/user/$(id -u)"
-    if [ ! -d "$XDG_RUNTIME_DIR" ]; then
-        mkdir -p "$XDG_RUNTIME_DIR" 2>/dev/null || true
-        chmod 0700 "$XDG_RUNTIME_DIR" 2>/dev/null || true
-    fi
-fi
-
-# Ensure D-Bus user session
-if [ -z "$DBUS_SESSION_BUS_ADDRESS" ]; then
-    if command -v dbus-launch >/dev/null 2>&1; then
-        eval $(dbus-launch --sh-syntax --exit-with-session 2>/dev/null || true)
-    fi
-fi
-
-# Release DRM KMS connector from zombie display servers
-pkill -9 -f gnome-shell 2>/dev/null || true
-pkill -9 -f mutter 2>/dev/null || true
-pkill -9 -f Xwayland 2>/dev/null || true
-sleep 1
-
-echo "=========================================================="
-echo " Starting Victorious Desktop Environment (VDE)..."
-echo " Compositor: Labwc (wlroots layer-shell)"
-echo " Shell: Astal Taskbar & Qt6 Start Menu"
-echo "=========================================================="
-
-labwc -s /usr/local/bin/vde-bar "$@"
-EXIT_CODE=$?
-
-if [ $EXIT_CODE -ne 0 ]; then
-    echo ">> GLES2 renderer exited with code $EXIT_CODE. Retrying with Pixman software renderer..."
-    export WLR_RENDERER=pixman
-    exec labwc -s /usr/local/bin/vde-bar "$@"
-fi
-EOF
+cp -f "$SRC_DIR/compositor/vde-session" "${BIN_PREFIX}/vde-session"
 chmod +x "${BIN_PREFIX}/vde-session"
 
-cat << 'EOF' > "${BIN_PREFIX}/vde"
-#!/usr/bin/env bash
-export WLR_RENDERER=${WLR_RENDERER:-gles2}
-export WLR_RENDERER_ALLOW_SOFTWARE=1
-export WLR_NO_HARDWARE_CURSORS=1
-
-# Ensure XDG_RUNTIME_DIR is set and accessible
-if [ -z "$XDG_RUNTIME_DIR" ]; then
-    export XDG_RUNTIME_DIR="/run/user/$(id -u)"
-    if [ ! -d "$XDG_RUNTIME_DIR" ]; then
-        mkdir -p "$XDG_RUNTIME_DIR" 2>/dev/null || true
-        chmod 0700 "$XDG_RUNTIME_DIR" 2>/dev/null || true
-    fi
-fi
-
-if [ -n "$WAYLAND_DISPLAY" ] || [ -n "$DISPLAY" ]; then
-    echo ">> Running VDE on display..."
-    labwc -s /usr/local/bin/vde-bar "$@" || {
-        echo ">> Falling back to Pixman software renderer..."
-        export WLR_RENDERER=pixman
-        exec labwc -s /usr/local/bin/vde-bar "$@"
-    }
-else
-    pkill -9 -f gnome-shell 2>/dev/null || true
-    pkill -9 -f mutter 2>/dev/null || true
-    pkill -9 -f Xwayland 2>/dev/null || true
-    sleep 1
-    exec /usr/local/bin/vde-session "$@"
-fi
-EOF
+cp -f "$SRC_DIR/compositor/vde" "${BIN_PREFIX}/vde"
 chmod +x "${BIN_PREFIX}/vde"
 
-cat << 'EOF' > "${BIN_PREFIX}/vde-bar"
-#!/usr/bin/env bash
-if [ -f /usr/share/vde/astal-shell/vde-bar ]; then
-    chmod +x /usr/share/vde/astal-shell/vde-bar 2>/dev/null || true
-    /usr/share/vde/astal-shell/vde-bar "$@"
-elif command -v waybar >/dev/null 2>&1; then
-    exec waybar -c /usr/share/vde/astal-shell/waybar_config.jsonc -s /usr/share/vde/astal-shell/waybar_style.css "$@"
-fi
-EOF
+cp -f "$SRC_DIR/compositor/vde-terminal" "${BIN_PREFIX}/vde-terminal"
+chmod +x "${BIN_PREFIX}/vde-terminal"
+
+cp -f "$SRC_DIR/compositor/vde-display-toggle" "${BIN_PREFIX}/vde-display-toggle"
+chmod +x "${BIN_PREFIX}/vde-display-toggle"
+
+cp -f "$SRC_DIR/astal-shell/vde-bar" "${BIN_PREFIX}/vde-bar"
 chmod +x "${BIN_PREFIX}/vde-bar"
 
-cat << 'EOF' > "${BIN_PREFIX}/vde-launcher"
-#!/usr/bin/env bash
-exec /usr/share/vde/qt-launcher/vde-launcher "$@"
-EOF
+cp -f "$SRC_DIR/qt-launcher/vde-launcher" "${BIN_PREFIX}/vde-launcher"
 chmod +x "${BIN_PREFIX}/vde-launcher"
 
-cat << 'EOF' > "${BIN_PREFIX}/crossings"
-#!/usr/bin/env bash
-exec /usr/share/vde/apps/crossings/crossings "$@"
-EOF
+cp -f "$SRC_DIR/apps/crossings/crossings" "${BIN_PREFIX}/crossings"
 chmod +x "${BIN_PREFIX}/crossings"
 
-# 9. Register Sessions & Desktop Shortcuts
-echo -e "${C_CYAN}>> [5/5] Registering desktop entries & live shortcuts...${C_RESET}"
+# 10. Register Sessions, Systemd Service & Desktop Shortcuts
+echo -e "${C_CYAN}>> [5/5] Registering desktop entries, systemd service & session...${C_RESET}"
+
 mkdir -p /usr/share/wayland-sessions
 cat << 'EOF' > /usr/share/wayland-sessions/vde.desktop
 [Desktop Entry]
@@ -470,6 +409,7 @@ Keywords=wayland;desktop;labwc;astal;vde;
 EOF
 
 mkdir -p /usr/share/applications
+
 cat << 'EOF' > /usr/share/applications/crossings.desktop
 [Desktop Entry]
 Name=Crossings Settings
@@ -479,6 +419,17 @@ Icon=/usr/share/vde/assets/icons/glm/settings.svg
 Terminal=false
 Type=Application
 Categories=Settings;DesktopSettings;
+EOF
+
+cat << 'EOF' > /usr/share/applications/vde-terminal.desktop
+[Desktop Entry]
+Name=VDE Terminal
+Comment=Fluent Dark Mica Terminal Emulator
+Exec=/usr/local/bin/vde-terminal
+Icon=utilities-terminal
+Terminal=false
+Type=Application
+Categories=System;TerminalEmulator;
 EOF
 
 cat << 'EOF' > /usr/share/applications/vde.desktop
@@ -501,23 +452,63 @@ for d in "$USER_HOME/Desktop" "/home/ubuntu/Desktop" "/root/Desktop"; do
     fi
 done
 
-# Configure automatic boot directly into VDE
-if [ "$WIPE_SLOP" = true ]; then
-    echo -e "${C_GREEN}>> Setting VDE as the default boot session...${C_RESET}"
-    mkdir -p /etc/systemd/system/getty@tty1.service.d
-    cat << EOF > /etc/systemd/system/getty@tty1.service.d/override.conf
+# Configure Standalone Systemd Service (True OS Desktop, NOT a nested app)
+echo -e "${C_GREEN}>> Creating standalone systemd display service (vde.service)...${C_RESET}"
+cat << EOF > /etc/systemd/system/vde.service
+[Unit]
+Description=Victorious Desktop Environment (VDE)
+Documentation=https://github.com/VicRoger27/VDE
+After=systemd-user-sessions.service plymouth-quit-wait.service systemd-logind.service
+Conflicts=gdm3.service gdm.service lightdm.service sddm.service
+Wants=systemd-user-sessions.service
+
+[Service]
+Type=simple
+User=${TARGET_USER}
+Group=${TARGET_USER}
+PAMName=login
+WorkingDirectory=${USER_HOME}
+TTYPath=/dev/tty1
+StandardInput=tty
+StandardOutput=journal
+StandardError=journal
+UtmpIdentifier=tty1
+UtmpMode=user
+Environment=XDG_SESSION_TYPE=wayland
+Environment=XDG_CURRENT_DESKTOP=VDE
+Environment=XDG_SESSION_DESKTOP=VDE
+Environment=WLR_RENDERER=gles2
+Environment=WLR_RENDERER_ALLOW_SOFTWARE=1
+Environment=WLR_NO_HARDWARE_CURSORS=1
+ExecStart=/usr/local/bin/vde-session
+Restart=always
+RestartSec=1
+
+[Install]
+WantedBy=graphical.target
+EOF
+
+# Configure automatic TTY1 login fallback
+mkdir -p /etc/systemd/system/getty@tty1.service.d
+cat << EOF > /etc/systemd/system/getty@tty1.service.d/override.conf
 [Service]
 ExecStart=
 ExecStart=-/sbin/agetty --autologin ${TARGET_USER} --noclear %I \$TERM
 EOF
-    mkdir -p /etc/profile.d
-    cat << 'EOF' > /etc/profile.d/99-vde-login.sh
+
+mkdir -p /etc/profile.d
+cat << 'EOF' > /etc/profile.d/99-vde-login.sh
 if [ -z "$WAYLAND_DISPLAY" ] && [ "$(tty)" = "/dev/tty1" ]; then
     exec /usr/local/bin/vde-session
 fi
 EOF
-    systemctl daemon-reload 2>/dev/null || true
-fi
+
+# Mask old display managers and enable VDE service
+systemctl daemon-reload 2>/dev/null || true
+systemctl disable --now gdm3 gdm lightdm sddm 2>/dev/null || true
+systemctl mask gdm3 gdm lightdm sddm 2>/dev/null || true
+systemctl enable vde.service 2>/dev/null || true
+systemctl set-default graphical.target 2>/dev/null || true
 
 echo ""
 echo -e "${C_GREEN}==============================================================${C_RESET}"
@@ -525,14 +516,15 @@ echo -e "${C_GREEN}  VDE Installed & Verified Successfully!                     
 echo -e "${C_GREEN}==============================================================${C_RESET}"
 echo ""
 echo -e "Background telemetry, snapd, and default desktop bloat have been eliminated."
+echo -e "VDE is configured as the standalone system desktop environment."
 echo ""
+
 # Smart Session Hand-off: Live RAM vs Installed System
 if [ "$IS_LIVE_SESSION" = true ]; then
     echo -e "${C_YELLOW}>> [LIVE SESSION DETECTED]${C_RESET}"
     echo -e "You are currently running in RAM ('Try Ubuntu' mode)."
-    echo -e "Rebooting will unmount the live ISO and reset RAM."
     echo ""
-    echo -e "To experience VDE right now, launch the desktop directly:"
+    echo -e "To switch into VDE right now on your screen:"
     if [ -t 0 ] || [ -c /dev/tty ]; then
         read -r -p "Would you like to launch VDE now? [Y/n]: " LAUNCH_CHOICE </dev/tty || LAUNCH_CHOICE="y"
     else
@@ -545,31 +537,23 @@ if [ "$IS_LIVE_SESSION" = true ]; then
             ;;
         *)
             echo ""
-            echo -e "${C_GREEN}>> Launching Victorious Desktop Environment (VDE)...${C_RESET}"
+            echo -e "${C_GREEN}>> Switching to Victorious Desktop Environment (TTY1)...${C_RESET}"
             sleep 1
-            if [ -n "$SUDO_USER" ] && [ "$SUDO_USER" != "root" ]; then
-                USER_UID=$(id -u "$SUDO_USER")
-                USER_RUNTIME="/run/user/$USER_UID"
-                mkdir -p "$USER_RUNTIME" 2>/dev/null || true
-                chown "$SUDO_USER:$SUDO_USER" "$USER_RUNTIME" 2>/dev/null || true
-                chmod 0700 "$USER_RUNTIME" 2>/dev/null || true
-                exec su - "$SUDO_USER" -c "export DISPLAY='$DISPLAY' WAYLAND_DISPLAY='$WAYLAND_DISPLAY' XDG_RUNTIME_DIR='$USER_RUNTIME' WLR_RENDERER=gles2 WLR_RENDERER_ALLOW_SOFTWARE=1; /usr/local/bin/vde"
-            else
-                export XDG_RUNTIME_DIR="/run/user/$(id -u)"
-                mkdir -p "$XDG_RUNTIME_DIR" 2>/dev/null || true
-                chmod 0700 "$XDG_RUNTIME_DIR" 2>/dev/null || true
-                exec /usr/local/bin/vde
-            fi
+            # Release DRM display and start standalone VDE on TTY1
+            systemctl stop gdm3 gdm lightdm sddm 2>/dev/null || true
+            pkill -9 -f gnome-shell 2>/dev/null || true
+            pkill -9 -f mutter 2>/dev/null || true
+            systemctl restart vde.service 2>/dev/null || true
+            chvt 1 2>/dev/null || true
             ;;
     esac
 else
-    # On Installed Hard Drive Systems, prompt to reboot
-    echo -e "A system restart is recommended to initialize a clean Wayland session"
-    echo -e "and boot directly into the Victorious Desktop Environment."
+    # On Installed Hard Drive Systems, prompt to restart or switch
+    echo -e "A system restart is recommended to boot cleanly into VDE."
     echo ""
     if [ -t 0 ] || [ -c /dev/tty ]; then
-        read -r -p "Would you like to restart the computer now? [Y/n]: " REBOOT_CHOICE </dev/tty || REBOOT_CHOICE="n"
-        case "$REBOOT_CHOICE" in
+        read -r -p "Would you like to switch to VDE right now? [Y/n]: " SWITCH_CHOICE </dev/tty || SWITCH_CHOICE="y"
+        case "$SWITCH_CHOICE" in
             [nN][oO]|[nN])
                 echo ""
                 echo -e "You can launch VDE anytime by running: ${C_CYAN}vde${C_RESET}"
@@ -577,9 +561,12 @@ else
                 ;;
             *)
                 echo ""
-                echo -e "${C_GREEN}>> Restarting computer into VDE...${C_RESET}"
-                sleep 2
-                reboot 2>/dev/null || systemctl reboot 2>/dev/null || shutdown -r now 2>/dev/null || true
+                echo -e "${C_GREEN}>> Starting VDE system session...${C_RESET}"
+                systemctl stop gdm3 gdm lightdm sddm 2>/dev/null || true
+                pkill -9 -f gnome-shell 2>/dev/null || true
+                pkill -9 -f mutter 2>/dev/null || true
+                systemctl restart vde.service 2>/dev/null || true
+                chvt 1 2>/dev/null || true
                 ;;
         esac
     else

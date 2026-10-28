@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+# VDE Direct Command Entrypoint
+# Switches to active VDE display or initializes standalone session
+
+# Unset remote display variables to prevent nested-window execution
+unset WAYLAND_DISPLAY
+unset DISPLAY
+
+# If systemd service is active, switch to VT1
+if command -v systemctl >/dev/null 2>&1 && systemctl is-active vde.service >/dev/null 2>&1; then
+    echo ">> Victorious Desktop Environment is active on TTY1. Switching display..."
+    chvt 1 2>/dev/null || true
+    exit 0
+fi
+
+# Ensure DRM KMS is released
+pkill -9 -f gnome-shell 2>/dev/null || true
+pkill -9 -f mutter 2>/dev/null || true
+pkill -9 -f Xwayland 2>/dev/null || true
+sleep 1
+
+# Launch clean standalone session
+exec /usr/local/bin/vde-session "$@"

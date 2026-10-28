@@ -19,24 +19,27 @@ if command -v systemctl >/dev/null 2>&1 && systemctl --user is-system-running >/
     systemctl --user import-environment WAYLAND_DISPLAY DISPLAY XDG_CURRENT_DESKTOP 2>/dev/null || true
 fi
 
-# 4. Core Session Processes
-# Wallpaper / Canvas Background
-command -v swaybg >/dev/null 2>&1 && swaybg -c '#18181b' &
+# 4. Wallpaper Canvas Background
+WALLPAPER_COLOR="#18181b"
+if [ -f "$HOME/.config/vde/wallpaper.color" ]; then
+    WALLPAPER_COLOR=$(cat "$HOME/.config/vde/wallpaper.color" 2>/dev/null || echo "#18181b")
+fi
+if command -v swaybg >/dev/null 2>&1; then
+    pkill -9 -x swaybg 2>/dev/null || true
+    swaybg -c "$WALLPAPER_COLOR" &
+fi
 
-# Audio Infrastructure
+# 5. Audio Infrastructure (PipeWire & WirePlumber)
 pgrep -x pipewire >/dev/null 2>&1 || (command -v pipewire >/dev/null 2>&1 && pipewire &)
 pgrep -x wireplumber >/dev/null 2>&1 || (command -v wireplumber >/dev/null 2>&1 && wireplumber &)
 
-# Taskbar & Shell Runner (Astal / Waybar fallback)
-if ! pgrep -x waybar >/dev/null 2>&1; then
-    if [ -x "/usr/local/bin/vde-bar" ]; then
-        /usr/local/bin/vde-bar &
-    elif [ -x "$VDE_DIR/../astal-shell/vde-bar" ]; then
-        "$VDE_DIR/../astal-shell/vde-bar" &
-    fi
-fi
-
-# Qt6 / QML Start Menu Daemon
-if command -v vde-launcher >/dev/null 2>&1; then
-    vde-launcher --daemon &
+# 6. Taskbar Shell (Waybar with VDE Dark Mica styling)
+pkill -9 -x waybar 2>/dev/null || true
+sleep 0.3
+if [ -x "/usr/local/bin/vde-bar" ]; then
+    /usr/local/bin/vde-bar &
+elif [ -x "$VDE_DIR/../astal-shell/vde-bar" ]; then
+    "$VDE_DIR/../astal-shell/vde-bar" &
+elif command -v waybar >/dev/null 2>&1; then
+    waybar -c /usr/share/vde/astal-shell/waybar_config.jsonc -s /usr/share/vde/astal-shell/waybar_style.css &
 fi

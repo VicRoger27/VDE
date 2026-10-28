@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+# VDE Terminal Emulator Runner
+# Launches the native Wayland Dark Mica terminal with automatic fallbacks
+
+# 1. Foot with VDE Mica Theme (Primary)
+if command -v foot >/dev/null 2>&1; then
+    if [ -f "/etc/xdg/foot/foot.ini" ]; then
+        exec foot -c /etc/xdg/foot/foot.ini "$@"
+    elif [ -f "$HOME/.config/foot/foot.ini" ]; then
+        exec foot "$@"
+    else
+        exec foot -o colors.background=18181b -o colors.foreground=fafafa -o main.font="monospace:size=11" "$@"
+    fi
+fi
+
+# 2. Xterm with VDE Mica Styling (Universal Fallback)
+if command -v xterm >/dev/null 2>&1; then
+    exec xterm -bg "#18181b" -fg "#fafafa" -fa "DejaVu Sans Mono" -fs 11 -title "VDE Terminal" "$@"
+fi
+
+# 3. Desktop Terminal Emulators
+if command -v alacritty >/dev/null 2>&1; then
+    exec alacritty "$@"
+elif command -v kitty >/dev/null 2>&1; then
+    exec kitty "$@"
+elif command -v gnome-terminal >/dev/null 2>&1; then
+    exec gnome-terminal "$@"
+elif command -v xfce4-terminal >/dev/null 2>&1; then
+    exec xfce4-terminal "$@"
+elif command -v x-terminal-emulator >/dev/null 2>&1; then
+    exec x-terminal-emulator "$@"
+fi
+
+echo "[VDE Terminal Error] No terminal emulator found in PATH." >&2
+exit 1

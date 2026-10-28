@@ -1,14 +1,22 @@
-#!/bin/sh
+#!/usr/bin/env bash
 # Crossings Native Settings Hub Runner
-# Executable wrapper launching the QML Settings application
+# Executable entrypoint for VDE Settings application
 
 SCRIPT_DIR="$(dirname "$(realpath "$0" 2>/dev/null || readlink -f "$0" 2>/dev/null || echo "$0")")"
 
+# 1. Native Python 3 + GTK Fluent Mica GUI (Zero-dependency, immediate load)
+if [ -f "$SCRIPT_DIR/crossings_gui.py" ] && command -v python3 >/dev/null 2>&1; then
+    exec python3 "$SCRIPT_DIR/crossings_gui.py" "$@"
+elif [ -f "/usr/share/vde/apps/crossings/crossings_gui.py" ] && command -v python3 >/dev/null 2>&1; then
+    exec python3 "/usr/share/vde/apps/crossings/crossings_gui.py" "$@"
+fi
+
+# 2. QML 6 Declarative Hub (if qml6 installed)
 if command -v qml6 >/dev/null 2>&1; then
     exec qml6 "$SCRIPT_DIR/CrossingsWindow.qml" "$@"
 elif command -v qml >/dev/null 2>&1; then
     exec qml "$SCRIPT_DIR/CrossingsWindow.qml" "$@"
-else
-    echo "[Crossings Error] 'qml6' runtime command not found in PATH." >&2
-    exit 1
 fi
+
+echo "[Crossings Error] No compatible settings runtime found." >&2
+exit 1
