@@ -71,12 +71,28 @@ button.flat-btn {
     background: transparent;
     border: none;
     border-radius: 4px;
-    padding: 4px 8px;
+    padding: 2px 6px;
     color: #e4e4e7;
 }
 
 button.flat-btn:hover {
     background: rgba(255, 255, 255, 0.08);
+    color: #ffffff;
+}
+
+button.tab-close-btn {
+    min-height: 16px;
+    min-width: 16px;
+    padding: 0 3px;
+    margin: 0;
+    margin-left: 4px;
+    font-size: 11px;
+    line-height: 1;
+    border-radius: 3px;
+}
+
+button.tab-close-btn:hover {
+    background: rgba(255, 255, 255, 0.18);
     color: #ffffff;
 }
 
@@ -240,6 +256,7 @@ class CrossminalWindow(Gtk.Window):
 
         close_btn = Gtk.Button(label="×")
         close_btn.get_style_context().add_class("flat-btn")
+        close_btn.get_style_context().add_class("tab-close-btn")
         close_btn.connect("clicked", lambda b: self.close_terminal_tab(scrolled))
         tab_box.pack_start(close_btn, False, False, 0)
         tab_box.show_all()
