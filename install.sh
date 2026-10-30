@@ -324,7 +324,7 @@ if [ "$WIPE_SLOP" = true ]; then
             echo -e "${C_YELLOW}>> Purging legacy desktop environments and display managers...${C_RESET}"
             DESKTOP_PKGS_TO_PURGE=(
                 "gnome-shell" "gnome-session" "gdm3" "gdm" "ubuntu-desktop" "ubuntu-desktop-minimal"
-                "gnome-initial-setup" "mutter" "mesa-vulkan-drivers"
+                "gnome-initial-setup" "mutter"
                 "plasma-desktop" "plasma-workspace" "sddm" "kde-standard" "kubuntu-desktop"
                 "xfce4" "xfce4-session" "xubuntu-desktop" "lightdm"
                 "lxqt" "lubuntu-desktop"

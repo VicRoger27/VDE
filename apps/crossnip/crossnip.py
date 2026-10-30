@@ -224,7 +224,7 @@ class CrossnipApp(Gtk.Window):
         self.statusbar.get_style_context().add_class("statusbar")
         root_box.pack_start(self.statusbar, False, False, 0)
 
-        self.status_lbl = Gtk.Label(label="Click 'New Snip' or press Super+Shift+S", xalign=0)
+        self.status_lbl = Gtk.Label(label="Click 'New Snip' or press Win+Shift+S", xalign=0)
         self.statusbar.pack_start(self.status_lbl, True, True, 0)
 
     def start_snip(self):

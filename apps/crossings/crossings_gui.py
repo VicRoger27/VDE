@@ -140,7 +140,9 @@ button.card-btn {
     color: #fafafa;
     border: 1px solid rgba(255, 255, 255, 0.12);
     border-radius: 6px;
-    padding: 6px 14px;
+    padding: 4px 12px;
+    min-height: 28px;
+    font-size: 12px;
 }
 
 button.card-btn:hover {
@@ -356,7 +358,7 @@ if HAS_GTK:
             scale_combo.connect("changed", self.on_scale_changed)
             scale_row.pack_start(scale_combo, False, False, 0)
 
-            mirror_btn = Gtk.Button(label="Mirror / Project Displays (Super+P)")
+            mirror_btn = Gtk.Button(label="Mirror / Project Displays (Win+P)")
             mirror_btn.get_style_context().add_class("card-btn")
             mirror_btn.connect("clicked", lambda b: subprocess.Popen(["/usr/local/bin/vde-display-toggle"]))
             scale_row.pack_end(mirror_btn, False, False, 0)
@@ -389,7 +391,7 @@ if HAS_GTK:
             power_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
             card3.pack_start(power_box, False, False, 0)
 
-            lock_btn = Gtk.Button(label="🔒 Lock (Super+L)")
+            lock_btn = Gtk.Button(label="🔒 Lock (Win+L)")
             lock_btn.get_style_context().add_class("card-btn")
             lock_btn.connect("clicked", lambda b: subprocess.Popen(["loginctl", "lock-session"]))
             power_box.pack_start(lock_btn, False, False, 0)

@@ -55,7 +55,7 @@
 
   "custom/settings": {
     "format": "  ",
-    "tooltip-format": "Crossings Settings (Super+I)",
+    "tooltip-format": "Crossings Settings (Win+I)",
     "on-click": "/usr/local/bin/crossings"
   },
 
