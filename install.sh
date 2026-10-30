@@ -322,16 +322,28 @@ if [ "$WIPE_SLOP" = true ]; then
                 landscape-common 2>/dev/null || true
 
             echo -e "${C_YELLOW}>> Purging legacy desktop environments and display managers...${C_RESET}"
-            apt_run purge -y \
-                gnome-shell gnome-session gdm3 gdm ubuntu-desktop ubuntu-desktop-minimal gnome-initial-setup mutter \
-                plasma-desktop plasma-workspace sddm kde-standard kubuntu-desktop \
-                xfce4 xfce4-session xubuntu-desktop lightdm \
-                lxqt lubuntu-desktop \
-                budgie-desktop budgie-desktop-minimal ubuntu-budgie-desktop budgie-core \
-                mate-desktop ubuntu-mate-desktop \
-                cinnamon ubuntu-cinnamon-desktop \
-                unity ubuntu-unity-desktop \
-                ubuntu-studio-desktop 2>/dev/null || true
+            DESKTOP_PKGS_TO_PURGE=(
+                "gnome-shell" "gnome-session" "gdm3" "gdm" "ubuntu-desktop" "ubuntu-desktop-minimal"
+                "gnome-initial-setup" "mutter" "mesa-vulkan-drivers"
+                "plasma-desktop" "plasma-workspace" "sddm" "kde-standard" "kubuntu-desktop"
+                "xfce4" "xfce4-session" "xubuntu-desktop" "lightdm"
+                "lxqt" "lubuntu-desktop"
+                "budgie-desktop" "budgie-desktop-minimal" "ubuntu-budgie-desktop" "budgie-core"
+                "mate-desktop" "ubuntu-mate-desktop"
+                "cinnamon" "ubuntu-cinnamon-desktop"
+                "unity" "ubuntu-unity-desktop"
+                "ubuntu-studio-desktop"
+            )
+            INSTALLED_DESKTOP_PKGS=()
+            for pkg in "${DESKTOP_PKGS_TO_PURGE[@]}"; do
+                if dpkg -s "$pkg" 2>/dev/null | grep -q "Status: install ok installed"; then
+                    INSTALLED_DESKTOP_PKGS+=("$pkg")
+                fi
+            done
+            if [ ${#INSTALLED_DESKTOP_PKGS[@]} -gt 0 ]; then
+                echo -e "${C_YELLOW}>> Purging installed legacy desktop packages: ${INSTALLED_DESKTOP_PKGS[*]}${C_RESET}"
+                apt_run purge -y "${INSTALLED_DESKTOP_PKGS[@]}" 2>/dev/null || true
+            fi
 
             echo -e "${C_YELLOW}>> Cleaning residual packages and unused dependencies...${C_RESET}"
             apt_run autoremove -y --purge 2>/dev/null || true
