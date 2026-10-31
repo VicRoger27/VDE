@@ -71,7 +71,7 @@
     <separator />
     <item label="Reload VDE Shell">
       <action name="Execute">
-        <command>pkill -9 -x waybar 2>/dev/null; /usr/local/bin/vde-bar &amp;</command>
+        <command>pkill -9 -f "waybar|vde_taskbar|vde-bar" 2>/dev/null; /usr/local/bin/vde-bar &amp;</command>
       </action>
     </item>
     <item label="Reconfigure Window Manager">

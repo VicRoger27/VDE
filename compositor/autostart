@@ -44,12 +44,14 @@ pgrep -x wireplumber >/dev/null 2>&1 || (command -v wireplumber >/dev/null 2>&1 
 # Wait 1.2s for compositor Wayland socket & layer-shell protocol to settle
 sleep 1.2
 
-# 6. Taskbar Shell (Waybar with Windhawk Acrylic styling)
-if ! pgrep -x waybar >/dev/null 2>&1; then
+# 6. Taskbar Shell (Native VDE Taskbar & Resilient Engine)
+if ! pgrep -f "vde-bar|vde_taskbar|waybar" >/dev/null 2>&1; then
     if [ -x "/usr/local/bin/vde-bar" ]; then
         /usr/local/bin/vde-bar &
     elif [ -x "$VDE_DIR/../astal-shell/vde-bar" ]; then
         "$VDE_DIR/../astal-shell/vde-bar" &
+    elif [ -f "/usr/share/vde/astal-shell/vde_taskbar.py" ]; then
+        python3 /usr/share/vde/astal-shell/vde_taskbar.py &
     elif command -v waybar >/dev/null 2>&1; then
         waybar -c /usr/share/vde/astal-shell/waybar_config.jsonc -s /usr/share/vde/astal-shell/waybar_style.css &
     fi

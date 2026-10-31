@@ -263,6 +263,7 @@ CORE_COMPONENTS=(
     "astal-shell/waybar_style.css"
     "astal-shell/vde_startmenu.py"
     "astal-shell/vde_quicksettings.py"
+    "astal-shell/vde_taskbar.py"
     "apps/crossings/crossings_gui.py"
     "apps/crosspad/crosspad.py"
     "apps/crossminal/crossminal.py"
@@ -400,7 +401,7 @@ case "$PKG_MGR" in
         apt_run update -y
         apt_run install -y --no-install-recommends \
             labwc waybar swaybg wofi foot xterm pcmanfm \
-            python3 python3-gi gir1.2-gtk-3.0 gir1.2-vte-2.91 \
+            python3 python3-gi gir1.2-gtk-3.0 gir1.2-vte-2.91 gir1.2-gtk-layer-shell-0.1 \
             espeak-ng pipewire wireplumber pulseaudio-utils \
             wayland-protocols libgl1-mesa-dri libglib2.0-bin \
             brightnessctl grim slurp wl-clipboard polkitd xdg-utils \
@@ -628,6 +629,16 @@ if [ -f "/usr/share/vde/astal-shell/vde_quicksettings.py" ]; then
 fi
 EOF
 chmod +x "${BIN_PREFIX}/vde-quicksettings"
+
+cat << 'EOF' > "${BIN_PREFIX}/vde-taskbar"
+#!/bin/sh
+if [ -f "/usr/share/vde/astal-shell/vde_taskbar.py" ]; then
+    exec python3 "/usr/share/vde/astal-shell/vde_taskbar.py" "$@"
+else
+    exec "${BIN_PREFIX}/vde-bar" "$@"
+fi
+EOF
+chmod +x "${BIN_PREFIX}/vde-taskbar"
 
 # Install all 12 VDE native applications to /usr/local/bin
 VDE_APPS=(

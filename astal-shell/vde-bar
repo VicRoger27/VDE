@@ -1,10 +1,14 @@
 #!/bin/sh
-# VDE Taskbar Shell Runner (Resilient Waybar Engine with Windhawk Acrylic Theme)
+# VDE Taskbar Shell Runner (Native Python GTK & Resilient Waybar Engine)
 
 SCRIPT_DIR="$(dirname "$(realpath "$0" 2>/dev/null || readlink -f "$0" 2>/dev/null || echo "$0")")"
 cd "$SCRIPT_DIR" 2>/dev/null || true
 
-# Determine configuration and style paths
+TASKBAR_PY="/usr/share/vde/astal-shell/vde_taskbar.py"
+if [ -f "$SCRIPT_DIR/vde_taskbar.py" ]; then
+    TASKBAR_PY="$SCRIPT_DIR/vde_taskbar.py"
+fi
+
 CONFIG_FILE="/usr/share/vde/astal-shell/waybar_config.jsonc"
 STYLE_FILE="/usr/share/vde/astal-shell/waybar_style.css"
 SAFE_CONFIG="/usr/share/vde/astal-shell/waybar_safe_config.jsonc"
@@ -15,7 +19,16 @@ if [ -f "$SCRIPT_DIR/waybar_config.jsonc" ]; then
     SAFE_CONFIG="$SCRIPT_DIR/waybar_safe_config.jsonc"
 fi
 
-if command -v waybar >/dev/null 2>&1; then
+# 1. Native VDE Python GTK3 Taskbar (Priority: Zero-dependency, 100% reliable)
+if [ -f "$TASKBAR_PY" ] && command -v python3 >/dev/null 2>&1; then
+    while true; do
+        python3 "$TASKBAR_PY" "$@" 2>/tmp/vde_taskbar.log
+        EXIT_CODE=$?
+        [ $EXIT_CODE -eq 0 ] && sleep 1
+        sleep 1
+    done
+# 2. Waybar Engine Fallback
+elif command -v waybar >/dev/null 2>&1; then
     while true; do
         if [ -f "$CONFIG_FILE" ]; then
             waybar -c "$CONFIG_FILE" -s "$STYLE_FILE" "$@" 2>/tmp/waybar.log || \
@@ -27,9 +40,10 @@ if command -v waybar >/dev/null 2>&1; then
         fi
         sleep 1
     done
+# 3. Astal / AGS Engine Fallback
 elif command -v ags >/dev/null 2>&1; then
     exec ags run app.ts "$@"
 else
-    echo "[VDE Shell Error] 'waybar' not found in PATH." >&2
+    echo "[VDE Shell Error] Neither Python GTK taskbar nor waybar found." >&2
     exit 1
 fi
